@@ -350,6 +350,32 @@
                 </button>
             </form>
 
+            <!-- GITHUB BOG'LANISH VA PUSH QILISH -->
+            <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem;">
+                    <span style="font-size: 1.5rem;">🐙</span>
+                    <h3 style="font-size: 1.3rem; color: #ffffff;">GitHub Repozitoriysi</h3>
+                </div>
+                
+                <p style="font-size: 0.88rem; color: var(--color-text-dim); margin-bottom: 1rem;">
+                    Bog'langan repozitoriy: <a href="https://github.com/java0918/animal" target="_blank" style="color: #38bdf8; font-weight: 700;">https://github.com/java0918/animal.git</a>
+                </p>
+
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-sm); padding: 1.2rem; margin-bottom: 1rem;">
+                    <label class="form-label">GitHub Personal Access Token (PAT):</label>
+                    <input type="password" id="github_token_input" class="form-control" placeholder="ghp_xxxx..." style="margin-bottom: 0.8rem;">
+                    
+                    <button type="button" onclick="pushToGitHub()" id="btnGithubPush" class="btn-primary" style="background: #2563eb;">
+                        <span>🚀</span> Kodlarni GitHub ga Yuklash (Push)
+                    </button>
+                    <span id="githubPushStatus" style="margin-left: 1rem; font-size: 0.88rem; font-weight: 600;"></span>
+                </div>
+                
+                <div style="font-size: 0.8rem; color: var(--color-text-muted);">
+                    💡 Shuningdek, terminalda <code>python push_to_github.py &lt;token&gt;</code> orqali ham to'g'ridan-to'g'ri push qilishingiz mumkin.
+                </div>
+            </div>
+
         </div>
     </div>
 

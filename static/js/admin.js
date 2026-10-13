@@ -186,3 +186,43 @@ function switchAdminTab(tabId) {
     const tabBtn = document.querySelector(`[data-tab="${tabId}"]`);
     if (tabBtn) tabBtn.classList.add('active');
 }
+
+async function pushToGitHub() {
+    const token = document.getElementById('github_token_input').value.trim();
+    const statusEl = document.getElementById('githubPushStatus');
+    const btn = document.getElementById('btnGithubPush');
+
+    if (!token) {
+        alert('Iltimos, GitHub tokeningizni kiriting!');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = 'Yuklanmoqda... ⏳';
+    statusEl.innerText = '';
+
+    try {
+        const resp = await fetch('/api/github/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        });
+        const res = await resp.json();
+        if (res.success) {
+            statusEl.innerText = 'Yuklandi! ✅ https://github.com/java0918/animal';
+            statusEl.style.color = '#4ade80';
+            alert('Muvaffaqiyatli! Barcha kodlar GitHub ga push qilindi!');
+        } else {
+            statusEl.innerText = 'Xatolik: ' + res.message;
+            statusEl.style.color = '#f87171';
+            alert('GitHub xatosi: ' + res.message);
+        }
+    } catch (e) {
+        statusEl.innerText = 'Server xatosi';
+        statusEl.style.color = '#f87171';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀</span> Kodlarni GitHub ga Yuklash (Push)';
+    }
+}
+

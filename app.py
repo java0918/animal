@@ -401,6 +401,26 @@ async def api_save_settings(request: Request):
     conn.close()
     return JSONResponse({"success": True})
 
+@app.post("/api/github/push")
+async def api_github_push(request: Request):
+    user = get_current_user(request)
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Ruxsat berilmagan")
+        
+    body = await request.json()
+    token = body.get("token", "").strip()
+    if not token:
+        return JSONResponse({"success": False, "message": "GitHub token kiritilmadi!"}, status_code=400)
+        
+    from dulwich import porcelain
+    auth_url = f"https://java0918:{token}@github.com/java0918/animal.git"
+    try:
+        porcelain.push(BASE_DIR, auth_url, "refs/heads/main:refs/heads/main", force=True)
+        return JSONResponse({"success": True, "message": "Barcha kodlar muvaffaqiyatli GitHub ga yuklandi!"})
+    except Exception as e:
+        return JSONResponse({"success": False, "message": f"GitHub xatosi: {str(e)}"}, status_code=500)
+
 if __name__ == "__main__":
+
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
