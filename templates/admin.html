@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Boshqaruv Paneli (Admin) — Fauna & Flora{% endblock %}
+
+{% block content %}
+
+<div class="portal-content-wrap">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">Boshqaruv Paneli (Admin)</h1>
+            <p style="color: var(--color-text-dim);">Hayvonlarni boshqarish, rasm va audio yuklash, foydalanuvchilar va sozlamalar</p>
+        </div>
+        <div>
+            <button onclick="resetAnimalForm(); switchAdminTab('editAnimalTab')" class="btn-primary">
+                <span>➕</span> Yangi Hayvon Qo'shish
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN BO'LIM TUGMALARI (TABS) -->
+    <div class="admin-tabs-row">
+        <button class="admin-tab active" data-tab="animalsListTab" onclick="switchAdminTab('animalsListTab')">
+            🐾 Hayvonlar Ro'yxati ({{ animals|length }})
+        </button>
+        <button class="admin-tab" data-tab="editAnimalTab" onclick="switchAdminTab('editAnimalTab')">
+            ✏️ Hayvon Qo'shish / Tahrirlash
+        </button>
+        <button class="admin-tab" data-tab="usersTab" onclick="switchAdminTab('usersTab')">
+            👥 Foydalanuvchilar ({{ users|length }})
+        </button>
+        <button class="admin-tab" data-tab="settingsTab" onclick="switchAdminTab('settingsTab')">
+            ⚙️ Tizim Sozlamalari
+        </button>
+    </div>
+
+    <!-- 1. HAYVONLAR RO'YXATI BO'LIMI -->
+    <div id="animalsListTab" class="admin-section">
+        <div style="background: var(--color-bg-card); backdrop-filter: blur(16px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card);">
+            <table class="diff-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Rasm</th>
+                        <th>Nomi</th>
+                        <th>Ilmiy nomi</th>
+                        <th>Toifasi</th>
+                        <th>Qizil Kitob</th>
+                        <th>Ovoz</th>
+                        <th style="text-align: right;">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in animals %}
+                    <tr>
+                        <td>
+                            <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        </td>
+                        <td>
+                            <strong style="color: #ffffff;">{{ a.name_uz }}</strong>
+                        </td>
+                        <td><em>{{ a.name_latin }}</em></td>
+                        <td>{{ a.category }}</td>
+                        <td>
+                            {% if a.uz_red_book_status != 'Kiritilmagan' %}
+                            <span style="color: #ef4444; font-weight: 700; font-size: 0.8rem;">{{ a.uz_red_book_status }}</span>
+                            {% else %}
+                            <span style="color: #10b981; font-size: 0.8rem;">Xavfsiz</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" 
+                                    class="btn-sound-play" 
+                                    data-sound-type="{{ a.sound_type }}" 
+                                    data-sound-file="{{ a.sound_file }}"
+                                    style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                                <span>🔊</span>
+                            </button>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" 
+                                    onclick='editAnimalData({{ a | tojson }})'
+                                    style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; margin-right: 0.4rem;">
+                                Tahrirlash
+                            </button>
+                            <button type="button" 
+                                    onclick="deleteAnimal({{ a.id }}, '{{ a.name_uz }}')"
+                                    style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer;">
+                                O'chirish
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. HAYVON QO'SHISH VA TAHRIRLASH BO'LIMI -->
+    <div id="editAnimalTab" class="admin-section" style="display: none;">
+        <div style="background: var(--color-bg-card); backdrop-filter: blur(20px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-card);">
+            
+            <h2 id="formTitle" style="font-size: 1.6rem; color: #ffffff; margin-bottom: 1.8rem;">Yangi hayvon qo'shish</h2>
+            
+            <form id="animalForm" onsubmit="saveAnimal(event)">
+                <input type="hidden" id="animalId" value="">
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Hayvon nomi (O'zbekcha) *</label>
+                        <input type="text" id="name_uz" class="form-control" required placeholder="Masalan: Gepard">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lotincha (Ilmiy) nomi *</label>
+                        <input type="text" id="name_latin" class="form-control" required placeholder="Masalan: Acinonyx jubatus">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Inglizcha nomi</label>
+                        <input type="text" id="name_en" class="form-control" placeholder="Masalan: Cheetah">
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Kategoriyasi</label>
+                        <select id="category" class="form-control">
+                            <option value="Sutemizuvchilar">Sutemizuvchilar</option>
+                            <option value="Qushlar">Qushlar</option>
+                            <option value="Sudralib yuruvchilar">Sudralib yuruvchilar</option>
+                            <option value="Suvda va quruqlikda yashovchilar">Suvda va quruqlikda yashovchilar</option>
+                            <option value="Baliqlar">Baliqlar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sinfi (Class)</label>
+                        <input type="text" id="class_name" class="form-control" value="Mammalia">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Oziqlanishi</label>
+                        <input type="text" id="diet" class="form-control" placeholder="Yirtqich, O'txo'r yoki Hammao'r">
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Harakat tezligi</label>
+                        <input type="text" id="speed" class="form-control" placeholder="Masalan: 110 km/soat">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">O'rtacha vazni</label>
+                        <input type="text" id="weight" class="form-control" placeholder="Masalan: 40 - 65 kg">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">O'rtacha umri</label>
+                        <input type="text" id="lifespan" class="form-control" placeholder="Masalan: 10 - 14 yil">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Yashash joyi (Habitat)</label>
+                    <input type="text" id="habitat" class="form-control" placeholder="Savannalar, dashtlar, cho'llar...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hayvon haqida umumiy batafsil ma'lumot *</label>
+                    <textarea id="description" class="form-control" rows="4" required placeholder="Hayvonning xarakteri, yashash tarzi va xususiyatlari..."></textarea>
+                </div>
+
+                <!-- O'XSHASH TURLARDAN QANDAY FARQLANISHI (ASOSIY TALAB) -->
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid var(--color-border-glass); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; color: #34d399; margin-bottom: 0.8rem;">🔬 O'xshash Turlardan Qanday Farqlanishi</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">O'xshash turlar ro'yxati</label>
+                        <input type="text" id="similar_species" class="form-control" placeholder="Masalan: Leopard, Yaguar, Serval">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Aniq farqlovchi belgilari (Dog'lari, tirnoqlari, yuzi, tezligi, in qurishi va h.k.)</label>
+                        <textarea id="differences" class="form-control" rows="4" placeholder="1. Leoparddan farqi: Dog'lari yaxlit qora nuqta, yuzida ko'z yoshi chizig'i bor..."></textarea>
+                    </div>
+                </div>
+
+                <!-- QIZIL KITOB MAQOMI -->
+                <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; color: #f87171; margin-bottom: 0.8rem;">📕 Qizil Kitob Maqomi</h3>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">O'zbekiston Qizil Kitobi Maqomi</label>
+                            <select id="uz_red_book_status" class="form-control">
+                                <option value="Kiritilmagan">Kiritilmagan (Oddiy tur)</option>
+                                <option value="1 (Yo'qolib ketish arafasida turgan)">1 - Yo'qolib ketish arafasidagi tur</option>
+                                <option value="2 (Zaif, kamayib borayotgan tur)">2 - Zaif, kamayib borayotgan tur</option>
+                                <option value="3 (Kamyob tur)">3 - Kamyob tur</option>
+                                <option value="0 (Yo'qolib ketgan tur)">0 - Tabiatda yo'qolgan tur</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IUCN Xalqaro Maqomi</label>
+                            <select id="iucn_status" class="form-control">
+                                <option value="LC">LC - Least Concern (Kam xavfli)</option>
+                                <option value="NT">NT - Near Threatened (Xavfga yaqin)</option>
+                                <option value="VU">VU - Vulnerable (Zaif)</option>
+                                <option value="EN">EN - Endangered (Xavf ostida)</option>
+                                <option value="CR">CR - Critically Endangered (O'ta xavf ostida)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">O'zbekiston Qizil kitobi izohi</label>
+                            <input type="text" id="uz_red_book_desc" class="form-control" placeholder="Qo'riqxonalarda saqlanishi, sabablari...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IUCN xalqaro izohi</label>
+                            <input type="text" id="iucn_desc" class="form-control" placeholder="Global populyatsiyasi...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RASM YUKLASH VA AUDIO YUKLASH -->
+                <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; color: #7dd3fc; margin-bottom: 0.8rem;">🖼️ Rasm va Ovoz Fayllarini Joylash</h3>
+
+                    <div class="form-grid-2">
+                        <!-- Rasm yuklash -->
+                        <div class="form-group">
+                            <label class="form-label">Rasm URL manzili *</label>
+                            <input type="text" id="image_url" class="form-control" required placeholder="https://... yoki quyidan yuklang">
+                            <div style="margin-top: 0.6rem;">
+                                <label style="font-size: 0.8rem; color: #94a3b8;">Kompyuterdan rasm yuklash:</label>
+                                <input type="file" id="imageFileInput" accept="image/*" onchange="uploadFile('imageFileInput', 'image', 'image_url', 'imagePreview')" style="display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #e2e8f0;">
+                                <span id="imageFileInput_status" style="font-size: 0.8rem; color: #34d399;"></span>
+                            </div>
+                            <div style="margin-top: 0.8rem;">
+                                <img id="imagePreview" src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=400&q=80" style="width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                            </div>
+                        </div>
+
+                        <!-- Audio yuklash -->
+                        <div class="form-group">
+                            <label class="form-label">Audio fayl URL manzili / Yo'li</label>
+                            <input type="text" id="sound_file" class="form-control" placeholder="/static/audio/... yoki yuklang">
+                            <div style="margin-top: 0.6rem;">
+                                <label style="font-size: 0.8rem; color: #94a3b8;">Kompyuterdan audio yuklash (.mp3 / .wav):</label>
+                                <input type="file" id="audioFileInput" accept="audio/*" onchange="uploadFile('audioFileInput', 'audio', 'sound_file')" style="display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #e2e8f0;">
+                                <span id="audioFileInput_status" style="font-size: 0.8rem; color: #34d399;"></span>
+                            </div>
+
+                            <div style="margin-top: 0.8rem;">
+                                <label class="form-label">Ovoz turi (Web Audio Sintezi uchun)</label>
+                                <select id="sound_type" class="form-control">
+                                    <option value="lion">🦁 Sher (Bo'kirish / Roar)</option>
+                                    <option value="swallow">🕊️ Qaldirg'och (Sayrash / Chirp)</option>
+                                    <option value="rabbit">🐇 Quyon (Zarba signali / Thump)</option>
+                                    <option value="wolf">🐺 Bo'ri (Uvillash / Howl)</option>
+                                    <option value="eagle">🦅 Burgut (Qichqiriq / Screech)</option>
+                                    <option value="dolphin">🐬 Delfin (Exolokatsiya / Clicks)</option>
+                                    <option value="bear">🐻 Ayiq (Xirillash / Growl)</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 0.8rem;">
+                                <label class="form-label">Ovoz tavsifi</label>
+                                <input type="text" id="sound_description" class="form-control" placeholder="Tovush qanday chiqariladi va qanchalik uzoqqa eshitiladi">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Qiziqarli faktlar (Har bir fakt yangi qatorda)</label>
+                    <textarea id="fun_facts" class="form-control" rows="3" placeholder="1-fakt&#10;2-fakt&#10;3-fakt"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" id="saveAnimalBtn" class="btn-primary" style="padding: 0.85rem 2.2rem;">
+                        Saqlash 💾
+                    </button>
+                    <button type="button" onclick="resetAnimalForm(); switchAdminTab('animalsListTab')" class="btn-logout" style="padding: 0.85rem 1.8rem; font-size: 0.95rem;">
+                        Bekor qilish
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- 3. FOYDALANUVCHILAR RO'YXATI BO'LIMI -->
+    <div id="usersTab" class="admin-section" style="display: none;">
+        <div style="background: var(--color-bg-card); backdrop-filter: blur(16px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card);">
+            <table class="diff-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Profil</th>
+                        <th>Ism</th>
+                        <th>Email (Google)</th>
+                        <th>Roli</th>
+                        <th>Ro'yxatdan o'tgan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <img src="{{ u.picture }}" alt="{{ u.name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        </td>
+                        <td><strong style="color: #ffffff;">{{ u.name }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span style="background: {% if u.role == 'admin' %}rgba(245, 158, 11, 0.2){% else %}rgba(16, 185, 129, 0.2){% endif %}; color: {% if u.role == 'admin' %}#fbbf24{% else %}#34d399{% endif %}; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 700;">
+                                {{ u.role }}
+                            </span>
+                        </td>
+                        <td style="color: var(--color-text-muted); font-size: 0.82rem;">{{ u.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4. TIZIM SOZLAMALARI BO'LIMI -->
+    <div id="settingsTab" class="admin-section" style="display: none;">
+        <div style="background: var(--color-bg-card); backdrop-filter: blur(20px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); padding: 2.5rem; max-width: 750px; box-shadow: var(--shadow-card);">
+            
+            <h2 style="font-size: 1.6rem; color: #ffffff; margin-bottom: 1.5rem;">Tizim Sozlamalari</h2>
+
+            <form onsubmit="saveSettings(event)">
+                <div class="form-group">
+                    <label class="form-label">Google OAuth 2.0 Client ID</label>
+                    <input type="text" id="setting_google_client_id" class="form-control" value="{{ settings.get('google_client_id', '') }}" placeholder="xxxx-xxxx.apps.googleusercontent.com">
+                    <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.3rem;">
+                        Haqiqiy Google hisob bilan kirish (Google Identity Services) uchun Google Cloud Console dan olingan Client ID.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Google Gemini API Key (Ixtiyoriy)</label>
+                    <input type="password" id="setting_gemini_api_key" class="form-control" value="{{ settings.get('gemini_api_key', '') }}" placeholder="AIzaSy...">
+                    <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.3rem;">
+                        AI yordamchining Gemini 1.5/3.8 tarmog'iga ulanishi uchun kalit. Kiritilmasa, tizimning o'rnatilgan aqlli biologik bilim moduli ishlaydi.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 1rem;">
+                    Sozlamalarni Saqlash ⚙️
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

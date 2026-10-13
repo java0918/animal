@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Fauna & Flora — Hayvonlar Ensiklopediyasi va Ovozlar Portali{% endblock %}
+
+{% block content %}
+
+<!-- HERO SPLIT BANNER (Yashil maydon: Quyon & Qaldirg'och vs Savanna: Sherlar) -->
+<section style="position: relative; margin-bottom: 3rem; border-bottom: 1px solid var(--color-border-glass); overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 380px;">
+        
+        <!-- Chap tomon: Yashil maydon, pastda quyon, yuqorida qaldirg'och -->
+        <div style="position: relative; background: linear-gradient(to right, rgba(6, 26, 16, 0.85), rgba(6, 26, 16, 0.5)), url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1000&q=80') center/cover; padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid rgba(74, 222, 128, 0.3);">
+            
+            <!-- Yuqorida: Qaldirg'och -->
+            <div style="display: flex; align-items: center; gap: 1rem; align-self: flex-start; background: rgba(10, 35, 22, 0.7); backdrop-filter: blur(10px); padding: 0.6rem 1.1rem; border-radius: 30px; border: 1px solid rgba(74, 222, 128, 0.35);">
+                <span style="font-size: 1.2rem;">🕊️</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: #4ade80;">Osmonda erkin qaldirg'och parvozi</span>
+            </div>
+
+            <div>
+                <span style="font-size: 0.82rem; color: #34d399; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Yashil Tabiat Ekotizimi</span>
+                <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin: 0.3rem 0 0.6rem;">Yashil Voha & O'tloqlar</h2>
+                <p style="font-size: 0.92rem; color: #e2e8f0; max-width: 480px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
+                    Yam-yashil maysazorlarda chaqqon quyonlar, baland moviy fazoda esa xushxabar qaldirg'ochlar hayot nafasi bilan jo'sh uradi.
+                </p>
+            </div>
+
+            <!-- Pastda: Quyon -->
+            <div style="display: flex; align-items: center; gap: 1rem; align-self: flex-start; background: rgba(10, 35, 22, 0.75); backdrop-filter: blur(10px); padding: 0.6rem 1.1rem; border-radius: 30px; border: 1px solid rgba(74, 222, 128, 0.4);">
+                <span style="font-size: 1.2rem;">🐇</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: #86efac;">Pastda maysalar bag'rida quyoncha</span>
+            </div>
+
+        </div>
+
+        <!-- O'ng tomon: Savannada dam olib yotgan sherlar -->
+        <div style="position: relative; background: linear-gradient(to left, rgba(35, 18, 5, 0.85), rgba(35, 18, 5, 0.5)), url('https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=1000&q=80') center/cover; padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; border-left: 1px solid rgba(245, 158, 11, 0.3);">
+            
+            <div style="display: flex; align-items: center; gap: 1rem; align-self: flex-end; background: rgba(35, 18, 5, 0.75); backdrop-filter: blur(10px); padding: 0.6rem 1.1rem; border-radius: 30px; border: 1px solid rgba(245, 158, 11, 0.4);">
+                <span style="font-size: 1.2rem;">☀️</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: #fbbf24;">Oltin Afrika Savannasi</span>
+            </div>
+
+            <div style="text-align: right; align-self: flex-end;">
+                <span style="font-size: 0.82rem; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Yovvoyi Tabiat Qirolligi</span>
+                <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin: 0.3rem 0 0.6rem;">Sherlar Saltanati</h2>
+                <p style="font-size: 0.92rem; color: #fef08a; max-width: 480px; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
+                    Quyosh nurlari ostida viqor bilan dam olib yotgan sherlar to'dasi — hayvonot olamining g'ururi va qudrat timsolidir.
+                </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem; align-self: flex-end; background: rgba(35, 18, 5, 0.8); backdrop-filter: blur(10px); padding: 0.6rem 1.1rem; border-radius: 30px; border: 1px solid rgba(245, 158, 11, 0.4);">
+                <span style="font-size: 1.2rem;">🦁</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: #fde047;">Savannada xotirjam yotgan arslonlar</span>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<div class="portal-content-wrap">
+
+    <!-- STATISTIKA BLOKI -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🦁</div>
+            <div>
+                <div class="stat-number">{{ stats.total_animals }}</div>
+                <div class="stat-label">Bazada jami hayvonlar</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">📕</div>
+            <div>
+                <div class="stat-number">{{ stats.red_book_count }}</div>
+                <div class="stat-label">Qizil kitobga kiritilganlar</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">🔊</div>
+            <div>
+                <div class="stat-number">{{ stats.total_animals }}</div>
+                <div class="stat-label">Akustik hayvon ovozlari</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">✨</div>
+            <div>
+                <div class="stat-number">AI 3.8</div>
+                <div class="stat-label">Aqlli biologik yordamchi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTR VA QIDIRUV PANELI -->
+    <div class="filter-search-bar">
+        <div class="categories-pills">
+            <a href="/" class="category-pill {% if current_category == 'all' %}active{% endif %}">
+                🐾 Barchasi
+            </a>
+            <a href="/?category=Sutemizuvchilar" class="category-pill {% if current_category == 'Sutemizuvchilar' %}active{% endif %}">
+                🐆 Sutemizuvchilar
+            </a>
+            <a href="/?category=Qushlar" class="category-pill {% if current_category == 'Qushlar' %}active{% endif %}">
+                🦅 Qushlar
+            </a>
+            <a href="/redbook" class="category-pill" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+                📕 Qizil Kitob turlari
+            </a>
+        </div>
+
+        <form action="/" method="GET" class="search-box-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Hayvon nomi, lotincha yoki tavsif..." class="search-input">
+        </form>
+    </div>
+
+    <!-- HAYVONLAR KARTALARI RO'YXATI -->
+    <div class="animals-grid">
+        {% for a in animals %}
+        <div class="animal-card">
+            
+            <div class="card-image-wrap">
+                <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" class="card-image" loading="lazy">
+                
+                <!-- Qizil Kitob Holati Nishoni -->
+                {% if a.uz_red_book_status != 'Kiritilmagan' or a.iucn_status in ['CR', 'EN', 'VU'] %}
+                <div class="badge-redbook {% if a.uz_red_book_status.startswith('1') or a.iucn_status == 'CR' %}status-danger{% else %}status-warning{% endif %}">
+                    <span>📕</span>
+                    <span>
+                        {% if a.uz_red_book_status != 'Kiritilmagan' %}
+                        O'zbekiston: {{ a.uz_red_book_status }}
+                        {% else %}
+                        IUCN: {{ a.iucn_status }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% else %}
+                <div class="badge-redbook status-safe">
+                    <span>🟢</span>
+                    <span>Xavfsiz (LC)</span>
+                </div>
+                {% endif %}
+
+                <div class="badge-category">{{ a.category }}</div>
+            </div>
+
+            <div class="card-body">
+                <h3 class="animal-title">{{ a.name_uz }}</h3>
+                <div class="animal-latin">{{ a.name_latin }} • {{ a.name_en }}</div>
+                
+                <p class="animal-desc-short">{{ a.description }}</p>
+
+                <!-- O'xshash turidan qanday farqlanishi -->
+                <div class="difference-highlight-box">
+                    <div class="diff-header">
+                        <span>🔬</span>
+                        <span>O'xshash turlaridan farqi:</span>
+                    </div>
+                    <p class="diff-text">{{ a.differences }}</p>
+                    <button type="button" 
+                            onclick="openDiffModal('{{ a.name_uz }}', `{{ a.differences | replace('`', '') }}`, '{{ a.similar_species }}')"
+                            style="background: none; border: none; color: #4ade80; font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 0; margin-top: 0.3rem;">
+                        Farqlarni to'liq ko'rish →
+                    </button>
+                </div>
+
+                <!-- Pastki harakat tugmalari: Audio va Batafsil -->
+                <div class="card-actions-row">
+                    <button type="button" 
+                            class="btn-sound-play" 
+                            data-sound-type="{{ a.sound_type }}" 
+                            data-sound-file="{{ a.sound_file }}"
+                            title="Ovozni tinglash">
+                        <span>🔊</span>
+                        <span>Ovoz</span>
+                        <div class="sound-waves-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </button>
+
+                    <a href="/animal/{{ a.id }}" class="btn-detail-link">
+                        <span>Batafsil</span>
+                        <span>→</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+        {% else %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: var(--color-bg-card); border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="color: #ffffff;">Hech qanday hayvon topilmadi</h3>
+            <p style="color: var(--color-text-dim); margin-top: 0.5rem;">Boshqa qidiruv so'zini sinab ko'ring yoki barcha hayvonlarni ko'ring.</p>
+            <a href="/" class="btn-primary" style="margin-top: 1.5rem;">Barcha hayvonlar</a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

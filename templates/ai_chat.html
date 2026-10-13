@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Fauna AI — Aqlli Zoologik Yordamchi{% endblock %}
+
+{% block content %}
+
+<div class="portal-content-wrap" style="max-width: 980px;">
+
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.15); padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid var(--color-border-glass);">
+            ✨ Sun'iy Intellekt Assistent
+        </span>
+        <h1 style="font-size: 2.4rem; font-weight: 800; color: #ffffff; margin: 0.6rem 0 0.3rem;">
+            Fauna AI Yordamchi
+        </h1>
+        <p style="color: var(--color-text-dim); font-size: 0.95rem;">
+            Hayvonlarni solishtirish, ularning anatomik farqlari, ovozlari va Qizil kitob haqida xohlagan savolingizni bering!
+        </p>
+    </div>
+
+    <!-- TAVSIYA ETILADIGAN TEZKOR SAVOLLAR -->
+    <div style="display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+        <button onclick="askPreset('Gepard va qoplon (leopard) qanday farqlanadi?')" class="category-pill" style="white-space: nowrap;">
+            🐆 Gepard va Qoplon farqi?
+        </button>
+        <button onclick="askPreset('Sher va yo\'lbarsning asosiy farqlari nimalar?')" class="category-pill" style="white-space: nowrap;">
+            🦁 Sher va Yo'lbars farqi?
+        </button>
+        <button onclick="askPreset('Quyon va xonaki quyon (krolik) qanday farqlanadi?')" class="category-pill" style="white-space: nowrap;">
+            🐇 Quyon va Krolik farqi?
+        </button>
+        <button onclick="askPreset('O\'zbekiston Qizil kitobiga qaysi hayvonlar kiritilgan?')" class="category-pill" style="white-space: nowrap;">
+            📕 O'zbekiston Qizil kitobi?
+        </button>
+        <button onclick="askPreset('Qaldirg\'och qanday sayraydi va qorayaloqdan qanday farqlanadi?')" class="category-pill" style="white-space: nowrap;">
+            🕊️ Qaldirg'och haqida?
+        </button>
+    </div>
+
+    <!-- AI CHAT CARD -->
+    <div class="ai-chat-card">
+        
+        <div class="ai-chat-header">
+            <div class="ai-header-info">
+                <div class="ai-avatar">🌿</div>
+                <div>
+                    <div style="font-weight: 700; color: #ffffff; font-size: 1.05rem;">Fauna AI</div>
+                    <div style="font-size: 0.78rem; color: #4ade80;">● Online • Biologik bilimlar bazasi</div>
+                </div>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--color-text-muted);">
+                Gemini 3.8 / Neural Fauna Core
+            </div>
+        </div>
+
+        <div id="aiMessagesContainer" class="ai-messages-box">
+            <div class="chat-bubble assistant">
+                🌿 <strong>Assalomu alaykum! Men Fauna AI yordamchisiman.</strong><br><br>
+                Sizga hayvonlar haqida umumiy ma'lumotlar, ularning o'xshash turlaridan qanday farqlanishi (masalan, gepard va leopard, quyon va krolik), ovozlari hamda O'zbekiston va Xalqaro Qizil kitob maqomi haqida to'liq javob bera olaman.<br><br>
+                <em>Qanday savolingiz bor? Quyidagi maydonga yozing! 🐾</em>
+            </div>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" id="aiChatInput" placeholder="Savolingizni yozing (masalan: Gepard va qoplon farqi nima?)..." class="chat-input">
+            <button type="button" id="aiSendBtn" class="btn-send-chat" title="Yuborish">
+                <span style="font-size: 1.2rem;">➤</span>
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function askPreset(question) {
+    const input = document.getElementById('aiChatInput');
+    const sendBtn = document.getElementById('aiSendBtn');
+    if (input && sendBtn) {
+        input.value = question;
+        sendBtn.click();
+    }
+}
+</script>
+{% endblock %}

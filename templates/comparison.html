@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Hayvonlarni Bir-Biridan Farqlash Laboratoriyasi — Fauna & Flora{% endblock %}
+
+{% block content %}
+
+<div class="portal-content-wrap">
+
+    <div class="comparison-hero">
+        <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: #4ade80; font-weight: 700; background: rgba(16, 185, 129, 0.15); padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid var(--color-border-glass);">
+            🔬 Interaktiv Zoologik Laboratoriya
+        </span>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 0.6rem 0 0.4rem;">
+            O'xshash Turlarni Farqlash
+        </h1>
+        <p style="color: var(--color-text-dim); max-width: 650px; margin: 0 auto; font-size: 0.95rem;">
+            Gepard va qoplon, sher va yo'lbars, quyon va tovushqon kabi o'xshash turlar qanday farqlanadi? Ikkita hayvonni tanlang va solishtiring!
+        </p>
+    </div>
+
+    <!-- HAYVONLARNI TANLASH FORMULYARI -->
+    <form action="/compare" method="GET" style="background: var(--color-bg-card); backdrop-filter: blur(16px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); padding: 1.5rem 2rem; margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+        
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <label style="font-size: 0.9rem; font-weight: 600; color: #a7f3d0;">1-Hayvon:</label>
+            <select name="left" onchange="this.form.submit()" class="form-control" style="width: 220px;">
+                {% for a in all_animals %}
+                <option value="{{ a.id }}" {% if left_animal and left_animal.id == a.id %}selected{% endif %}>
+                    {{ a.name_uz }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="font-size: 1.2rem; font-weight: 800; color: #f59e0b;">VS</div>
+
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <label style="font-size: 0.9rem; font-weight: 600; color: #fde047;">2-Hayvon:</label>
+            <select name="right" onchange="this.form.submit()" class="form-control" style="width: 220px;">
+                {% for a in all_animals %}
+                <option value="{{ a.id }}" {% if right_animal and right_animal.id == a.id %}selected{% endif %}>
+                    {{ a.name_uz }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn-primary" style="padding: 0.65rem 1.4rem;">
+            Taqqoslash ⚖️
+        </button>
+
+    </form>
+
+    <!-- TAQQOSLASH JADVALI VA VIZUAL KARTALAR -->
+    {% if left_animal and right_animal %}
+    <div class="comparison-grid">
+        
+        <!-- CHAP HAYVON KARTASI -->
+        <div class="compare-card" style="border-top: 4px solid #10b981;">
+            <div style="width: 100%; height: 260px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 1.2rem; border: 1px solid rgba(255,255,255,0.15);">
+                <img src="{{ left_animal.image_url }}" alt="{{ left_animal.name_uz }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">{{ left_animal.name_uz }}</h2>
+            <div style="font-style: italic; color: #34d399; font-size: 0.9rem; margin-bottom: 1rem;">
+                {{ left_animal.name_latin }}
+            </div>
+
+            <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 1.5rem;">
+                {{ left_animal.description }}
+            </p>
+
+            <button type="button" 
+                    class="btn-sound-play" 
+                    data-sound-type="{{ left_animal.sound_type }}" 
+                    data-sound-file="{{ left_animal.sound_file }}"
+                    style="width: 100%; justify-content: center; margin-bottom: 1.5rem;">
+                <span>🔊</span>
+                <span>{{ left_animal.name_uz }} ovozini tinglash</span>
+                <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
+            </button>
+
+            <!-- Qizil kitob maqomi -->
+            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #10b981; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.78rem; color: var(--color-text-muted);">QIZIL KITOB MAQOMI:</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: #ffffff;">O'zbekiston: {{ left_animal.uz_red_book_status }}</div>
+                <div style="font-size: 0.85rem; color: #a7f3d0;">IUCN: {{ left_animal.iucn_status }}</div>
+            </div>
+
+            <!-- O'zining turidan qanday farqlanishi -->
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid var(--color-border-glass); border-radius: var(--radius-sm); padding: 1.2rem;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;">FARQLOVCHI BELGILARI:</div>
+                <div style="font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; white-space: pre-line;">
+                    {{ left_animal.differences }}
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKAZIY VS NISHONI -->
+        <div class="compare-vs-badge">
+            VS
+        </div>
+
+        <!-- O'NG HAYVON KARTASI -->
+        <div class="compare-card" style="border-top: 4px solid #f59e0b;">
+            <div style="width: 100%; height: 260px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 1.2rem; border: 1px solid rgba(255,255,255,0.15);">
+                <img src="{{ right_animal.image_url }}" alt="{{ right_animal.name_uz }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">{{ right_animal.name_uz }}</h2>
+            <div style="font-style: italic; color: #fbbf24; font-size: 0.9rem; margin-bottom: 1rem;">
+                {{ right_animal.name_latin }}
+            </div>
+
+            <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 1.5rem;">
+                {{ right_animal.description }}
+            </p>
+
+            <button type="button" 
+                    class="btn-sound-play" 
+                    data-sound-type="{{ right_animal.sound_type }}" 
+                    data-sound-file="{{ right_animal.sound_file }}"
+                    style="width: 100%; justify-content: center; margin-bottom: 1.5rem; border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; background: rgba(245, 158, 11, 0.15);">
+                <span>🔊</span>
+                <span>{{ right_animal.name_uz }} ovozini tinglash</span>
+                <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
+            </button>
+
+            <!-- Qizil kitob maqomi -->
+            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #f59e0b; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.78rem; color: var(--color-text-muted);">QIZIL KITOB MAQOMI:</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: #ffffff;">O'zbekiston: {{ right_animal.uz_red_book_status }}</div>
+                <div style="font-size: 0.85rem; color: #fde047;">IUCN: {{ right_animal.iucn_status }}</div>
+            </div>
+
+            <!-- O'zining turidan qanday farqlanishi -->
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm); padding: 1.2rem;">
+                <div style="font-size: 0.82rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.5rem;">FARQLOVCHI BELGILARI:</div>
+                <div style="font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; white-space: pre-line;">
+                    {{ right_animal.differences }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PARAMETRLARNI TAQQOSLASH JADVALI -->
+    <div style="margin-top: 3rem; background: var(--color-bg-card); backdrop-filter: blur(20px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); padding: 2.2rem; box-shadow: var(--shadow-card);">
+        <h3 style="font-size: 1.5rem; font-weight: 800; color: #ffffff; margin-bottom: 1.5rem; text-align: center;">
+            Aniq Parametrlar Bo'yicha Solishtirish Jadvali
+        </h3>
+
+        <table class="diff-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Xususiyat</th>
+                    <th style="width: 37.5%; color: #34d399;">{{ left_animal.name_uz }}</th>
+                    <th style="width: 37.5%; color: #fbbf24;">{{ right_animal.name_uz }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Ilmiy nomi:</strong></td>
+                    <td><em>{{ left_animal.name_latin }}</em></td>
+                    <td><em>{{ right_animal.name_latin }}</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Sinfi / Toifasi:</strong></td>
+                    <td>{{ left_animal.category }} ({{ left_animal.class_name }})</td>
+                    <td>{{ right_animal.category }} ({{ right_animal.class_name }})</td>
+                </tr>
+                <tr>
+                    <td><strong>Harakat tezligi:</strong></td>
+                    <td><span style="color: #4ade80; font-weight: 700;">{{ left_animal.speed }}</span></td>
+                    <td><span style="color: #fde047; font-weight: 700;">{{ right_animal.speed }}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Tana vazni:</strong></td>
+                    <td>{{ left_animal.weight }}</td>
+                    <td>{{ right_animal.weight }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Yashash muhiti:</strong></td>
+                    <td>{{ left_animal.habitat }}</td>
+                    <td>{{ right_animal.habitat }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Oziqlanish turi:</strong></td>
+                    <td>{{ left_animal.diet }}</td>
+                    <td>{{ right_animal.diet }}</td>
+                </tr>
+                <tr>
+                    <td><strong>O'rtacha umri:</strong></td>
+                    <td>{{ left_animal.lifespan }}</td>
+                    <td>{{ right_animal.lifespan }}</td>
+                </tr>
+                <tr>
+                    <td><strong>O'zbekiston Qizil kitobi:</strong></td>
+                    <td>{{ left_animal.uz_red_book_status }}</td>
+                    <td>{{ right_animal.uz_red_book_status }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

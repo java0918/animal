@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}O'zbekiston va Xalqaro Qizil Kitob — Fauna & Flora{% endblock %}
+
+{% block content %}
+
+<div class="portal-content-wrap">
+
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: #f87171; font-weight: 700; background: rgba(239, 68, 68, 0.15); padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.35);">
+            📕 Tabiatni Muhofaza Qilish
+        </span>
+        <h1 style="font-size: 2.6rem; font-weight: 800; color: #ffffff; margin: 0.6rem 0 0.4rem;">
+            O'zbekiston va Xalqaro Qizil Kitob
+        </h1>
+        <p style="color: var(--color-text-dim); max-width: 680px; margin: 0 auto; font-size: 0.95rem;">
+            Noyob va yo'qolib ketish xavfi ostida turgan hayvon turlari, ularning populyatsiya holati va davlat muhofazasi choralari.
+        </p>
+    </div>
+
+    <!-- MAQOMLAR VA TOIFALAR TUSHUNTIRIShI -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem;">
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1.4rem;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #ef4444; margin-bottom: 0.3rem;">1 - Toifa (CR)</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Yo'qolish arafasida</div>
+            <p style="font-size: 0.82rem; color: #fca5a5; margin-top: 0.4rem;">Soni keskin kamaygan va zudlik bilan saqlab qolish choralarini talab qiladigan turlar (Qor qoploni, Buxoro bug'usi).</p>
+        </div>
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 1.4rem;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.3rem;">2 - Toifa (VU)</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Zaif / Qisqarib borayotgan</div>
+            <p style="font-size: 0.82rem; color: #fde047; margin-top: 0.4rem;">Yashash muhiti buzilishi sababli soni barqaror ravishda kamayib borayotgan turlar (Jayron, Tyanshan qo'ng'ir ayig'i).</p>
+        </div>
+        <div style="background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: var(--radius-md); padding: 1.4rem;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #38bdf8; margin-bottom: 0.3rem;">3 - Toifa</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Kamyob turlar</div>
+            <p style="font-size: 0.82rem; color: #bae6fd; margin-top: 0.4rem;">Tabiiy tarqalish maydoni kichik va o'ziga xos tor ekologik mintaqada yashovchi turlar.</p>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 1.4rem;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #10b981; margin-bottom: 0.3rem;">Qo'riqxonalar</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Tabiatni asrash hududlari</div>
+            <p style="font-size: 0.82rem; color: #86efac; margin-top: 0.4rem;">Chotqol, Hisor, Zomin, Baday-To'qay, Quyi Amudaryo va Buxoro "Jayron" pitomnigi.</p>
+        </div>
+    </div>
+
+    <!-- MAQOM BO'YICHA FILTR -->
+    <div style="background: var(--color-bg-card); border: 1px solid var(--color-border-glass); border-radius: var(--radius-md); padding: 1rem 1.5rem; margin-bottom: 2.5rem; display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.88rem; font-weight: 600; color: #cbd5e1;">Filtr:</span>
+        <a href="/redbook" class="category-pill {% if status_filter == 'all' %}active{% endif %}">Barcha muhofaza turlari</a>
+        <a href="/redbook?status_filter=1" class="category-pill {% if status_filter == '1' %}active{% endif %}">1-Toifa (O'zbekiston)</a>
+        <a href="/redbook?status_filter=2" class="category-pill {% if status_filter == '2' %}active{% endif %}">2-Toifa (O'zbekiston)</a>
+        <a href="/redbook?status_filter=VU" class="category-pill {% if status_filter == 'VU' %}active{% endif %}">IUCN Vulnerable (Zaif)</a>
+        <a href="/redbook?status_filter=EN" class="category-pill {% if status_filter == 'EN' %}active{% endif %}">IUCN Endangered</a>
+    </div>
+
+    <!-- QIZIL KITOB HAYVONLAR KARTALARI -->
+    <div class="animals-grid">
+        {% for a in animals %}
+        <div class="animal-card" style="border-color: rgba(239, 68, 68, 0.35);">
+            
+            <div class="card-image-wrap">
+                <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" class="card-image" loading="lazy">
+                
+                <div class="badge-redbook status-danger">
+                    <span>📕</span>
+                    <span>{{ a.uz_red_book_status }}</span>
+                </div>
+
+                <div class="badge-category">{{ a.category }}</div>
+            </div>
+
+            <div class="card-body">
+                <h3 class="animal-title">{{ a.name_uz }}</h3>
+                <div class="animal-latin">{{ a.name_latin }}</div>
+
+                <!-- Muhofaza tafsilotlari -->
+                <div style="background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; padding: 0.85rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 1rem;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #fca5a5; text-transform: uppercase;">Muhofaza holati:</div>
+                    <p style="font-size: 0.85rem; color: #ffffff; line-height: 1.4; margin-top: 0.2rem;">{{ a.uz_red_book_desc }}</p>
+                    <div style="margin-top: 0.4rem; font-size: 0.78rem; color: #fde047;">
+                        <strong>IUCN Xalqaro:</strong> {{ a.iucn_status }} ({{ a.iucn_desc }})
+                    </div>
+                </div>
+
+                <p class="animal-desc-short">{{ a.description }}</p>
+
+                <div class="card-actions-row">
+                    <button type="button" 
+                            class="btn-sound-play" 
+                            data-sound-type="{{ a.sound_type }}" 
+                            data-sound-file="{{ a.sound_file }}">
+                        <span>🔊</span>
+                        <span>Ovoz</span>
+                        <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
+                    </button>
+
+                    <a href="/animal/{{ a.id }}" class="btn-detail-link">
+                        <span>Batafsil</span>
+                        <span>→</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+        {% else %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: var(--color-bg-card); border-radius: var(--radius-lg);">
+            <p style="color: #ffffff;">Bu filtr bo'yicha hayvonlar topilmadi.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

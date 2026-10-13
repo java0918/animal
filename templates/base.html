@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fauna & Flora — Hayvonot Olami Portali{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- AI ANIMATION SPLASH OVERLAY (Kirish paytidagi animatsiya) -->
+    <div id="aiSplashOverlay" class="ai-entrance-overlay">
+        <div class="ai-loader-graphic">
+            <div class="ai-ring ring-outer"></div>
+            <div class="ai-ring ring-middle"></div>
+            <div class="ai-ring ring-inner"></div>
+            <div class="ai-core-icon">🌿</div>
+        </div>
+        <div class="ai-status-text">FAUNA AI MATRITSA YUKLANMOQDA...</div>
+        <div class="ai-sub-status">Jonli tabiat va ekotizim ma'lumotlari yangilanmoqda</div>
+    </div>
+
+    <!-- YUQORI NAVIGATION BAR -->
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-logo-badge">🌿</div>
+            <div>
+                <div class="brand-title">Fauna & Flora</div>
+                <div class="brand-subtitle">Hayvonot Olami Portali</div>
+            </div>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+                    <span>🐾</span> Hayvonlar
+                </a>
+            </li>
+            <li>
+                <a href="/compare" class="nav-link {% if request.url.path == '/compare' %}active{% endif %}">
+                    <span>⚖️</span> Turlarni Taqqoslash
+                </a>
+            </li>
+            <li>
+                <a href="/redbook" class="nav-link {% if request.url.path == '/redbook' %}active{% endif %}">
+                    <span>📕</span> Qizil Kitob
+                </a>
+            </li>
+            <li>
+                <a href="/ai-chat" class="nav-link {% if request.url.path == '/ai-chat' %}active{% endif %}">
+                    <span>✨</span> Fauna AI Yordamchi
+                </a>
+            </li>
+            {% if user and user.role == 'admin' %}
+            <li>
+                <a href="/admin" class="nav-link {% if request.url.path == '/admin' %}active{% endif %}" style="color: #fbbf24;">
+                    <span>🛡️</span> Admin Panel
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="nav-user-panel">
+            {% if user %}
+            <div class="user-badge">
+                <img src="{{ user.picture }}" alt="{{ user.name }}" class="user-avatar">
+                <span class="user-name">{{ user.name }}</span>
+            </div>
+            <a href="/logout" class="btn-logout" title="Tizimdan chiqish">Chiqish 🚪</a>
+            {% else %}
+            <a href="/login" class="nav-link">Kirish</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- ASOSIY SAHIFA KONTENTI -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- O'XSHASH TURLAR FARQI MODAL OYNSI -->
+    <div id="speciesDiffModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 1.5rem;">
+        <div style="background: rgba(12, 28, 20, 0.95); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); max-width: 650px; width: 100%; padding: 2.2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative;">
+            <button onclick="closeDiffModal()" style="position: absolute; top: 1.2rem; right: 1.4rem; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
+                <span style="font-size: 1.5rem;">🔬</span>
+                <h3 id="modalAnimalName" style="color: #ffffff; font-size: 1.5rem;">Hayvon farqi</h3>
+            </div>
+            <div style="font-size: 0.85rem; color: #34d399; margin-bottom: 1.2rem;">
+                <strong>O'xshash turlari:</strong> <span id="modalSimilarSpecies"></span>
+            </div>
+            <div id="modalDiffBody" style="background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary); font-size: 0.92rem; line-height: 1.6; color: #f1f5f9; max-height: 350px; overflow-y: auto;">
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button onclick="closeDiffModal()" class="btn-detail-link" style="padding: 0.6rem 1.4rem; cursor: pointer;">Tushunarli</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING AI ASSISTANT TUGMASI (Har bir sahifada) -->
+    <a href="/ai-chat" class="floating-ai-btn">
+        <span>✨ Fauna AI Yordamchi</span>
+    </a>
+
+    <!-- FOOTER -->
+    <footer style="margin-top: 5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem 2rem; background: rgba(5, 12, 8, 0.9); text-align: center; color: var(--color-text-muted); font-size: 0.88rem;">
+        <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #ffffff;">
+                <span>🌿</span> Fauna & Flora — O'zbekiston va Jahon Hayvonot Olami Portali
+            </div>
+            <p>O'zbekiston Qizil kitobi & IUCN Xalqaro Qizil ro'yxati asosida tuzilgan ilmiy-ommabop biologik tizim.</p>
+            <p style="font-size: 0.78rem; color: #64748b;">© 2026 Barcha huquqlar himoyalangan. Himoyalangan Google hisob tizimi.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fauna & Flora — Yopiq Hayvonot Olami Portali</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- Google Identity Services (Google Sign-In) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Maxsus kirish sahifasi elementlari */
+        body {
+            overflow: hidden;
+            background: #020704;
+        }
+
+        /* Qaldirg'och va Quyon uchun animatsion tasvirlar */
+        .swallow-wing-anim {
+            animation: swallowGlide 6s ease-in-out infinite;
+        }
+        @keyframes swallowGlide {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50% { transform: translateY(-16px) rotate(3deg); }
+        }
+
+        .rabbit-hop-anim {
+            animation: rabbitBreathe 4s ease-in-out infinite;
+        }
+        @keyframes rabbitBreathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .lion-glow-anim {
+            animation: lionSunGlow 5s ease-in-out infinite alternate;
+        }
+        @keyframes lionSunGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+            100% { filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.8)); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yashirin Client ID saqlash -->
+    <input type="hidden" id="googleClientIdData" value="{{ google_client_id }}">
+
+    <!-- AI ANIMATSIYALI SPLASH OVERLAY (Saytga kirish animatsiyasi) -->
+    <div id="aiSplashOverlay" class="ai-entrance-overlay hidden">
+        <div class="ai-loader-graphic">
+            <div class="ai-ring ring-outer"></div>
+            <div class="ai-ring ring-middle"></div>
+            <div class="ai-ring ring-inner"></div>
+            <div class="ai-core-icon">🌿</div>
+        </div>
+        <div class="ai-status-text">FAUNA BIOMATRIX FAOL...</div>
+        <div class="ai-sub-status">Sun'iy intellekt ekotizim muhitini shakllantirmoqda</div>
+    </div>
+
+    <!-- ASOSIY SPLIT SCREEN HERO EKRANI -->
+    <div class="split-hero-container">
+
+        <!-- ================= CHAP TOMON =================
+             YASHIL MAYDON:
+             - Yuqorisida: Qaldirg'och uchib turishi
+             - Pastida: Quyon turishi
+             - Yozuvlar: Orqa fonga mos, kontrast va yorqin
+        ================================================== -->
+        <div class="split-side split-meadow">
+            
+            <!-- YUQORISIDA: Qaldirg'och parvozi -->
+            <div class="flying-swallow-box swallow-wing-anim">
+                <div class="swallow-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1555661530-68c8e9894ae6?auto=format&fit=crop&w=400&q=80" alt="Qaldirg'och">
+                </div>
+                <div>
+                    <span style="font-size: 0.72rem; color: #4ade80; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Osmondagi Erkinlik</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">Qaldirg'och</h3>
+                    <p class="hero-side-desc">Bahor elchisi, soatiga 75 km tezlikda moviy osmonda chaqqon parvoz qiluvchi nafis qush.</p>
+                </div>
+            </div>
+
+            <!-- PASTIDA: Quyon turishi -->
+            <div class="ground-rabbit-box rabbit-hop-anim">
+                <div class="rabbit-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=400&q=80" alt="Quyon">
+                </div>
+                <div>
+                    <span style="font-size: 0.72rem; color: #22c55e; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Maysazor va O'tloqlar</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">Chaqqon Quyon</h3>
+                    <p class="hero-side-desc">Yam-yashil maydonda chaqqon sakrovchi, 360° ko'rish burchagiga ega sezgir jonivor.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= O'NG TOMON =================
+             SHERLARNING YASHASH JOYI (SAVANNA):
+             - Akatsiya soyasida sokin dam olib yotgan sherlar
+             - Yozuvlar: Oltin rang va kontrast
+        ================================================== -->
+        <div class="split-side split-savannah">
+            
+            <div style="align-self: flex-start; max-width: 320px; background: rgba(30, 15, 3, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem 1.4rem; border-radius: var(--radius-md);">
+                <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Yovvoyi Savanna</span>
+                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.2rem;">Sherlar Saltanati</h4>
+                <p style="font-size: 0.82rem; color: #e2e8f0;">Afrika jaziramasi, oltin quyosh va erkin hayvonot olami.</p>
+            </div>
+
+            <!-- Yotgan sherlar axborot bloki -->
+            <div class="resting-lions-box lion-glow-anim">
+                <div class="lions-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=400&q=80" alt="Yotgan sherlar">
+                </div>
+                <div>
+                    <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Savannada Dam Olish</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">Viqorli Sherlar</h3>
+                    <p class="hero-side-desc">Akatsiya daraxti soyasida prayd a'zolari bilan xotirjam yotgan ulug'vor arslonlar.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= MARKAZIY AI GATEWAY PANELI =================
+             YOPIQ SAYT: Faqat Google hisob orqali kiriladi
+             AI animatsiyasi bilan portal ochiladi
+        ================================================================== -->
+        <div class="gateway-hero-card">
+            
+            <div class="gateway-badge">
+                <span>🔐</span> Himoyalangan Ilmiy Portal
+            </div>
+
+            <h1 class="gateway-title">Fauna & Flora</h1>
+            <p class="gateway-desc">
+                Hayvonlar anatomiyasi, ularning o'xshash turlaridan farqlanishi, real ovozlari va Qizil kitob maqomi.
+            </p>
+
+            <!-- 1. Google One-Tap / Google Sign-In tugmasi -->
+            <div id="googleSignInBtnWrap" style="margin-bottom: 1rem; min-height: 44px;">
+                <!-- Google Client ID kiritilgan bo'lsa avtomatik render bo'ladi -->
+            </div>
+
+            <!-- 2. Universal Google bilan kirish tugmasi -->
+            <button class="google-btn" onclick="loginAsDemo('user')">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Google hisobi bilan kirish</span>
+            </button>
+
+            <!-- Tezkor Demo va Admin orqali kirish (Tizimni darhol tekshirish uchun) -->
+            <div class="demo-login-box">
+                <span class="demo-title">Tezkor Sinov Rejimi (1-Bosish bilan)</span>
+                <div class="demo-buttons-grid">
+                    <button class="btn-demo-user" onclick="loginAsDemo('user')">
+                        👤 Foydalanuvchi (Google)
+                    </button>
+                    <button class="btn-demo-admin" onclick="loginAsDemo('admin')">
+                        🛡️ Administrator
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; font-size: 0.78rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <span>⚡ Fauna AI & Neural Bio-System faol</span>
+            </div>
+
+        </div>
+
+        <!-- MARKAZIY DEKORATIV AI CHIZIQ -->
+        <div class="split-divider-center">
+            <div class="divider-line"></div>
+            <div class="divider-badge">
+                <span>🌱</span>
+                <span>BIOLOGIK MATRITSA</span>
+                <span>🦁</span>
+            </div>
+            <div class="divider-line"></div>
+        </div>
+
+    </div>
+
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
