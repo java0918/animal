@@ -1,16 +1,29 @@
 import sqlite3
 import json
 import os
+import shutil
 from typing import List, Dict, Any, Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "fauna.db")
 
 def get_connection():
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    target_db = DB_PATH
+    if os.environ.get("VERCEL"):
+        tmp_db = "/tmp/fauna.db"
+        if not os.path.exists(tmp_db):
+            if os.path.exists(DB_PATH):
+                shutil.copyfile(DB_PATH, tmp_db)
+            else:
+                os.makedirs(os.path.dirname(tmp_db), exist_ok=True)
+        target_db = tmp_db
+    else:
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
+    conn = sqlite3.connect(target_db, timeout=30.0)
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 def init_db():
