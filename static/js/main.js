@@ -9,6 +9,10 @@ class AnimalAudioEngine {
         this.audioCtx = null;
         this.currentAudio = null;
         this.currentBtn = null;
+        this.canvas = null;
+        this.canvasCtx = null;
+        this.animationFrameId = null;
+        this.isPlaying = false;
     }
 
     initContext() {
@@ -21,10 +25,106 @@ class AnimalAudioEngine {
         }
     }
 
-    playSound(soundType, audioUrl, buttonEl) {
+    initCanvas() {
+        if (!this.canvas) {
+            this.canvas = document.getElementById('audioWaveCanvas');
+            if (this.canvas) {
+                this.canvasCtx = this.canvas.getContext('2d');
+            }
+        }
+    }
+
+    startWaveAnimation() {
+        this.initCanvas();
+        if (!this.canvasCtx) return;
+        this.isPlaying = true;
+        let phase = 0;
+
+        const draw = () => {
+            if (!this.isPlaying) return;
+            const ctx = this.canvasCtx;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Chiroyli neon to'lqin chizish
+            ctx.beginPath();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#34d399';
+            ctx.shadowColor = '#10b981';
+            ctx.shadowBlur = 8;
+
+            for (let x = 0; x < w; x++) {
+                const angle = (x / w) * Math.PI * 4 + phase;
+                const amplitude = Math.sin(phase * 1.5) * (h / 3) + 4;
+                const y = h / 2 + Math.sin(angle) * amplitude;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // 2-oltin to'lqin
+            ctx.beginPath();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#fbbf24';
+            for (let x = 0; x < w; x += 4) {
+                const angle = (x / w) * Math.PI * 6 - phase;
+                const amplitude = Math.cos(phase * 2) * (h / 4);
+                const y = h / 2 + Math.cos(angle) * amplitude;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            phase += 0.08;
+            this.animationFrameId = requestAnimationFrame(draw);
+        };
+        draw();
+    }
+
+    stopWaveAnimation() {
+        this.isPlaying = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
+        if (this.canvasCtx && this.canvas) {
+            this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    showBottomBar(name, desc, imgUrl) {
+        const bar = document.getElementById('globalAudioBar');
+        if (!bar) return;
+        if (name) document.getElementById('audioBarName').innerText = name;
+        if (desc) document.getElementById('audioBarDesc').innerText = desc || 'Tovush signali';
+        if (imgUrl) document.getElementById('audioBarImg').src = imgUrl;
+        bar.classList.add('active');
+        this.startWaveAnimation();
+    }
+
+    hideBottomBar() {
+        const bar = document.getElementById('globalAudioBar');
+        if (bar) bar.classList.remove('active');
+        this.stopWaveAnimation();
+    }
+
+    stopSound() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
+        }
+        if (this.currentBtn) {
+            this.currentBtn.classList.remove('playing');
+            this.currentBtn = null;
+        }
+        this.hideBottomBar();
+    }
+
+    playSound(soundType, audioUrl, buttonEl, animalName = '', animalDesc = '', animalImg = '') {
         this.initContext();
 
-        // Agar hozir biror ovoz o'ynayotgan bo'lsa, to'xtatish
         if (this.currentAudio) {
             this.currentAudio.pause();
             this.currentAudio = null;
@@ -34,25 +134,24 @@ class AnimalAudioEngine {
         }
 
         if (this.currentBtn === buttonEl) {
-            this.currentBtn = null;
-            return; // Ikkinchi marta bosilganda o'chirish
+            this.stopSound();
+            return;
         }
 
         buttonEl.classList.add('playing');
         this.currentBtn = buttonEl;
 
-        // Agar audio fayli mavjud bo'lsa, uni o'ynatishga urinish
+        // Bottom bar yangilash
+        this.showBottomBar(animalName, animalDesc, animalImg);
+
         if (audioUrl && audioUrl.endsWith('.mp3')) {
             const audio = new Audio(audioUrl);
             this.currentAudio = audio;
             audio.play().then(() => {
                 audio.onended = () => {
-                    buttonEl.classList.remove('playing');
-                    this.currentBtn = null;
-                    this.currentAudio = null;
+                    this.stopSound();
                 };
             }).catch(() => {
-                // Audio fayl topilmasa yoki xatolik bersa, Web Audio sintezatoriga o'tish
                 this.synthesizeAnimalSound(soundType, buttonEl);
             });
         } else {
@@ -297,7 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             const soundType = btn.getAttribute('data-sound-type') || 'roar';
             const audioUrl = btn.getAttribute('data-sound-file') || '';
-            audioEngine.playSound(soundType, audioUrl, btn);
+            const card = btn.closest('.animal-card') || btn.closest('.compare-card') || document;
+            const name = card.querySelector('.animal-title, h1, h2')?.innerText || 'Hayvon ovozi';
+            const desc = card.querySelector('.animal-latin, .animal-desc-short')?.innerText || 'Akustik tovush';
+            const img = card.querySelector('img')?.src || '';
+            audioEngine.playSound(soundType, audioUrl, btn, name, desc, img);
         });
     });
 
@@ -318,4 +421,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('speciesDiffModal');
         if (modal) modal.style.display = 'none';
     };
+
+    // E. Lightbox (HD rasmlarni to'liq ekranda ko'rish)
+    window.openLightbox = function(src, caption) {
+        const overlay = document.getElementById('imageLightboxModal');
+        const img = document.getElementById('lightboxImage');
+        const cap = document.getElementById('lightboxCaption');
+        if (!overlay || !img) return;
+        img.src = src;
+        if (cap) cap.innerText = caption || '';
+        overlay.style.display = 'flex';
+    };
+
+    window.closeLightbox = function(e) {
+        if (e && e.target && e.target.id === 'lightboxImage') return;
+        const overlay = document.getElementById('imageLightboxModal');
+        if (overlay) overlay.style.display = 'none';
+    };
+
+    document.querySelectorAll('.card-image, #mainAnimalImage').forEach(img => {
+        img.style.cursor = 'zoom-in';
+        img.title = 'Rasmni to\'liq ekranda ko\'rish uchun bosing';
+        img.addEventListener('click', () => {
+            const caption = img.alt || 'Hayvon fotosurati';
+            window.openLightbox(img.src, caption);
+        });
+    });
+
+    // F. Split Hero Parallax (Quyon & Qaldirg'och vs Sherlar interaktiv harakati)
+    const splitHero = document.querySelector('.split-hero-container');
+    if (splitHero) {
+        const swallow = splitHero.querySelector('.flying-swallow-box');
+        const rabbit = splitHero.querySelector('.ground-rabbit-box');
+        const lion = splitHero.querySelector('.resting-lions-box');
+
+        splitHero.addEventListener('mousemove', (e) => {
+            const rect = splitHero.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+            if (swallow) swallow.style.transform = `translate3d(${x * -25}px, ${y * -20}px, 0)`;
+            if (rabbit) rabbit.style.transform = `translate3d(${x * 15}px, ${y * 10}px, 0)`;
+            if (lion) lion.style.transform = `translate3d(${x * -18}px, ${y * 12}px, 0)`;
+        });
+
+        splitHero.addEventListener('mouseleave', () => {
+            if (swallow) swallow.style.transform = 'translate3d(0,0,0)';
+            if (rabbit) rabbit.style.transform = 'translate3d(0,0,0)';
+            if (lion) lion.style.transform = 'translate3d(0,0,0)';
+        });
+    }
 });
+

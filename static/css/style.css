@@ -1335,3 +1335,176 @@ a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   GLOBAL BOTTOM AUDIO PLAYER BAR
+   ========================================================================== */
+.global-audio-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 95;
+  background: rgba(8, 20, 14, 0.94);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--color-border-glass);
+  padding: 0.8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateY(120%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.global-audio-bar.active {
+  transform: translateY(0);
+}
+
+.audio-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.audio-bar-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid var(--color-primary-glow);
+}
+
+.audio-bar-canvas {
+  width: 220px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.audio-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-audio-stop {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-audio-stop:hover {
+  background: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   IMAGE LIGHTBOX (HD TO'LIQ EKRANDA KO'RISH)
+   ========================================================================== */
+.image-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(14px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.image-lightbox-wrap {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+}
+
+.lightbox-caption {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   ZOOLOGIK VIKTORINA (QUIZ) USLUBLARI
+   ========================================================================== */
+.quiz-card {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-glass);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-card);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.quiz-option-btn {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-light);
+  color: #ffffff;
+  padding: 1.1rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.quiz-option-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--color-primary-glow);
+  transform: translateX(4px);
+}
+
+.quiz-option-btn.correct {
+  background: rgba(16, 185, 129, 0.3) !important;
+  border-color: #34d399 !important;
+  color: #a7f3d0 !important;
+}
+
+.quiz-option-btn.incorrect {
+  background: rgba(239, 68, 68, 0.3) !important;
+  border-color: #f87171 !important;
+  color: #fca5a5 !important;
+}

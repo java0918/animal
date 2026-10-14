@@ -295,6 +295,15 @@ async def ai_chat_page(request: Request):
         context={"user": user}
     )
 
+@app.get("/quiz", response_class=HTMLResponse)
+async def quiz_page(request: Request):
+    user = get_current_user(request)
+    return templates.TemplateResponse(
+        request=request,
+        name="quiz.html",
+        context={"user": user}
+    )
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
     user = get_current_user(request)

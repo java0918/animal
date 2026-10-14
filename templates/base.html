@@ -52,6 +52,11 @@
                 </a>
             </li>
             <li>
+                <a href="/quiz" class="nav-link {% if request.url.path == '/quiz' %}active{% endif %}">
+                    <span>🧠</span> Viktorina (O'yin)
+                </a>
+            </li>
+            <li>
                 <a href="/ai-chat" class="nav-link {% if request.url.path == '/ai-chat' %}active{% endif %}">
                     <span>✨</span> Fauna AI Yordamchi
                 </a>
@@ -99,6 +104,34 @@
             <div style="margin-top: 1.5rem; text-align: right;">
                 <button onclick="closeDiffModal()" class="btn-detail-link" style="padding: 0.6rem 1.4rem; cursor: pointer;">Tushunarli</button>
             </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL BOTTOM AUDIO PLAYER BAR (CANVAS EQUALIZER) -->
+    <div id="globalAudioBar" class="global-audio-bar">
+        <div class="audio-bar-info">
+            <img id="audioBarImg" src="https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?auto=format&fit=crop&w=200&q=80" alt="Hayvon" class="audio-bar-avatar">
+            <div>
+                <div id="audioBarName" style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Sher (Arslon)</div>
+                <div id="audioBarDesc" style="font-size: 0.78rem; color: #34d399;">Akustik tovush to'lqini ijro etilmoqda...</div>
+            </div>
+            <!-- Jonli tovush to'lqini Canvas -->
+            <canvas id="audioWaveCanvas" class="audio-bar-canvas" width="220" height="38"></canvas>
+        </div>
+
+        <div class="audio-bar-controls">
+            <button type="button" onclick="audioEngine.stopSound()" class="btn-audio-stop" title="To'xtatish">
+                ⏹
+            </button>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX (HD FOTO GALEREYA TO'LIQ EKRAN) -->
+    <div id="imageLightboxModal" class="image-lightbox-overlay" onclick="closeLightbox(event)">
+        <div class="image-lightbox-wrap">
+            <button type="button" class="lightbox-close-btn" onclick="closeLightbox(event)">✕</button>
+            <img id="lightboxImage" src="" alt="Hayvon HD" class="lightbox-img">
+            <div id="lightboxCaption" class="lightbox-caption"></div>
         </div>
     </div>
 
