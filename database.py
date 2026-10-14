@@ -83,7 +83,19 @@ def init_db():
     """)
     
     conn.commit()
+    
+    cursor.execute("SELECT count(*) FROM animals")
+    row = cursor.fetchone()
+    count = row[0] if row else 0
     conn.close()
+    
+    if count == 0:
+        try:
+            from seed_data import seed_database
+            seed_database()
+        except Exception as e:
+            print(f"Auto-seed warning: {e}")
+
 
 def get_all_animals(category: Optional[str] = None, red_book_only: bool = False, search: Optional[str] = None) -> List[Dict[str, Any]]:
     conn = get_connection()
