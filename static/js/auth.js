@@ -37,13 +37,76 @@ function loginAsDemo(role) {
             playEntranceTransition();
         } else {
             alert('Kirishda xatolik');
-            if (btn) btn.innerHTML = role === 'admin' ? '🛡️ Admin sifatida kirish' : '👤 Foydalanuvchi sifatida';
+}
+
+function toggleAdminLoginForm(show) {
+    const userBlock = document.getElementById('userLoginBlock');
+    const adminBlock = document.getElementById('adminLoginBlock');
+    if (userBlock && adminBlock) {
+        userBlock.style.display = show ? 'none' : 'block';
+        adminBlock.style.display = show ? 'block' : 'none';
+        if (show) {
+            const userInput = document.getElementById('admin_login_user');
+            if (userInput) userInput.focus();
+        }
+    }
+}
+
+function loginAsAdmin(e) {
+    if (e) e.preventDefault();
+    const username = document.getElementById('admin_login_user').value.trim();
+    const password = document.getElementById('admin_login_pass').value.trim();
+    const errorEl = document.getElementById('adminLoginError');
+    const btn = document.getElementById('btnSubmitAdminLogin');
+
+    if (!username || !password) {
+        if (errorEl) {
+            errorEl.innerText = 'Login va parolni kiriting!';
+            errorEl.style.display = 'block';
+        }
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Tekshirilmoqda... ⏳';
+    if (errorEl) errorEl.style.display = 'none';
+
+    fetch('/api/auth/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const overlay = document.getElementById('aiSplashOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                const status = overlay.querySelector('.ai-status-text');
+                if (status) status.innerText = 'ADMIN TASDIQLANDI... XUSH KELIBSIZ!';
+            }
+            setTimeout(() => {
+                window.location.href = data.redirect || '/admin';
+            }, 1000);
+        } else {
+            btn.disabled = false;
+            btn.innerText = 'Kirish 🔓';
+            if (errorEl) {
+                errorEl.innerText = data.message || 'Login yoki parol xato!';
+                errorEl.style.display = 'block';
+            }
         }
     })
-    .catch(err => {
-        alert('Server xatosi');
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerText = 'Kirish 🔓';
+        if (errorEl) {
+            errorEl.innerText = 'Server bilan aloqa xatosi!';
+            errorEl.style.display = 'block';
+        }
     });
 }
+
 
 function playEntranceTransition() {
     const overlay = document.getElementById('aiSplashOverlay');

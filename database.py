@@ -7,9 +7,11 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "data", "fauna.db")
 
 def get_connection():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    conn.execute("PRAGMA journal_mode=WAL;")
     conn.row_factory = sqlite3.Row
     return conn
+
 
 def init_db():
     conn = get_connection()
@@ -237,13 +239,16 @@ def delete_animal(animal_id: int):
 def get_or_create_user(google_id: str, email: str, name: str, picture: str, role: str = 'user') -> Dict[str, Any]:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+    cursor.execute("SELECT * FROM users WHERE email = ? OR google_id = ?", (email, google_id))
     row = cursor.fetchone()
     if row:
         user = dict(row)
-        cursor.execute("UPDATE users SET name = ?, picture = ? WHERE id = ?", (name, picture, user["id"]))
+        cursor.execute("UPDATE users SET name = ?, picture = ?, role = ? WHERE id = ?", (name, picture, role, user["id"]))
         conn.commit()
         conn.close()
+        user["name"] = name
+        user["picture"] = picture
+        user["role"] = role
         return user
     else:
         cursor.execute("""
@@ -256,6 +261,7 @@ def get_or_create_user(google_id: str, email: str, name: str, picture: str, role
         new_user = dict(cursor.fetchone())
         conn.close()
         return new_user
+
 
 def get_all_users() -> List[Dict[str, Any]]:
     conn = get_connection()

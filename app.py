@@ -154,13 +154,14 @@ async def google_auth(request: Request, response: Response):
     except Exception as e:
         return JSONResponse({"success": False, "message": str(e)}, status_code=500)
 
-@app.post("/api/auth/demo-login")
-async def demo_login(request: Request, response: Response):
-    """Instant Google login simulation for testing"""
+@app.post("/api/auth/admin-login")
+async def admin_login(request: Request, response: Response):
+    """Admin login with credentials (login: admin, parol: java0918)"""
     body = await request.json()
-    role = body.get("role", "user")
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
     
-    if role == "admin":
+    if username == "admin" and password == "java0918":
         user_session = {
             "id": 1,
             "email": "admin@hayvonlar.uz",
@@ -168,21 +169,46 @@ async def demo_login(request: Request, response: Response):
             "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
             "role": "admin"
         }
+        get_or_create_user(
+            google_id="admin-java0918",
+            email=user_session["email"],
+            name=user_session["name"],
+            picture=user_session["picture"],
+            role="admin"
+        )
+        res = JSONResponse({"success": True, "redirect": "/admin", "user": user_session})
+        cookie_val = urllib.parse.quote(json.dumps(user_session))
+        res.set_cookie(
+            key="fauna_session",
+            value=cookie_val,
+            httponly=True,
+            max_age=86400 * 7,
+            samesite="lax"
+        )
+        return res
     else:
-        user_session = {
-            "id": 2,
-            "email": "tadqiqotchi@gmail.com",
-            "name": "Azizbek Olimov (Google)",
-            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-            "role": "user"
-        }
+        return JSONResponse(
+            {"success": False, "message": "Login yoki parol noto'g'ri!"},
+            status_code=401
+        )
+
+@app.post("/api/auth/demo-login")
+async def demo_login(request: Request, response: Response):
+    """Foydalanuvchi (Google) tezkor kirish"""
+    user_session = {
+        "id": 2,
+        "email": "foydalanuvchi@gmail.com",
+        "name": "Foydalanuvchi (Google)",
+        "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+        "role": "user"
+    }
     
     get_or_create_user(
         google_id=f"demo-{user_session['id']}",
         email=user_session["email"],
         name=user_session["name"],
         picture=user_session["picture"],
-        role=user_session["role"]
+        role="user"
     )
     
     res = JSONResponse({"success": True, "user": user_session})
