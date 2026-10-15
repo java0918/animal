@@ -22,8 +22,8 @@ function handleCredentialResponse(response) {
     });
 }
 
-function loginAsDemo(role) {
-    const btn = event ? event.target : null;
+function loginAsDemo(role, e) {
+    const btn = (e && e.target) || (window.event ? window.event.target : null);
     if (btn) btn.innerHTML = 'Kirilmoqda... ⏳';
 
     fetch('/api/auth/demo-login', {
@@ -36,8 +36,17 @@ function loginAsDemo(role) {
         if (data.success) {
             playEntranceTransition();
         } else {
-            alert('Kirishda xatolik');
+            alert('Kirishda xatolik: ' + (data.message || ''));
+            if (btn) btn.innerHTML = 'Google hisobi bilan kirish';
+        }
+    })
+    .catch(err => {
+        console.error('Demo login error:', err);
+        alert('Server bilan bog\'lanishda xatolik yuz berdi.');
+        if (btn) btn.innerHTML = 'Google hisobi bilan kirish';
+    });
 }
+
 
 function toggleAdminLoginForm(show) {
     const userBlock = document.getElementById('userLoginBlock');
