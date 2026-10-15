@@ -172,64 +172,26 @@ async def google_auth(request: Request, response: Response):
     except Exception as e:
         return JSONResponse({"success": False, "message": str(e)}, status_code=500)
 
+@app.post("/api/auth/login")
 @app.post("/api/auth/admin-login")
-async def admin_login(request: Request, response: Response):
-    """Admin login with credentials (login: admin, parol: java0918)"""
-    body = await request.json()
-    username = body.get("username", "").strip()
-    password = body.get("password", "").strip()
-    
-    if username == "admin" and password == "java0918":
-        user_session = {
-            "id": 1,
-            "email": "admin@hayvonlar.uz",
-            "name": "Bosh Administrator",
-            "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-            "role": "admin"
-        }
-        get_or_create_user(
-            google_id="admin-java0918",
-            email=user_session["email"],
-            name=user_session["name"],
-            picture=user_session["picture"],
-            role="admin"
-        )
-        res = JSONResponse({"success": True, "redirect": "/admin", "user": user_session})
-        cookie_val = urllib.parse.quote(json.dumps(user_session))
-        res.set_cookie(
-            key="fauna_session",
-            value=cookie_val,
-            httponly=True,
-            max_age=86400 * 7,
-            samesite="lax"
-        )
-        return res
-    else:
-        return JSONResponse(
-            {"success": False, "message": "Login yoki parol noto'g'ri!"},
-            status_code=401
-        )
-
 @app.post("/api/auth/step2-login")
-async def step2_login(request: Request, response: Response):
-    """2-bosqichli kirish: Google hisob (1-qadam) + Login va Parol (2-qadam)"""
+async def user_login(request: Request, response: Response):
+    """Faqat login va parol orqali kirish (Admin: admin / java0918, Foydalanuvchi: username / password)"""
     body = await request.json()
     username = body.get("username", "").strip()
     password = body.get("password", "").strip()
-    google_email = body.get("google_email", "").strip()
     
-    # Google hisob tekshiruvi: Google pochtasiz 2-qadamga o'tish qat'iyan taqiqlanadi
-    if not google_email or "@" not in google_email or "." not in google_email:
+    if not username or not password:
         return JSONResponse(
-            {"success": False, "message": "Avval 1-bosqichda Google hisobingiz orqali kirishingiz yoki tasdiqlashingiz shart!"},
+            {"success": False, "message": "Iltimos, login va parolni kiriting!"},
             status_code=400
         )
-    
+        
     if username.lower() == "admin":
         if password == "java0918":
             user_session = {
                 "id": 1,
-                "email": google_email if "@" in google_email else "admin@hayvonlar.uz",
+                "email": "admin@hayvonlar.uz",
                 "name": "Bosh Administrator",
                 "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
                 "role": "admin"
@@ -256,16 +218,17 @@ async def step2_login(request: Request, response: Response):
                 {"success": False, "message": "Login yoki parol noto'g'ri!"},
                 status_code=401
             )
-    elif username and password:
+    else:
+        # Oddiy foydalanuvchi
         user_session = {
             "id": 2,
-            "email": google_email,
+            "email": f"{username.lower()}@hayvonlar.uz",
             "name": username.capitalize(),
             "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
             "role": "user"
         }
         get_or_create_user(
-            google_id=f"user-{username}",
+            google_id=f"user-{username.lower()}",
             email=user_session["email"],
             name=user_session["name"],
             picture=user_session["picture"],
@@ -281,11 +244,6 @@ async def step2_login(request: Request, response: Response):
             samesite="lax"
         )
         return res
-    else:
-        return JSONResponse(
-            {"success": False, "message": "Login va parolni kiriting!"},
-            status_code=400
-        )
 
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
