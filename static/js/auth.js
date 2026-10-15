@@ -21,7 +21,7 @@ function goToStep(stepNumber) {
 
         const emailInput = document.getElementById('googleEmailInput');
         const displayEl = document.getElementById('step2GoogleDisplay');
-        const selectedEmail = (emailInput && emailInput.value.trim()) ? emailInput.value.trim() : 'admin@hayvonlar.uz';
+        const selectedEmail = (emailInput && emailInput.value.trim()) ? emailInput.value.trim() : 'Google hisob tasdiqlandi';
         if (displayEl) displayEl.innerText = selectedEmail;
 
         const passInput = document.getElementById('step2_login_pass');
@@ -63,7 +63,7 @@ function submitStep2Login(e) {
 
     const username = userInput ? userInput.value.trim() : '';
     const password = passInput ? passInput.value.trim() : '';
-    const googleEmail = emailInput ? emailInput.value.trim() : 'admin@hayvonlar.uz';
+    const googleEmail = (emailInput && emailInput.value.trim()) ? emailInput.value.trim() : 'foydalanuvchi@gmail.com';
 
     if (!username || !password) {
         if (errorEl) {

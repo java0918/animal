@@ -212,7 +212,7 @@
 
                 <div style="margin-top: 1.2rem; text-align: left;">
                     <label style="display: block; font-size: 0.78rem; color: #cbd5e1; margin-bottom: 0.35rem;">Yoki Google elektron pochtangiz:</label>
-                    <input type="email" id="googleEmailInput" class="form-control" value="admin@hayvonlar.uz" placeholder="nomingiz@gmail.com">
+                    <input type="email" id="googleEmailInput" class="form-control" placeholder="nomingiz@gmail.com">
                 </div>
 
                 <button type="button" onclick="goToStep(2)" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.2rem; padding: 0.85rem; font-weight: 700;">
@@ -231,26 +231,22 @@
                 </div>
 
                 <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.82rem; color: #a7f3d0; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
-                    <span>✅ Google hisob: <b id="step2GoogleDisplay">admin@hayvonlar.uz</b></span>
+                    <span>✅ Google hisob: <b id="step2GoogleDisplay">Hisob tasdiqlangan</b></span>
                     <a href="javascript:void(0)" onclick="goToStep(1)" style="color: #cbd5e1; font-size: 0.75rem; text-decoration: underline;">O'zgartirish</a>
                 </div>
 
                 <form onsubmit="submitStep2Login(event)">
                     <div style="margin-bottom: 0.9rem;">
                         <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.3rem;">Login:</label>
-                        <input type="text" id="step2_login_user" class="form-control" required placeholder="admin" value="admin" autocomplete="username">
+                        <input type="text" id="step2_login_user" class="form-control" required placeholder="Loginingizni kiriting" autocomplete="username">
                     </div>
 
-                    <div style="margin-bottom: 1rem;">
+                    <div style="margin-bottom: 1.2rem;">
                         <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.3rem;">Parol:</label>
                         <input type="password" id="step2_login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
                     </div>
 
                     <div id="step2Error" style="display: none; font-size: 0.82rem; color: #f87171; margin-bottom: 1rem; background: rgba(239, 68, 68, 0.15); padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
-
-                    <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 6px; padding: 0.55rem 0.8rem; font-size: 0.78rem; color: #fef3c7; margin-bottom: 1.2rem;">
-                        🛡️ <b>Administrator uchun:</b> Login: <code style="color: #fbbf24; font-weight: 700;">admin</code> | Parol: <code style="color: #fbbf24; font-weight: 700;">java0918</code>
-                    </div>
 
                     <div style="display: flex; gap: 0.8rem;">
                         <button type="button" onclick="goToStep(1)" class="btn-secondary" style="flex: 1; justify-content: center; padding: 0.85rem;">
