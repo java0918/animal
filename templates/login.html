@@ -184,7 +184,7 @@
                     <span>Google Hisob</span>
                 </div>
                 <div style="color: rgba(255,255,255,0.3); font-size: 0.85rem;">➔</div>
-                <div id="stepPill2" class="step-pill" onclick="goToStep(2)">
+                <div id="stepPill2" class="step-pill" onclick="tryGoToStep2()">
                     <span class="step-num">2</span>
                     <span>Login & Parol</span>
                 </div>
@@ -192,6 +192,9 @@
 
             <!-- 1-QADAM: GOOGLE HISOB -->
             <div id="step1Block">
+                <div id="step1AdminNotice" style="display: none; font-size: 0.82rem; color: #fbbf24; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.6rem 0.8rem; border-radius: 6px; margin-bottom: 0.9rem; text-align: left;">
+                    🔒 Administrator sifatida kirish uchun avval 1-bosqichda Google hisobingizni tasdiqlang.
+                </div>
                 <div style="font-size: 0.88rem; color: #a7f3d0; font-weight: 700; margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
                     1-Qadam: Google hisobingizni tasdiqlang
                 </div>
@@ -212,11 +215,15 @@
 
                 <div style="margin-top: 1.2rem; text-align: left;">
                     <label style="display: block; font-size: 0.78rem; color: #cbd5e1; margin-bottom: 0.35rem;">Yoki Google elektron pochtangiz:</label>
-                    <input type="email" id="googleEmailInput" class="form-control" placeholder="nomingiz@gmail.com">
+                    <input type="email" id="googleEmailInput" class="form-control" placeholder="nomingiz@gmail.com" onkeydown="if(event.key==='Enter') verifyGoogleAndProceed()">
                 </div>
 
-                <button type="button" onclick="goToStep(2)" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.2rem; padding: 0.85rem; font-weight: 700;">
-                    Keyingi qadam: Login va Parol ➔
+                <!-- Xatolik va Muvaffaqiyat xabarlari -->
+                <div id="step1Error" style="display: none; font-size: 0.82rem; color: #f87171; margin-top: 0.9rem; background: rgba(239, 68, 68, 0.15); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3); text-align: left;"></div>
+                <div id="step1Success" style="display: none; font-size: 0.82rem; color: #34d399; margin-top: 0.9rem; background: rgba(16, 185, 129, 0.15); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); text-align: left;"></div>
+
+                <button type="button" id="btnVerifyGoogle" onclick="verifyGoogleAndProceed()" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.2rem; padding: 0.85rem; font-weight: 700;">
+                    Tasdiqlash va 2-qadamga o'tish ➔
                 </button>
 
                 <div style="margin-top: 1.2rem; font-size: 0.8rem;">

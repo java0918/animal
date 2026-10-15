@@ -212,37 +212,50 @@ async def admin_login(request: Request, response: Response):
 
 @app.post("/api/auth/step2-login")
 async def step2_login(request: Request, response: Response):
-    """2-bosqichli kirish: Google hisob + Login va Parol (admin / java0918)"""
+    """2-bosqichli kirish: Google hisob (1-qadam) + Login va Parol (2-qadam)"""
     body = await request.json()
     username = body.get("username", "").strip()
     password = body.get("password", "").strip()
-    google_email = body.get("google_email", "").strip() or "foydalanuvchi@gmail.com"
+    google_email = body.get("google_email", "").strip()
     
-    if username == "admin" and password == "java0918":
-        user_session = {
-            "id": 1,
-            "email": google_email if "admin" in google_email else "admin@hayvonlar.uz",
-            "name": "Bosh Administrator",
-            "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-            "role": "admin"
-        }
-        get_or_create_user(
-            google_id="admin-java0918",
-            email=user_session["email"],
-            name=user_session["name"],
-            picture=user_session["picture"],
-            role="admin"
+    # Google hisob tekshiruvi: Google pochtasiz 2-qadamga o'tish qat'iyan taqiqlanadi
+    if not google_email or "@" not in google_email or "." not in google_email:
+        return JSONResponse(
+            {"success": False, "message": "Avval 1-bosqichda Google hisobingiz orqali kirishingiz yoki tasdiqlashingiz shart!"},
+            status_code=400
         )
-        res = JSONResponse({"success": True, "redirect": "/admin", "role": "admin", "user": user_session})
-        cookie_val = urllib.parse.quote(json.dumps(user_session))
-        res.set_cookie(
-            key="fauna_session",
-            value=cookie_val,
-            httponly=True,
-            max_age=86400 * 7,
-            samesite="lax"
-        )
-        return res
+    
+    if username.lower() == "admin":
+        if password == "java0918":
+            user_session = {
+                "id": 1,
+                "email": google_email if "@" in google_email else "admin@hayvonlar.uz",
+                "name": "Bosh Administrator",
+                "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+                "role": "admin"
+            }
+            get_or_create_user(
+                google_id="admin-java0918",
+                email=user_session["email"],
+                name=user_session["name"],
+                picture=user_session["picture"],
+                role="admin"
+            )
+            res = JSONResponse({"success": True, "redirect": "/admin", "role": "admin", "user": user_session})
+            cookie_val = urllib.parse.quote(json.dumps(user_session))
+            res.set_cookie(
+                key="fauna_session",
+                value=cookie_val,
+                httponly=True,
+                max_age=86400 * 7,
+                samesite="lax"
+            )
+            return res
+        else:
+            return JSONResponse(
+                {"success": False, "message": "Login yoki parol noto'g'ri!"},
+                status_code=401
+            )
     elif username and password:
         user_session = {
             "id": 2,
@@ -416,7 +429,7 @@ async def quiz_page(request: Request):
 async def admin_page(request: Request):
     user = get_current_user(request)
     if not user or user.get("role") != "admin":
-        return RedirectResponse(url="/login?redirect=/admin&step=2")
+        return RedirectResponse(url="/login?redirect=/admin")
         
     animals = get_all_animals()
     users = get_all_users()
