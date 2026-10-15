@@ -6,21 +6,34 @@ from typing import List, Dict, Any, Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "fauna.db")
 
+def is_serverless_env():
+    return bool(
+        os.environ.get("VERCEL") or 
+        os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or 
+        os.environ.get("NOW_REGION") or
+        not os.access(os.path.dirname(os.path.abspath(__file__)), os.W_OK)
+    )
+
 def get_connection():
-    target_db = DB_PATH
-    if os.environ.get("VERCEL"):
+    if is_serverless_env():
         tmp_db = "/tmp/fauna.db"
         if not os.path.exists(tmp_db):
+            os.makedirs(os.path.dirname(tmp_db), exist_ok=True)
             if os.path.exists(DB_PATH):
-                shutil.copyfile(DB_PATH, tmp_db)
-            else:
-                os.makedirs(os.path.dirname(tmp_db), exist_ok=True)
+                try:
+                    shutil.copyfile(DB_PATH, tmp_db)
+                except Exception as e:
+                    print(f"DB copy error: {e}")
         target_db = tmp_db
     else:
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        target_db = DB_PATH
 
     conn = sqlite3.connect(target_db, timeout=30.0)
-    conn.execute("PRAGMA journal_mode=WAL;")
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -91,8 +104,8 @@ def init_db():
     
     if count == 0:
         try:
-            from seed_data import seed_database
-            seed_database()
+            from seed_data import seed
+            seed()
         except Exception as e:
             print(f"Auto-seed warning: {e}")
 

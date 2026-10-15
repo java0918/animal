@@ -22,12 +22,30 @@ app = FastAPI(title="Fauna & Flora — Hayvonot Olami Portali")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
-UPLOAD_IMG_DIR = os.path.join(STATIC_DIR, "uploads", "images")
-UPLOAD_AUD_DIR = os.path.join(STATIC_DIR, "uploads", "audio")
 
-os.makedirs(UPLOAD_IMG_DIR, exist_ok=True)
-os.makedirs(UPLOAD_AUD_DIR, exist_ok=True)
+is_serverless = bool(
+    os.environ.get("VERCEL") or 
+    os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or 
+    os.environ.get("NOW_REGION") or 
+    not os.access(BASE_DIR, os.W_OK)
+)
 
+if is_serverless:
+    UPLOAD_ROOT = "/tmp/uploads"
+else:
+    UPLOAD_ROOT = os.path.join(STATIC_DIR, "uploads")
+
+UPLOAD_IMG_DIR = os.path.join(UPLOAD_ROOT, "images")
+UPLOAD_AUD_DIR = os.path.join(UPLOAD_ROOT, "audio")
+
+try:
+    os.makedirs(UPLOAD_IMG_DIR, exist_ok=True)
+    os.makedirs(UPLOAD_AUD_DIR, exist_ok=True)
+except OSError:
+    pass
+
+if is_serverless and os.path.exists(UPLOAD_ROOT):
+    app.mount("/static/uploads", StaticFiles(directory=UPLOAD_ROOT), name="static_uploads")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
