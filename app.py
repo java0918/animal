@@ -210,6 +210,70 @@ async def admin_login(request: Request, response: Response):
             status_code=401
         )
 
+@app.post("/api/auth/step2-login")
+async def step2_login(request: Request, response: Response):
+    """2-bosqichli kirish: Google hisob + Login va Parol (admin / java0918)"""
+    body = await request.json()
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    google_email = body.get("google_email", "").strip() or "foydalanuvchi@gmail.com"
+    
+    if username == "admin" and password == "java0918":
+        user_session = {
+            "id": 1,
+            "email": google_email if "admin" in google_email else "admin@hayvonlar.uz",
+            "name": "Bosh Administrator",
+            "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+            "role": "admin"
+        }
+        get_or_create_user(
+            google_id="admin-java0918",
+            email=user_session["email"],
+            name=user_session["name"],
+            picture=user_session["picture"],
+            role="admin"
+        )
+        res = JSONResponse({"success": True, "redirect": "/admin", "role": "admin", "user": user_session})
+        cookie_val = urllib.parse.quote(json.dumps(user_session))
+        res.set_cookie(
+            key="fauna_session",
+            value=cookie_val,
+            httponly=True,
+            max_age=86400 * 7,
+            samesite="lax"
+        )
+        return res
+    elif username and password:
+        user_session = {
+            "id": 2,
+            "email": google_email,
+            "name": username.capitalize(),
+            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+            "role": "user"
+        }
+        get_or_create_user(
+            google_id=f"user-{username}",
+            email=user_session["email"],
+            name=user_session["name"],
+            picture=user_session["picture"],
+            role="user"
+        )
+        res = JSONResponse({"success": True, "redirect": "/", "role": "user", "user": user_session})
+        cookie_val = urllib.parse.quote(json.dumps(user_session))
+        res.set_cookie(
+            key="fauna_session",
+            value=cookie_val,
+            httponly=True,
+            max_age=86400 * 7,
+            samesite="lax"
+        )
+        return res
+    else:
+        return JSONResponse(
+            {"success": False, "message": "Login va parolni kiriting!"},
+            status_code=400
+        )
+
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
     """Foydalanuvchi (Google) tezkor kirish"""
@@ -352,7 +416,7 @@ async def quiz_page(request: Request):
 async def admin_page(request: Request):
     user = get_current_user(request)
     if not user or user.get("role") != "admin":
-        return RedirectResponse(url="/?error=unauthorized")
+        return RedirectResponse(url="/login?redirect=/admin&step=2")
         
     animals = get_all_animals()
     users = get_all_users()
@@ -409,6 +473,13 @@ async def api_upload(
         await out_file.write(content)
         
     return JSONResponse({"url": f"{url_prefix}{unique_name}"})
+
+@app.get("/api/animals/{animal_id}")
+async def api_get_animal(animal_id: int):
+    animal = get_animal_by_id(animal_id)
+    if not animal:
+        raise HTTPException(status_code=404, detail="Hayvon topilmadi")
+    return JSONResponse(animal)
 
 @app.post("/api/animals")
 async def api_create_animal(request: Request):

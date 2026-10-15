@@ -109,6 +109,20 @@ async function deleteAnimal(id, name) {
     }
 }
 
+async function editAnimalById(id) {
+    try {
+        const resp = await fetch(`/api/animals/${id}`);
+        if (!resp.ok) {
+            alert('Hayvon ma\'lumotlarini yuklab bo\'lmadi');
+            return;
+        }
+        const animal = await resp.json();
+        editAnimalData(animal);
+    } catch (e) {
+        alert('Server bilan bog\'lanishda xatolik yuz berdi');
+    }
+}
+
 function editAnimalData(animal) {
     document.getElementById('formTitle').innerText = 'Hayvonni tahrirlash';
     document.getElementById('animalId').value = animal.id;

@@ -140,57 +140,126 @@
                 Hayvonlar anatomiyasi, ularning o'xshash turlaridan farqlanishi, real ovozlari va Qizil kitob maqomi.
             </p>
 
-            <!-- 1. Google One-Tap / Google Sign-In tugmasi -->
-            <div id="googleSignInBtnWrap" style="margin-bottom: 1rem; min-height: 44px;">
-                <!-- Google Client ID kiritilgan bo'lsa avtomatik render bo'ladi -->
+            <!-- QADAMLI KIRISH TIZIMI: 1-qadam Google, 2-qadam Login & Parol -->
+            <style>
+            .step-pill {
+                display: flex;
+                align-items: center;
+                gap: 0.45rem;
+                padding: 0.4rem 0.9rem;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #94a3b8;
+                font-size: 0.82rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.25s ease;
+            }
+            .step-pill.active {
+                background: rgba(16, 185, 129, 0.25);
+                border-color: #10b981;
+                color: #ffffff;
+                box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            }
+            .step-pill .step-num {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.72rem;
+            }
+            .step-pill.active .step-num {
+                background: #10b981;
+                color: #ffffff;
+            }
+            </style>
+
+            <div class="steps-progress-bar" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-bottom: 1.5rem;">
+                <div id="stepPill1" class="step-pill active" onclick="goToStep(1)">
+                    <span class="step-num">1</span>
+                    <span>Google Hisob</span>
+                </div>
+                <div style="color: rgba(255,255,255,0.3); font-size: 0.85rem;">➔</div>
+                <div id="stepPill2" class="step-pill" onclick="goToStep(2)">
+                    <span class="step-num">2</span>
+                    <span>Login & Parol</span>
+                </div>
             </div>
 
-            <!-- 2. Universal Google bilan kirish tugmasi (Foydalanuvchilar uchun) -->
-            <div id="userLoginBlock">
-                <button class="google-btn" onclick="loginAsDemo('user')">
-                    <svg viewBox="0 0 24 24">
+            <!-- 1-QADAM: GOOGLE HISOB -->
+            <div id="step1Block">
+                <div style="font-size: 0.88rem; color: #a7f3d0; font-weight: 700; margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    1-Qadam: Google hisobingizni tasdiqlang
+                </div>
+
+                <div id="googleSignInBtnWrap" style="margin-bottom: 1rem; min-height: 44px;">
+                    <!-- Google Client ID kiritilgan bo'lsa avtomatik render bo'ladi -->
+                </div>
+
+                <button type="button" class="google-btn" onclick="proceedToStep2WithGoogle()">
+                    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px;">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                     </svg>
-                    <span>Google hisobi bilan kirish</span>
+                    <span>Google hisobi bilan davom etish</span>
                 </button>
 
-                <div style="margin-top: 1.8rem; padding-top: 1.2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                    <button type="button" onclick="toggleAdminLoginForm(true)" style="background: none; border: none; color: #94a3b8; font-size: 0.82rem; cursor: pointer; text-decoration: underline; transition: color 0.2s;">
-                        🛡️ Administrator sifatida kirish (Login / Parol)
-                    </button>
+                <div style="margin-top: 1.2rem; text-align: left;">
+                    <label style="display: block; font-size: 0.78rem; color: #cbd5e1; margin-bottom: 0.35rem;">Yoki Google elektron pochtangiz:</label>
+                    <input type="email" id="googleEmailInput" class="form-control" value="admin@hayvonlar.uz" placeholder="nomingiz@gmail.com">
+                </div>
+
+                <button type="button" onclick="goToStep(2)" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.2rem; padding: 0.85rem; font-weight: 700;">
+                    Keyingi qadam: Login va Parol ➔
+                </button>
+
+                <div style="margin-top: 1.2rem; font-size: 0.8rem;">
+                    <a href="javascript:void(0)" onclick="loginAsDemo('user')" style="color: #94a3b8; text-decoration: underline;">⚡ Mehmon sifatida tezkor ko'rish</a>
                 </div>
             </div>
 
-            <!-- 3. MAXSUS ADMIN KIRISH FORMASI (Login: admin, Parol: java0918) -->
-            <div id="adminLoginBlock" style="display: none; text-align: left; background: rgba(0,0,0,0.4); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 1.5rem; margin-top: 1rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                    <div style="font-size: 0.95rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 0.5rem;">
-                        <span>🛡️</span> Admin Panelga Kirish
-                    </div>
-                    <button type="button" onclick="toggleAdminLoginForm(false)" style="background: none; border: none; color: #94a3b8; font-size: 0.82rem; cursor: pointer;">
-                        ← Qaytish
-                    </button>
+            <!-- 2-QADAM: LOGIN VA PAROL -->
+            <div id="step2Block" style="display: none; text-align: left;">
+                <div style="font-size: 0.88rem; color: #fbbf24; font-weight: 700; margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">
+                    2-Qadam: Login va parol bilan kiring
                 </div>
 
-                <form onsubmit="loginAsAdmin(event)">
-                    <div style="margin-bottom: 1rem;">
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.82rem; color: #a7f3d0; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>✅ Google hisob: <b id="step2GoogleDisplay">admin@hayvonlar.uz</b></span>
+                    <a href="javascript:void(0)" onclick="goToStep(1)" style="color: #cbd5e1; font-size: 0.75rem; text-decoration: underline;">O'zgartirish</a>
+                </div>
+
+                <form onsubmit="submitStep2Login(event)">
+                    <div style="margin-bottom: 0.9rem;">
                         <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.3rem;">Login:</label>
-                        <input type="text" id="admin_login_user" class="form-control" required placeholder="admin" autocomplete="username">
+                        <input type="text" id="step2_login_user" class="form-control" required placeholder="admin" value="admin" autocomplete="username">
                     </div>
 
-                    <div style="margin-bottom: 1.2rem;">
+                    <div style="margin-bottom: 1rem;">
                         <label style="display: block; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.3rem;">Parol:</label>
-                        <input type="password" id="admin_login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
+                        <input type="password" id="step2_login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
                     </div>
 
-                    <div id="adminLoginError" style="display: none; font-size: 0.82rem; color: #f87171; margin-bottom: 1rem; background: rgba(239, 68, 68, 0.15); padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
+                    <div id="step2Error" style="display: none; font-size: 0.82rem; color: #f87171; margin-bottom: 1rem; background: rgba(239, 68, 68, 0.15); padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
 
-                    <button type="submit" id="btnSubmitAdminLogin" class="btn-primary" style="width: 100%; justify-content: center; background: #f59e0b; color: #000000; font-weight: 700;">
-                        Kirish 🔓
-                    </button>
+                    <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 6px; padding: 0.55rem 0.8rem; font-size: 0.78rem; color: #fef3c7; margin-bottom: 1.2rem;">
+                        🛡️ <b>Administrator uchun:</b> Login: <code style="color: #fbbf24; font-weight: 700;">admin</code> | Parol: <code style="color: #fbbf24; font-weight: 700;">java0918</code>
+                    </div>
+
+                    <div style="display: flex; gap: 0.8rem;">
+                        <button type="button" onclick="goToStep(1)" class="btn-secondary" style="flex: 1; justify-content: center; padding: 0.85rem;">
+                            ← Qaytish
+                        </button>
+                        <button type="submit" id="btnSubmitStep2" class="btn-primary" style="flex: 2; justify-content: center; padding: 0.85rem; background: #f59e0b; color: #000; font-weight: 700;">
+                            Tizimga Kirish 🔓
+                        </button>
+                    </div>
                 </form>
             </div>
 
