@@ -1,5 +1,5 @@
 /**
- * FAUNA & FLORA — Asosiy Interaktiv Skript
+ * ANIMORE — Asosiy Interaktiv Skript
  * Web Audio Tovush Sintezi, AI Yordamchi, Kirish Animatsiyasi
  */
 
@@ -305,7 +305,7 @@ class AnimalAudioEngine {
 const audioEngine = new AnimalAudioEngine();
 
 // 2. AI ASSISTANT CHAT ENGINE
-class FaunaAIChat {
+class AnimoreAIChat {
     constructor() {
         this.chatBox = document.getElementById('aiMessagesContainer');
         this.inputEl = document.getElementById('aiChatInput');
@@ -367,7 +367,7 @@ class FaunaAIChat {
         const bubble = document.createElement('div');
         bubble.id = id;
         bubble.className = 'chat-bubble assistant';
-        bubble.innerHTML = '<em>Fauna AI o\'ylamoqda... 🐾</em>';
+        bubble.innerHTML = '<em>Animore AI o\'ylamoqda... 🐾</em>';
         this.chatBox.appendChild(bubble);
         this.chatBox.scrollTop = this.chatBox.scrollHeight;
         return id;
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // C. AI Chatni ishga tushirish
-    new FaunaAIChat();
+    new AnimoreAIChat();
 
     // D. Tezkor farq modalini ochish
     window.openDiffModal = function(name, diffText, similarSpecies) {

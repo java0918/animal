@@ -1,5 +1,5 @@
 /**
- * FAUNA & FLORA — Admin Panel Boshqaruvi
+ * ANIMORE — Admin Panel Boshqaruvi
  */
 
 async function uploadFile(fileInputId, fileType, targetUrlInputId, previewImgId = null) {

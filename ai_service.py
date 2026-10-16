@@ -6,7 +6,7 @@ from typing import Dict, Any, List
 from database import get_connection, get_all_animals
 
 SYSTEM_PROMPT = """Siz hayvonot olami, zoologiya, O'zbekiston va Xalqaro Qizil kitob bo'yicha ixtisoslashgan mukammal AI yordamchisiz.
-Ismingiz: Fauna AI.
+Ismingiz: Animore AI.
 Vazifangiz: Foydalanuvchilarga hayvonlar, ularning o'xshash turlaridan qanday farqlanishi, yashash tarzi, ovozlari, O'zbekiston Qizil kitobi va IUCN maqomi haqida o'zbek tilida aniq, ravon va qiziqarli javob berish.
 Har doim do'stona, ilmiy va tushunarli uslubda javob bering."""
 
@@ -121,7 +121,7 @@ Istalgan hayvon kartasida ovoz belgisini bosing!"""
 {facts}"""
 
     # 5. General intelligent assistant response
-    return f"""🌿 **Salom! Men Fauna AI — hayvonot olami bo'yicha aqlli yordamchingizman.**
+    return f"""🌿 **Salom! Men Animore AI — hayvonot olami bo'yicha aqlli yordamchingizman.**
 
 Men sizga quyidagi mavzularda yordam bera olaman:
 1. **Hayvonlarni solishtirish:** Masalan, *'Gepard bilan qoplon qanday farqlanadi?'* yoki *'Sher bilan yo'lbars farqi nima?'*

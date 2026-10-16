@@ -1,5 +1,5 @@
 /**
- * FAUNA & FLORA — Login va Parol orqali Kirish Tizimi
+ * ANIMORE — Login va Parol orqali Kirish Tizimi
  */
 
 function submitLogin(e) {

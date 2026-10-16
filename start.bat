@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 echo ========================================================
-echo   🌿 Fauna & Flora — Hayvonot Olami Portali Ishga Tushmoqda...
+echo   🌿 Animore — Hayvonot Olami Portali Ishga Tushmoqda...
 echo ========================================================
 echo.
 echo Brauzerda ochish manzili: http://127.0.0.1:8000
