@@ -41,10 +41,11 @@
             <h2 id="questionText" style="font-size: 1.35rem; font-weight: 700; color: #ffffff; line-height: 1.5; margin-bottom: 1rem;">
                 Savol yuklanmoqda...
             </h2>
-            <div id="soundCueWrap" style="display: none; margin-bottom: 1.2rem;">
-                <button type="button" id="btnQuizSound" class="btn-sound-play" style="padding: 0.6rem 1.2rem;">
-                    <span>🔊</span> <span>Ovozni tinglang</span>
-                    <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
+            <div id="soundCueWrap" style="margin-bottom: 1.2rem;">
+                <button type="button" id="btnQuizSound" class="btn-sound-play" style="padding: 0.6rem 1.25rem; cursor: pointer;">
+                    <span id="quizSoundIcon">🔊</span>
+                    <span id="quizSoundText">Ovozni tinglang</span>
+                    <div id="quizSoundWaves" class="sound-waves-indicator"><span></span><span></span><span></span></div>
                 </button>
             </div>
         </div>
@@ -178,9 +179,110 @@ const QUIZ_QUESTIONS = [
 let currentIdx = 0;
 let score = 0;
 let answered = false;
+let isSpeaking = false;
+
+// Ovozli o'qish (Web Speech API) funksiyalari
+function toggleSpeakQuestion() {
+    if (!('speechSynthesis' in window)) {
+        alert("Kechirasiz, brauzeringizda ovozli o'qish (Web Speech API) imkoniyati mavjud emas.");
+        return;
+    }
+
+    if (window.speechSynthesis.speaking || isSpeaking) {
+        stopSpeaking();
+        return;
+    }
+
+    const q = QUIZ_QUESTIONS[currentIdx];
+    if (!q) return;
+
+    speakQuestionText(q.question);
+}
+
+function speakQuestionText(text) {
+    if (!('speechSynthesis' in window)) return;
+    
+    stopSpeaking();
+
+    // Matnni tozalash va ravonlashtirish
+    let cleanText = text
+        .replace(/['’‘`]/g, "'")
+        .replace(/["“”]/g, "")
+        .replace(/\((.*?)\)/g, " ($1) ")
+        .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+
+    // Eng yaxshi ovozni tanlash (uz -> tr -> ru -> default)
+    const voices = window.speechSynthesis.getVoices();
+    let selectedVoice = null;
+    if (voices && voices.length > 0) {
+        selectedVoice = voices.find(v => v.lang.toLowerCase().includes('uz') || v.name.toLowerCase().includes('uzbek')) ||
+                        voices.find(v => v.lang.toLowerCase().startsWith('tr') || v.name.toLowerCase().includes('turkish')) ||
+                        voices.find(v => v.lang.toLowerCase().startsWith('ru')) ||
+                        voices.find(v => v.default) ||
+                        voices[0];
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        utterance.lang = selectedVoice.lang;
+    } else {
+        utterance.lang = 'uz-UZ';
+    }
+
+    utterance.rate = 0.92; // Tushunarli va ravon o'qish tezligi
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+        isSpeaking = true;
+        updateSoundButtonUI(true);
+    };
+
+    utterance.onend = () => {
+        isSpeaking = false;
+        updateSoundButtonUI(false);
+    };
+
+    utterance.onerror = (e) => {
+        console.warn('Speech error:', e);
+        isSpeaking = false;
+        updateSoundButtonUI(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    updateSoundButtonUI(false);
+}
+
+function updateSoundButtonUI(speaking) {
+    const btn = document.getElementById('btnQuizSound');
+    const textSpan = document.getElementById('quizSoundText');
+    const iconSpan = document.getElementById('quizSoundIcon');
+    const waves = document.getElementById('quizSoundWaves');
+
+    if (speaking) {
+        if (btn) btn.classList.add('playing');
+        if (textSpan) textSpan.innerText = "Savol o'qilmoqda... (To'xtatish)";
+        if (iconSpan) iconSpan.innerText = "⏹";
+        if (waves) waves.style.display = "inline-flex";
+    } else {
+        if (btn) btn.classList.remove('playing');
+        if (textSpan) textSpan.innerText = "Ovozni tinglang";
+        if (iconSpan) iconSpan.innerText = "🔊";
+        if (waves) waves.style.display = "none";
+    }
+}
 
 function loadQuestion() {
     answered = false;
+    stopSpeaking();
     const q = QUIZ_QUESTIONS[currentIdx];
     document.getElementById('currentQuestionNum').innerText = currentIdx + 1;
     document.getElementById('totalQuestionsNum').innerText = QUIZ_QUESTIONS.length;
@@ -189,16 +291,13 @@ function loadQuestion() {
     
     document.getElementById('questionText').innerText = q.question;
     
-    // Tovush tugmasi
+    // Savolni o'qib berish tugmasini faollashtirish
     const soundCue = document.getElementById('soundCueWrap');
     const btnSound = document.getElementById('btnQuizSound');
-    if (q.hasSound || q.soundType) {
-        soundCue.style.display = 'block';
-        btnSound.onclick = () => {
-            audioEngine.playSound(q.soundType, '', btnSound, 'Viktorina tovushi', 'Tovushni taxmin qiling');
-        };
-    } else {
-        soundCue.style.display = 'none';
+    if (soundCue) soundCue.style.display = 'block';
+    updateSoundButtonUI(false);
+    if (btnSound) {
+        btnSound.onclick = toggleSpeakQuestion;
     }
 
     // Variantlar
@@ -219,6 +318,7 @@ function loadQuestion() {
 function selectOption(selectedIdx) {
     if (answered) return;
     answered = true;
+    stopSpeaking();
     const q = QUIZ_QUESTIONS[currentIdx];
     const buttons = document.querySelectorAll('.quiz-option-btn');
 
@@ -241,6 +341,7 @@ function selectOption(selectedIdx) {
 }
 
 function nextQuestion() {
+    stopSpeaking();
     currentIdx++;
     if (currentIdx < QUIZ_QUESTIONS.length) {
         loadQuestion();
@@ -250,6 +351,7 @@ function nextQuestion() {
 }
 
 function showResults() {
+    stopSpeaking();
     document.querySelector('.quiz-card').style.display = 'none';
     const resBox = document.getElementById('quizResultBox');
     resBox.style.display = 'block';
@@ -259,6 +361,7 @@ function showResults() {
 }
 
 function restartQuiz() {
+    stopSpeaking();
     currentIdx = 0;
     score = 0;
     document.getElementById('quizResultBox').style.display = 'none';
@@ -267,6 +370,11 @@ function restartQuiz() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
     loadQuestion();
 });
 </script>
