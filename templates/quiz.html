@@ -104,6 +104,7 @@ const QUIZ_QUESTIONS = [
     {
         question: "Qaysi mushuksimon hayvonning yuzida ko'zlaridan labiga qadar qora 'ko'z yoshi chizig'i' bo'ladi va tirnoqlari itlarnikidek ichkariga kirmaydi?",
         soundType: "cheetah",
+        audioUrl: "/static/audio/quiz/q1.mp3",
         options: [
             "Leopard (Qoplon)",
             "Gepard (Cheetah)",
@@ -116,6 +117,7 @@ const QUIZ_QUESTIONS = [
     {
         question: "Yovvoyi tovushqon (zayats) va xonaki quyon (krolik) o'rtasidagi eng muhim biologik farq nima?",
         soundType: "rabbit",
+        audioUrl: "/static/audio/quiz/q2.mp3",
         options: [
             "Tovushqon faqat go'sht bilan oziqlanadi",
             "Tovushqon bolalari ko'zi ochiq va yuguradigan bo'lib tug'iladi, krolik bolalari esa ko'zi yumuq va yungsiz tug'iladi",
@@ -129,6 +131,7 @@ const QUIZ_QUESTIONS = [
         question: "Ushbu haybatli tovush qaysi qudratli yirtqichga tegishli?",
         soundType: "lion",
         hasSound: true,
+        audioUrl: "/static/audio/quiz/q3.mp3",
         options: [
             "Bo'ri",
             "Yo'lbars",
@@ -141,6 +144,7 @@ const QUIZ_QUESTIONS = [
     {
         question: "O'zbekiston Qizil kitobiga kiritilgan qaysi noyob antilopaning dumi qop-qora bo'lgani uchun 'qoraquyruq' deb ataladi?",
         soundType: "gazelle",
+        audioUrl: "/static/audio/quiz/q4.mp3",
         options: [
             "Sayg'oq",
             "Jayron (Gazella)",
@@ -153,6 +157,7 @@ const QUIZ_QUESTIONS = [
     {
         question: "Qaldirg'och va qorayaloq (swift) qanday farqlanadi?",
         soundType: "swallow",
+        audioUrl: "/static/audio/quiz/q5.mp3",
         options: [
             "Qaldirg'och daraxt shoxlariga yoki simlarga qo'na oladi, qorayaloq esa tekis yerdan o'zi ucha olmaydi",
             "Qorayaloq loydan qadahsimon in quradi",
@@ -165,6 +170,7 @@ const QUIZ_QUESTIONS = [
     {
         question: "O'zbekiston tog'larining ramzi bo'lgan Qor qoploni (Ilbirs) oddiy leopardan qanday anatomik farq qiladi?",
         soundType: "leopard",
+        audioUrl: "/static/audio/quiz/q6.mp3",
         options: [
             "Ilbirs daraxtlarda in quradi",
             "Ilbirsning dumi deyarli tana uzunligiga teng va juda qalin bo'lib, tik qoyalarda muvozanat saqlaydi hamda sovuqda yuzini isitadi",
@@ -180,31 +186,54 @@ let currentIdx = 0;
 let score = 0;
 let answered = false;
 let isSpeaking = false;
+let currentQuizAudio = null;
 
-// Ovozli o'qish (Web Speech API) funksiyalari
+// O'zbek tili nutqida savolni o'qib berish funksiyasi
 function toggleSpeakQuestion() {
-    if (!('speechSynthesis' in window)) {
-        alert("Kechirasiz, brauzeringizda ovozli o'qish (Web Speech API) imkoniyati mavjud emas.");
-        return;
-    }
+    const q = QUIZ_QUESTIONS[currentIdx];
+    if (!q) return;
 
-    if (window.speechSynthesis.speaking || isSpeaking) {
+    if (isSpeaking || (currentQuizAudio && !currentQuizAudio.paused)) {
         stopSpeaking();
         return;
     }
 
-    const q = QUIZ_QUESTIONS[currentIdx];
-    if (!q) return;
+    stopSpeaking();
 
-    speakQuestionText(q.question);
+    // 1. O'zbek tili nutqi (uz-UZ-MadinaNeural audio)
+    if (q.audioUrl) {
+        currentQuizAudio = new Audio(q.audioUrl);
+        currentQuizAudio.onplay = () => {
+            isSpeaking = true;
+            updateSoundButtonUI(true);
+        };
+        currentQuizAudio.onended = () => {
+            isSpeaking = false;
+            updateSoundButtonUI(false);
+            // Agar 3-savol hayvon ovozini taxmin qilish bo'lsa, savoldan keyin hayvon o'kirishi chalinadi
+            if (q.hasSound && q.soundType && typeof audioEngine !== 'undefined') {
+                audioEngine.playSound(q.soundType, '', null, 'Viktorina tovushi', 'Tovushni taxmin qiling');
+            }
+        };
+        currentQuizAudio.onerror = () => {
+            console.warn("Audio yuklanmadi, SpeechSynthesis ga o'tilmoqda...");
+            fallbackSpeechSynthesis(q.question);
+        };
+        currentQuizAudio.play().catch(e => {
+            console.warn("Audio play blocked, fallback:", e);
+            fallbackSpeechSynthesis(q.question);
+        });
+        return;
+    }
+
+    fallbackSpeechSynthesis(q.question);
 }
 
-function speakQuestionText(text) {
+function fallbackSpeechSynthesis(text) {
     if (!('speechSynthesis' in window)) return;
     
     stopSpeaking();
 
-    // Matnni tozalash va ravonlashtirish
     let cleanText = text
         .replace(/['’‘`]/g, "'")
         .replace(/["“”]/g, "")
@@ -213,13 +242,12 @@ function speakQuestionText(text) {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // Eng yaxshi ovozni tanlash (uz -> tr -> ru -> default)
+    // Ovoz tanlash (uzbek -> turkish -> default)
     const voices = window.speechSynthesis.getVoices();
     let selectedVoice = null;
     if (voices && voices.length > 0) {
         selectedVoice = voices.find(v => v.lang.toLowerCase().includes('uz') || v.name.toLowerCase().includes('uzbek')) ||
                         voices.find(v => v.lang.toLowerCase().startsWith('tr') || v.name.toLowerCase().includes('turkish')) ||
-                        voices.find(v => v.lang.toLowerCase().startsWith('ru')) ||
                         voices.find(v => v.default) ||
                         voices[0];
     }
@@ -231,7 +259,7 @@ function speakQuestionText(text) {
         utterance.lang = 'uz-UZ';
     }
 
-    utterance.rate = 0.92; // Tushunarli va ravon o'qish tezligi
+    utterance.rate = 0.92;
     utterance.pitch = 1.0;
 
     utterance.onstart = () => {
@@ -254,8 +282,17 @@ function speakQuestionText(text) {
 }
 
 function stopSpeaking() {
+    if (currentQuizAudio) {
+        try {
+            currentQuizAudio.pause();
+            currentQuizAudio.currentTime = 0;
+        } catch(e) {}
+        currentQuizAudio = null;
+    }
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        try {
+            window.speechSynthesis.cancel();
+        } catch(e) {}
     }
     isSpeaking = false;
     updateSoundButtonUI(false);
