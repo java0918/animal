@@ -101,17 +101,17 @@
     </main>
 
     <!-- O'XSHASH TURLAR FARQI MODAL OYNSI -->
-    <div id="speciesDiffModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 1.5rem;">
-        <div style="background: rgba(12, 28, 20, 0.95); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); max-width: 650px; width: 100%; padding: 2.2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative;">
+    <div id="speciesDiffModal" style="display: none; position: fixed; inset: 0; z-index: 1000; backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 1.5rem;">
+        <div class="species-diff-modal-card" style="border-radius: var(--radius-lg); max-width: 650px; width: 100%; padding: 2.2rem; position: relative;">
             <button onclick="closeDiffModal()" style="position: absolute; top: 1.2rem; right: 1.4rem; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
             <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
                 <span style="font-size: 1.5rem;">🔬</span>
-                <h3 id="modalAnimalName" style="color: #ffffff; font-size: 1.5rem;">Hayvon farqi</h3>
+                <h3 id="modalAnimalName" style="font-size: 1.5rem;">Hayvon farqi</h3>
             </div>
             <div style="font-size: 0.85rem; color: #34d399; margin-bottom: 1.2rem;">
                 <strong>O'xshash turlari:</strong> <span id="modalSimilarSpecies"></span>
             </div>
-            <div id="modalDiffBody" style="background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary); font-size: 0.92rem; line-height: 1.6; color: #f1f5f9; max-height: 350px; overflow-y: auto;">
+            <div id="modalDiffBody" style="padding: 1.2rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary); font-size: 0.92rem; line-height: 1.6; max-height: 350px; overflow-y: auto;">
             </div>
             <div style="margin-top: 1.5rem; text-align: right;">
                 <button onclick="closeDiffModal()" class="btn-detail-link" style="padding: 0.6rem 1.4rem; cursor: pointer;">Tushunarli</button>

@@ -118,7 +118,11 @@ a:hover {
   text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
 }
 
-/* KUN REJIMI (LIGHT MODE) ELEMENTLARI */
+/* ==========================================================================
+   KUN REJIMI (LIGHT MODE) — BARCHA PANELLAR VA ELEMENTLARNI TO'LIQ MOSLASH
+   ========================================================================== */
+
+/* 1. Universal Matn va Sarlavhalar Kontrasti */
 [data-theme="light"] h1,
 [data-theme="light"] h2,
 [data-theme="light"] h3,
@@ -126,25 +130,96 @@ a:hover {
 [data-theme="light"] h5,
 [data-theme="light"] h6 {
   color: #0f172a !important;
-  text-shadow: none;
+  text-shadow: none !important;
 }
 
 [data-theme="light"] p,
 [data-theme="light"] span,
-[data-theme="light"] label {
-  text-shadow: none;
+[data-theme="light"] label,
+[data-theme="light"] div {
+  text-shadow: none !important;
+}
+
+[data-theme="light"] body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 [data-theme="light"] body::before {
   background: 
-    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 40%);
+    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 40%) !important;
 }
 
+/* Inline oq/och rangli matnlarni Light modeda o'qiladigan to'q rangga o'tkazish */
+[data-theme="light"] [style*="color: #ffffff"],
+[data-theme="light"] [style*="color:#ffffff"],
+[data-theme="light"] [style*="color: #f1f5f9"],
+[data-theme="light"] [style*="color: #e2e8f0"],
+[data-theme="light"] [style*="color: #cbd5e1"] {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] [style*="color: var(--color-text-dim)"] {
+  color: #475569 !important;
+}
+
+[data-theme="light"] [style*="color: var(--color-text-muted)"] {
+  color: #64748b !important;
+}
+
+[data-theme="light"] [style*="color: #6ee7b7"],
+[data-theme="light"] [style*="color: #a7f3d0"],
+[data-theme="light"] [style*="color: #34d399"] {
+  color: #047857 !important;
+}
+
+[data-theme="light"] [style*="color: #7dd3fc"],
+[data-theme="light"] [style*="color: #38bdf8"] {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] [style*="color: #fca5a5"],
+[data-theme="light"] [style*="color: #fecaca"],
+[data-theme="light"] [style*="color: #f87171"] {
+  color: #dc2626 !important;
+}
+
+[data-theme="light"] [style*="color: #fde047"],
+[data-theme="light"] [style*="color: #fef08a"],
+[data-theme="light"] [style*="color: #fbbf24"] {
+  color: #b45309 !important;
+}
+
+/* Hero Banner ichidagi rasm usti yozuvlari */
+[data-theme="light"] .hero-split-banner h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85) !important;
+}
+
+[data-theme="light"] .hero-split-banner p {
+  color: #f1f5f9 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85) !important;
+}
+
+[data-theme="light"] .hero-split-banner span {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Inline qora shaffof fonlarni yorug' fonlarga aylantirish */
+[data-theme="light"] [style*="background: rgba(0,0,0"],
+[data-theme="light"] [style*="background: rgba(6, 18, 12"],
+[data-theme="light"] [style*="background: rgba(255,255,255,0.04)"],
+[data-theme="light"] [style*="background: rgba(255,255,255,0.03)"] {
+  background: #f8fafc !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* 2. Yuqori Navbar va Foydalanuvchi Paneli */
 [data-theme="light"] .navbar {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.25) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-theme="light"] .brand-title {
@@ -156,99 +231,400 @@ a:hover {
 }
 
 [data-theme="light"] .nav-link {
-  color: #334155;
+  color: #334155 !important;
+  font-weight: 600;
 }
 
 [data-theme="light"] .nav-link:hover,
 [data-theme="light"] .nav-link.active {
-  color: #059669;
-  background: rgba(16, 185, 129, 0.12);
+  color: #059669 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
 }
 
-[data-theme="light"] .animal-card,
-[data-theme="light"] .quiz-card,
-[data-theme="light"] .ai-chat-card,
-[data-theme="light"] .diff-card,
-[data-theme="light"] .compare-card,
-[data-theme="light"] .gateway-hero-card {
+[data-theme="light"] .user-badge {
+  background: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="light"] .user-name {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .btn-logout {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+}
+
+/* 3. Statistika Kartochkalari (Stats Grid) */
+[data-theme="light"] .stat-card {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .stat-card:hover {
+  border-color: #10b981 !important;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme="light"] .stat-number {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .stat-label {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+/* 4. Qidiruv va Filtr Paneli */
+[data-theme="light"] .filter-search-bar {
   background: #ffffff !important;
   border: 1px solid rgba(16, 185, 129, 0.25) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
-[data-theme="light"] .animal-title {
+[data-theme="light"] .search-input {
+  background: #f8fafc !important;
   color: #0f172a !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
 }
 
-[data-theme="light"] .animal-latin {
-  color: #059669 !important;
-}
-
-[data-theme="light"] .animal-desc-short,
-[data-theme="light"] .animal-stat-label {
-  color: #475569 !important;
-}
-
-[data-theme="light"] .animal-stat-val {
-  color: #0f172a !important;
-}
-
-[data-theme="light"] .search-input,
-[data-theme="light"] .form-control,
-[data-theme="light"] .chat-input {
+[data-theme="light"] .search-input:focus {
   background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
 }
 
-[data-theme="light"] .search-input::placeholder,
-[data-theme="light"] .form-control::placeholder,
-[data-theme="light"] .chat-input::placeholder {
-  color: #94a3b8;
+[data-theme="light"] .search-input::placeholder {
+  color: #94a3b8 !important;
 }
 
 [data-theme="light"] .category-pill {
-  background: #ffffff;
-  color: #334155;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
 [data-theme="light"] .category-pill:hover,
 [data-theme="light"] .category-pill.active {
-  background: #10b981;
-  color: #ffffff;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+/* 5. Asosiy Hayvonlar Kartochkalari (Animal Cards) */
+[data-theme="light"] .animal-card {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .animal-card:hover {
+  border-color: #10b981 !important;
+  box-shadow: 0 15px 35px rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme="light"] .animal-title {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .animal-latin {
+  color: #059669 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .animal-desc-short {
+  color: #334155 !important;
+  line-height: 1.6 !important;
+}
+
+[data-theme="light"] .badge-category {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #065f46 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  font-weight: 700 !important;
+}
+
+/* O'xshash turlaridan farqi bloki (Karta ichida) */
+[data-theme="light"] .difference-highlight-box {
+  background: #f0fdf4 !important;
+  border-left: 3.5px solid #10b981 !important;
+  border-top: 1px solid rgba(16, 185, 129, 0.2) !important;
+  border-right: 1px solid rgba(16, 185, 129, 0.2) !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="light"] .diff-header {
+  color: #065f46 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .diff-text {
+  color: #1e293b !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="light"] .difference-highlight-box button {
+  color: #047857 !important;
+}
+
+/* Karta pastki qismi va tugmalari */
+[data-theme="light"] .card-actions-row {
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+[data-theme="light"] .btn-sound-play {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border: 1.5px solid #7dd3fc !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .btn-sound-play:hover,
+[data-theme="light"] .btn-sound-play.playing {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3) !important;
+}
+
+[data-theme="light"] .btn-detail-link {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1.5px solid #a7f3d0 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .btn-detail-link:hover {
+  background: #059669 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3) !important;
+}
+
+/* 6. Turlarni Taqqoslash Sahifasi (/compare) */
+[data-theme="light"] .compare-card {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07) !important;
+}
+
+[data-theme="light"] .compare-card h2 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .compare-card p {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .compare-vs-badge {
+  background: #ffffff !important;
+  color: #d97706 !important;
+  border: 3px solid #f59e0b !important;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25) !important;
+}
+
+[data-theme="light"] .compare-selector-panel {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] select.form-control,
+[data-theme="light"] .compare-select {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+  font-weight: 600;
+}
+
+/* 7. Qizil Kitob Sahifasi (/redbook) */
+[data-theme="light"] .redbook-hero-banner {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+/* 8. Zoologik Viktorina Sahifasi (/quiz) */
+[data-theme="light"] .quiz-card {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] #questionText,
+[data-theme="light"] .quiz-card h2 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
 }
 
 [data-theme="light"] .quiz-option-btn {
-  background: #ffffff !important;
+  background: #f8fafc !important;
   color: #0f172a !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.14) !important;
+  font-weight: 600 !important;
 }
 
 [data-theme="light"] .quiz-option-btn:hover {
   background: #ecfdf5 !important;
   border-color: #10b981 !important;
+  color: #065f46 !important;
+  transform: translateX(4px);
 }
 
-[data-theme="light"] .diff-table th {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
+[data-theme="light"] .quiz-option-btn.correct {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #14532d !important;
 }
 
-[data-theme="light"] .diff-table td {
+[data-theme="light"] .quiz-option-btn.incorrect {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #7f1d1d !important;
+}
+
+[data-theme="light"] #quizExplanationBox {
+  background: #f0fdf4 !important;
+  border: 1.5px solid #86efac !important;
+}
+
+[data-theme="light"] #explanationText {
   color: #1e293b !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 9. AI Chat Sahifasi (/ai-chat) */
+[data-theme="light"] .ai-chat-card {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.07) !important;
+}
+
+[data-theme="light"] .ai-chat-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
 
 [data-theme="light"] .chat-bubble.assistant {
   background: #f1f5f9 !important;
   color: #0f172a !important;
-  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
 }
 
+[data-theme="light"] .chat-bubble.user {
+  background: #059669 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .chat-input {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+/* 10. Jadvallar va Admin Paneli (/admin) */
+[data-theme="light"] .diff-table {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .diff-table th {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.3) !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .diff-table td {
+  color: #1e293b !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+[data-theme="light"] .diff-table strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .diff-table tr:hover td {
+  background: #f8fafc !important;
+}
+
+[data-theme="light"] .admin-tab {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
+  font-weight: 600;
+}
+
+[data-theme="light"] .admin-tab.active {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="light"] .form-control {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+/* 11. Modal Oynalar (Species Diff Modal & Lightbox) */
+#speciesDiffModal {
+  background: rgba(0, 0, 0, 0.8);
+}
+.species-diff-modal-card {
+  background: rgba(12, 28, 20, 0.95);
+  border: 1px solid var(--color-border-glass);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+}
+#modalDiffBody {
+  background: rgba(0, 0, 0, 0.3);
+  color: #f1f5f9;
+}
+
+[data-theme="light"] #speciesDiffModal {
+  background: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme="light"] .species-diff-modal-card,
+[data-theme="light"] #speciesDiffModal > div {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="light"] #modalAnimalName {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] #modalDiffBody {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border-left: 3.5px solid #10b981 !important;
+}
+
+/* 12. Global Pastki Audio Player Bar */
+[data-theme="light"] .global-audio-bar {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-top: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] #audioBarName {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] #audioBarDesc {
+  color: #059669 !important;
+}
+
+/* 13. Footer */
 [data-theme="light"] footer {
   background: #ffffff !important;
-  border-top: 1px solid rgba(16, 185, 129, 0.25) !important;
+  border-top: 1.5px solid rgba(16, 185, 129, 0.25) !important;
 }
 
 [data-theme="light"] footer p,
