@@ -3,11 +3,11 @@
    Zamonaviy Ekotizim & AI Bionik Dizayn Tizimi
    ========================================================================== */
 
-:root {
+:root, [data-theme="dark"] {
   --font-main: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
   
-  /* Ranglar palitrasi */
+  /* Tun rejimi (Dark Mode) ranglar palitrasi */
   --color-bg-dark: #070e0a;
   --color-bg-card: rgba(14, 27, 20, 0.75);
   --color-bg-glass: rgba(18, 38, 28, 0.6);
@@ -26,11 +26,11 @@
   --color-text-dim: #cbd5e1;
   
   /* Qizil kitob ranglari */
-  --redbook-cr: #ef4444; /* Qat'iy xavf ostida */
-  --redbook-en: #f97316; /* Xavf ostida */
-  --redbook-vu: #eab308; /* Zaif */
-  --redbook-nt: #06b6d4; /* Xavfga yaqin */
-  --redbook-lc: #10b981; /* Xavf yo'q */
+  --redbook-cr: #ef4444;
+  --redbook-en: #f97316;
+  --redbook-vu: #eab308;
+  --redbook-nt: #06b6d4;
+  --redbook-lc: #10b981;
   
   --shadow-glow-green: 0 0 25px rgba(16, 185, 129, 0.35);
   --shadow-glow-gold: 0 0 25px rgba(245, 158, 11, 0.35);
@@ -38,6 +38,30 @@
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 8px;
+}
+
+/* Kun rejimi (Light Mode) */
+[data-theme="light"] {
+  --color-bg-dark: #f8fafc;
+  --color-bg-card: rgba(255, 255, 255, 0.94);
+  --color-bg-glass: rgba(248, 250, 252, 0.9);
+  --color-border-glass: rgba(16, 185, 129, 0.3);
+  --color-border-light: rgba(15, 23, 42, 0.1);
+  
+  --color-primary: #059669;
+  --color-primary-glow: #10b981;
+  --color-savannah: #d97706;
+  --color-savannah-glow: #f59e0b;
+  --color-meadow: #16a34a;
+  --color-sky: #0284c7;
+  
+  --color-text-main: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-dim: #1e293b;
+  
+  --shadow-glow-green: 0 0 20px rgba(16, 185, 129, 0.2);
+  --shadow-glow-gold: 0 0 20px rgba(217, 119, 6, 0.2);
+  --shadow-card: 0 8px 25px -4px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -92,6 +116,180 @@ a {
 a:hover {
   color: #a7f3d0;
   text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+}
+
+/* KUN REJIMI (LIGHT MODE) ELEMENTLARI */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: #0f172a !important;
+  text-shadow: none;
+}
+
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] label {
+  text-shadow: none;
+}
+
+[data-theme="light"] body::before {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 40%);
+}
+
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .brand-title {
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .brand-subtitle {
+  color: #059669 !important;
+}
+
+[data-theme="light"] .nav-link {
+  color: #334155;
+}
+
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+[data-theme="light"] .animal-card,
+[data-theme="light"] .quiz-card,
+[data-theme="light"] .ai-chat-card,
+[data-theme="light"] .diff-card,
+[data-theme="light"] .compare-card,
+[data-theme="light"] .gateway-hero-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .animal-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .animal-latin {
+  color: #059669 !important;
+}
+
+[data-theme="light"] .animal-desc-short,
+[data-theme="light"] .animal-stat-label {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .animal-stat-val {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .search-input,
+[data-theme="light"] .form-control,
+[data-theme="light"] .chat-input {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+[data-theme="light"] .search-input::placeholder,
+[data-theme="light"] .form-control::placeholder,
+[data-theme="light"] .chat-input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .category-pill {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+[data-theme="light"] .category-pill:hover,
+[data-theme="light"] .category-pill.active {
+  background: #10b981;
+  color: #ffffff;
+}
+
+[data-theme="light"] .quiz-option-btn {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="light"] .quiz-option-btn:hover {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="light"] .diff-table th {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .diff-table td {
+  color: #1e293b !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .chat-bubble.assistant {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="light"] footer {
+  background: #ffffff !important;
+  border-top: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+
+[data-theme="light"] footer p,
+[data-theme="light"] footer div {
+  color: #334155 !important;
+}
+
+/* THEME TOGGLE BUTTON STYLES */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.95rem;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-glass);
+  color: var(--color-text-main);
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.theme-toggle-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .theme-icon-sun { display: inline-block; }
+[data-theme="dark"] .theme-icon-moon { display: none; }
+[data-theme="light"] .theme-icon-sun { display: none; }
+[data-theme="light"] .theme-icon-moon { display: inline-block; }
+
+[data-theme="light"] .theme-toggle-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 /* ==========================================================================

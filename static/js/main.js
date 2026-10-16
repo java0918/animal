@@ -471,5 +471,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lion) lion.style.transform = 'translate3d(0,0,0)';
         });
     }
+
+    // G. Kun / Tun (Light / Dark) Rejim Boshqaruvi
+    function updateThemeToggleUI(theme) {
+        const btnText = document.getElementById('themeToggleText');
+        if (btnText) {
+            btnText.innerText = theme === 'light' ? 'Tun' : 'Kun';
+        }
+    }
+
+    window.toggleTheme = function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('animore_theme', newTheme);
+        updateThemeToggleUI(newTheme);
+    };
+
+    const initialTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('animore_theme') || 'dark';
+    updateThemeToggleUI(initialTheme);
 });
+
 

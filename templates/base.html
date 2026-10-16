@@ -8,6 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Theme Initialization to avoid flicker -->
+    <script>
+        (function() {
+            var savedTheme = localStorage.getItem('animore_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     <link rel="stylesheet" href="/static/css/style.css">
     {% block extra_head %}{% endblock %}
 </head>
@@ -71,6 +78,11 @@
         </ul>
 
         <div class="nav-user-panel">
+            <button type="button" id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Rejimni almashtirish (Kun / Tun)">
+                <span class="theme-icon-sun">☀️</span>
+                <span class="theme-icon-moon">🌙</span>
+                <span id="themeToggleText">Kun</span>
+            </button>
             {% if user %}
             <div class="user-badge">
                 <img src="{{ user.picture }}" alt="{{ user.name }}" class="user-avatar">
