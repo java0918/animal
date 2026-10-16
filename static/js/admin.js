@@ -1,5 +1,5 @@
 /**
- * ANIMORE — Admin Panel Boshqaruvi
+ * ANIMORA — Admin Panel Boshqaruvi
  */
 
 async function uploadFile(fileInputId, fileType, targetUrlInputId, previewImgId = null) {

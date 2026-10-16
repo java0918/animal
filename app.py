@@ -17,7 +17,7 @@ from database import (
 )
 from ai_service import ask_ai
 
-app = FastAPI(title="Animore — Hayvonot Olami Portali")
+app = FastAPI(title="Animora — Hayvonot Olami Portali")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -53,7 +53,7 @@ import urllib.parse
 
 # Helper for current user from cookie
 def get_current_user(request: Request) -> Optional[dict]:
-    session_cookie = request.cookies.get("animore_session") or request.cookies.get("fauna_session")
+    session_cookie = request.cookies.get("animora_session") or request.cookies.get("animore_session") or request.cookies.get("fauna_session")
     if not session_cookie:
         return None
     try:
@@ -205,7 +205,7 @@ async def user_login(request: Request, response: Response):
             )
             res = JSONResponse({"success": True, "redirect": "/admin", "role": "admin", "user": user_session})
             cookie_val = urllib.parse.quote(json.dumps(user_session))
-            res.set_cookie(key="animore_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
+            res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
             res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
             return res
         else:
@@ -217,7 +217,7 @@ async def user_login(request: Request, response: Response):
         # Oddiy foydalanuvchi
         user_session = {
             "id": 2,
-            "email": f"{username.lower()}@animore.uz",
+            "email": f"{username.lower()}@animora.uz",
             "name": username.capitalize(),
             "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
             "role": "user"
@@ -231,7 +231,7 @@ async def user_login(request: Request, response: Response):
         )
         res = JSONResponse({"success": True, "redirect": "/", "role": "user", "user": user_session})
         cookie_val = urllib.parse.quote(json.dumps(user_session))
-        res.set_cookie(key="animore_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
+        res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         return res
 
@@ -240,7 +240,7 @@ async def demo_login(request: Request, response: Response):
     """Foydalanuvchi tezkor kirish"""
     user_session = {
         "id": 2,
-        "email": "mehmon@animore.uz",
+        "email": "mehmon@animora.uz",
         "name": "Mehmon",
         "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
         "role": "user"
@@ -256,7 +256,7 @@ async def demo_login(request: Request, response: Response):
     
     res = JSONResponse({"success": True, "user": user_session})
     cookie_val = urllib.parse.quote(json.dumps(user_session))
-    res.set_cookie(key="animore_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
+    res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
     res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
     return res
 
@@ -264,7 +264,7 @@ async def demo_login(request: Request, response: Response):
 @app.post("/api/auth/logout")
 async def logout(response: Response):
     res = RedirectResponse(url="/login")
-    res.delete_cookie("animore_session")
+    res.delete_cookie("animora_session")
     res.delete_cookie("fauna_session")
     return res
 

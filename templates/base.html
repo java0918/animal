@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Animore — Hayvonot Olami Portali{% endblock %}</title>
+    <title>{% block title %}Animora — Hayvonot Olami Portali{% endblock %}</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
     <!-- Theme Initialization to avoid flicker -->
     <script>
         (function() {
-            var savedTheme = localStorage.getItem('animore_theme') || 'dark';
+            var savedTheme = localStorage.getItem('animora_theme') || localStorage.getItem('animore_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
@@ -28,7 +28,7 @@
             <div class="ai-ring ring-inner"></div>
             <div class="ai-core-icon">🌿</div>
         </div>
-        <div class="ai-status-text">ANIMORE AI MATRITSA YUKLANMOQDA...</div>
+        <div class="ai-status-text">ANIMORA AI MATRITSA YUKLANMOQDA...</div>
         <div class="ai-sub-status">Jonli tabiat va ekotizim ma'lumotlari yangilanmoqda</div>
     </div>
 
@@ -37,7 +37,7 @@
         <a href="/" class="nav-brand">
             <div class="brand-logo-badge">🌿</div>
             <div>
-                <div class="brand-title">Animore</div>
+                <div class="brand-title">Animora</div>
                 <div class="brand-subtitle">Hayvonot Olami Portali</div>
             </div>
         </a>
@@ -65,7 +65,7 @@
             </li>
             <li>
                 <a href="/ai-chat" class="nav-link {% if request.url.path == '/ai-chat' %}active{% endif %}">
-                    <span>✨</span> Animore AI Yordamchi
+                    <span>✨</span> Animora AI Yordamchi
                 </a>
             </li>
             {% if user and user.role == 'admin' %}
@@ -149,14 +149,14 @@
 
     <!-- FLOATING AI ASSISTANT TUGMASI (Har bir sahifada) -->
     <a href="/ai-chat" class="floating-ai-btn">
-        <span>✨ Animore AI Yordamchi</span>
+        <span>✨ Animora AI Yordamchi</span>
     </a>
 
     <!-- FOOTER -->
     <footer style="margin-top: 5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem 2rem; background: rgba(5, 12, 8, 0.9); text-align: center; color: var(--color-text-muted); font-size: 0.88rem;">
         <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #ffffff;">
-                <span>🌿</span> Animore — O'zbekiston va Jahon Hayvonot Olami Portali
+                <span>🌿</span> Animora — O'zbekiston va Jahon Hayvonot Olami Portali
             </div>
             <p>O'zbekiston Qizil kitobi & IUCN Xalqaro Qizil ro'yxati asosida tuzilgan ilmiy-ommabop biologik tizim.</p>
             <p style="font-size: 0.78rem; color: #64748b;">© 2026 Barcha huquqlar himoyalangan. Himoyalangan xavfsiz tizim.</p>
