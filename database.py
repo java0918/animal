@@ -2,9 +2,17 @@ import sqlite3
 import json
 import os
 import shutil
+import re
 from typing import List, Dict, Any, Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "fauna.db")
+
+def normalize_uz_text(text: Optional[str]) -> str:
+    """Normalize Uzbek text: remove all variations of apostrophes/backticks and lowercase."""
+    if not text:
+        return ""
+    cleaned = re.sub(r"['`’ʻʼ‘´]", "", str(text).lower())
+    return cleaned.strip()
 
 def is_serverless_env():
     return bool(
@@ -34,6 +42,7 @@ def get_connection():
         conn.execute("PRAGMA journal_mode=WAL;")
     except Exception:
         pass
+    conn.create_function("NORMALIZE_UZ", 1, normalize_uz_text)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -125,8 +134,9 @@ def get_all_animals(category: Optional[str] = None, red_book_only: bool = False,
         query += " AND (uz_red_book_status != 'Kiritilmagan' OR iucn_status IN ('CR', 'EN', 'VU'))"
         
     if search:
-        query += " AND (name_uz LIKE ? OR name_latin LIKE ? OR name_en LIKE ? OR description LIKE ?)"
-        s = f"%{search}%"
+        cleaned_search = normalize_uz_text(search)
+        query += " AND (NORMALIZE_UZ(name_uz) LIKE ? OR NORMALIZE_UZ(name_latin) LIKE ? OR NORMALIZE_UZ(name_en) LIKE ? OR NORMALIZE_UZ(description) LIKE ?)"
+        s = f"%{cleaned_search}%"
         params.extend([s, s, s, s])
         
     query += " ORDER BY id ASC"

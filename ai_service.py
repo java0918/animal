@@ -2,8 +2,8 @@ import os
 import json
 import sqlite3
 import re
-from typing import Dict, Any, List
-from database import get_connection, get_all_animals
+from typing import Dict, Any, List, Optional
+from database import get_connection, get_all_animals, normalize_uz_text
 
 SYSTEM_PROMPT = """Siz hayvonot olami, zoologiya, O'zbekiston va Xalqaro Qizil kitob bo'yicha ixtisoslashgan mukammal AI yordamchisiz.
 Ismingiz: Animora AI.
@@ -11,7 +11,6 @@ Vazifangiz: Foydalanuvchilarga hayvonlar, ularning o'xshash turlaridan qanday fa
 Har doim do'stona, ilmiy va tushunarli uslubda javob bering."""
 
 def get_gemini_api_key() -> str:
-    # Check env or database settings
     key = os.environ.get("GEMINI_API_KEY", "")
     if key:
         return key
@@ -32,7 +31,6 @@ def call_gemini_api(api_key: str, message: str, history: List[Dict[str, str]] = 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     
     contents = []
-    # system instruction or prompt context
     contents.append({
         "role": "user",
         "parts": [{"text": SYSTEM_PROMPT + "\n\nSavol: " + message}]
@@ -51,23 +49,83 @@ def call_gemini_api(api_key: str, message: str, history: List[Dict[str, str]] = 
                 return parts[0].get("text", "")
     raise Exception(f"Gemini API xatoligi: {response.text}")
 
+def _extract_animal_tokens(animal: Dict[str, Any]) -> List[str]:
+    """Extract normalized keywords for matching an animal."""
+    tokens = set()
+    norm_uz = normalize_uz_text(animal.get("name_uz", ""))
+    words = re.findall(r'[a-z0-9]+', norm_uz)
+    for w in words:
+        if len(w) > 2 and w not in ["yovvoyi", "qum", "chol", "orta", "osiyo", "tur", "daryo"]:
+            tokens.add(w)
+            
+    norm_latin = normalize_uz_text(animal.get("name_latin", ""))
+    for w in re.findall(r'[a-z0-9]+', norm_latin):
+        if len(w) > 3:
+            tokens.add(w)
+
+    norm_en = normalize_uz_text(animal.get("name_en", ""))
+    for w in re.findall(r'[a-z0-9]+', norm_en):
+        if len(w) > 3:
+            tokens.add(w)
+            
+    return list(tokens)
+
+def _find_matching_animals(norm_msg: str, animals: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    matched = []
+    for a in animals:
+        tokens = _extract_animal_tokens(a)
+        if any(re.search(r'\b' + re.escape(t) + r'\b', norm_msg) for t in tokens):
+            matched.append(a)
+        elif any(t in norm_msg for t in tokens if len(t) >= 4):
+            if a not in matched:
+                matched.append(a)
+    return matched
+
 def fallback_smart_ai(message: str) -> str:
     """
     Intelligent Biological Knowledge Engine in Uzbek.
     Matches animal queries, comparisons, red book questions, sounds, and general biology.
     """
-    msg_lower = message.lower()
+    norm_msg = normalize_uz_text(message)
     animals = get_all_animals()
+    matched_animals = _find_matching_animals(norm_msg, animals)
     
     # 1. Check for animal difference / comparison query
-    if any(k in msg_lower for k in ["farq", "farqi", "farqlanadi", "taqqosla", "solishtir", "ajrat"]):
-        for a in animals:
-            name_low = a["name_uz"].lower()
-            sim_low = a["similar_species"].lower()
-            if any(part in msg_lower for part in name_low.split()[:2]) or any(part in msg_lower for part in sim_low.split()):
-                return f"""🦁 **{a['name_uz']} va unga o'xshash turlar o'rtasidagi asosiy farqlar:**\n\n{a['differences']}\n\n📌 **Yashash muhiti:** {a['habitat']}\n⚡ **Harakat tezligi:** {a['speed']}"""
-                
-        if "gepard" in msg_lower or "qoplon" in msg_lower or "leopard" in msg_lower:
+    is_compare = any(k in norm_msg for k in ["farq", "farqi", "farqlanadi", "taqqosla", "solishtir", "ajrat", "solishtirilsa"])
+    
+    if is_compare:
+        if len(matched_animals) >= 2:
+            a1, a2 = matched_animals[0], matched_animals[1]
+            return f"""⚖️ **{a1['name_uz']} va {a2['name_uz']} o'rtasidagi biologik taqqoslash:**
+
+📌 **1. {a1['name_uz']}:**
+• **Yashash joyi:** {a1['habitat']}
+• **Oziqlanishi:** {a1['diet']}
+• **Tezligi va vazni:** {a1['speed']} | {a1['weight']}
+• **Muhofaza maqomi:** O'zbekiston Qizil kitobi: `{a1['uz_red_book_status']}`, IUCN: `{a1['iucn_status']}`
+
+📌 **2. {a2['name_uz']}:**
+• **Yashash joyi:** {a2['habitat']}
+• **Oziqlanishi:** {a2['diet']}
+• **Tezligi va vazni:** {a2['speed']} | {a2['weight']}
+• **Muhofaza maqomi:** O'zbekiston Qizil kitobi: `{a2['uz_red_book_status']}`, IUCN: `{a2['iucn_status']}`
+
+🔍 **O'xshash turlardan ajratuvchi asosiy farqlar:**
+{a1['differences']}
+
+💡 *Batafsil solishtirish uchun saytimizning 'Turlarni Taqqoslash' bo'limiga kiring.*"""
+
+        elif len(matched_animals) == 1:
+            a = matched_animals[0]
+            return f"""🦁 **{a['name_uz']} va unga o'xshash turlar o'rtasidagi asosiy farqlar:**
+
+{a['differences']}
+
+📌 **Yashash muhiti:** {a['habitat']}
+🥩 **Oziqlanishi:** {a['diet']}
+⚡ **Harakat tezligi:** {a['speed']} | ⚖️ **Vazni:** {a['weight']}"""
+
+        if any(w in norm_msg for w in ["gepard", "qoplon", "leopard"]):
             return """🐆 **Gepard va Qoplon (Leopard) o'rtasidagi asosiy farqlar:**
 1. **Dog'lari:** Gepard tanasidagi dog'lar yakka-yakka yaxlit qora nuqtalardir. Leopardda esa gulsimon, markazi ochiq 'rozetka' dog'lar bo'ladi.
 2. **Yuzdagi chiziq:** Gepardning ko'zlaridan labiga qadar qora 'ko'z yoshi chizig'i' o'tgan (quyosh nuridan himoya). Leopardda bunday chiziq yo'q.
@@ -75,7 +133,7 @@ def fallback_smart_ai(message: str) -> str:
 4. **Xulq-atvori:** Leopard o'ljasini baland daraxtlarga olib chiqadi; gepard esa faqat tekislikda katta tezlikda (120 km/soat) quvlab ovlaydi."""
 
     # 2. Check for Red Book query
-    if any(k in msg_lower for k in ["qizil kitob", "red book", "iucn", "yo'qolib", "yoqolib", "muhofaza", "noyob"]):
+    if any(k in norm_msg for k in ["qizil kitob", "red book", "iucn", "yoqolib", "muhofaza", "noyob", "xavf"]):
         red_animals = [a for a in animals if a["uz_red_book_status"] != "Kiritilmagan" or a["iucn_status"] in ["CR", "EN", "VU"]]
         response_lines = ["📕 **O'zbekiston va Xalqaro Qizil kitobga kiritilgan muhim turlar:**\n"]
         for ra in red_animals[:6]:
@@ -84,10 +142,14 @@ def fallback_smart_ai(message: str) -> str:
         return "\n".join(response_lines)
 
     # 3. Check for animal sounds query
-    if any(k in msg_lower for k in ["ovoz", "tovush", "sayrash", "o'kir", "okir", "uvilla"]):
-        for a in animals:
-            if any(w in msg_lower for w in a["name_uz"].lower().split()[:2]):
-                return f"""🔊 **{a['name_uz']}ning ovozi haqida:**\n\n{a['sound_description']}\n\nSiz ushbu hayvon kartasidagi **'Ovozni tinglash'** tugmasini bosib, uning haqiqiy tovushini audio to'lqinlar bilan eshitishingiz mumkin!"""
+    if any(k in norm_msg for k in ["ovoz", "tovush", "sayrash", "okir", "uvilla", "chuldirash", "qichqir"]):
+        if matched_animals:
+            a = matched_animals[0]
+            return f"""🔊 **{a['name_uz']}ning ovozi haqida:**
+
+{a['sound_description']}
+
+Siz ushbu hayvon kartasidagi **'Ovozni tinglash'** tugmasini bosib, uning haqiqiy tovushini audio to'lqinlar bilan eshitishingiz mumkin!"""
         return """🎵 **Hayvonlarning ovozlari haqida:**
 Har bir hayvon o'ziga xos akustik signallar orqali muloqot qiladi:
 • **Sher:** Haybatli o'kirishi 8 km masofagacha eshitiladi.
@@ -99,11 +161,10 @@ Har bir hayvon o'ziga xos akustik signallar orqali muloqot qiladi:
 Istalgan hayvon kartasida ovoz belgisini bosing!"""
 
     # 4. Check for specific animal info
-    for a in animals:
-        name_parts = a["name_uz"].lower().split()
-        if any(part in msg_lower for part in name_parts if len(part) > 2) or a["name_latin"].lower() in msg_lower or a["name_en"].lower() in msg_lower:
-            facts = "\n".join([f"  - {f}" for f in a.get("fun_facts", [])])
-            return f"""🐾 **{a['name_uz']} ({a['name_latin']}) haqida to'liq ma'lumot:**
+    if matched_animals:
+        a = matched_animals[0]
+        facts = "\n".join([f"  - {f}" for f in a.get("fun_facts", [])])
+        return f"""🐾 **{a['name_uz']} ({a['name_latin']}) haqida to'liq ma'lumot:**
 
 📖 **Tavsifi:** {a['description']}
 🌿 **Yashash joyi:** {a['habitat']}
@@ -124,7 +185,7 @@ Istalgan hayvon kartasida ovoz belgisini bosing!"""
     return f"""🌿 **Salom! Men Animora AI — hayvonot olami bo'yicha aqlli yordamchingizman.**
 
 Men sizga quyidagi mavzularda yordam bera olaman:
-1. **Hayvonlarni solishtirish:** Masalan, *'Gepard bilan qoplon qanday farqlanadi?'* yoki *'Sher bilan yo'lbars farqi nima?'*
+1. **Hayvonlarni solishtirish:** Masalan, *'Gepard bilan qoplon qanday farqlanadi?'* yoki *'Sher bilan bo'ri farqi nima?'*
 2. **Qizil kitob:** *'O'zbekiston Qizil kitobiga qaysi hayvonlar kiritilgan?'* yoki *'Qor qoploni maqomi qanday?'*
 3. **Ovozlar:** *'Sherning o'kirishi qanchalik uzoqqa eshitiladi?'* yoki *'Qaldirg'och qanday sayraydi?'*
 4. **Biologik faktlar:** Yashash muhiti, oziqlanishi, tezligi va kamyob odatlari.
@@ -137,6 +198,5 @@ def ask_ai(message: str) -> str:
         try:
             return call_gemini_api(key, message)
         except Exception as e:
-            # Fallback to local intelligent engine
             return fallback_smart_ai(message)
     return fallback_smart_ai(message)

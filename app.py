@@ -39,13 +39,20 @@ UPLOAD_IMG_DIR = os.path.join(UPLOAD_ROOT, "images")
 UPLOAD_AUD_DIR = os.path.join(UPLOAD_ROOT, "audio")
 
 try:
+    os.makedirs(UPLOAD_ROOT, exist_ok=True)
     os.makedirs(UPLOAD_IMG_DIR, exist_ok=True)
     os.makedirs(UPLOAD_AUD_DIR, exist_ok=True)
 except OSError:
     pass
 
-if is_serverless and os.path.exists(UPLOAD_ROOT):
-    app.mount("/static/uploads", StaticFiles(directory=UPLOAD_ROOT), name="static_uploads")
+if is_serverless:
+    if not os.path.exists(UPLOAD_ROOT):
+        try:
+            os.makedirs(UPLOAD_ROOT, exist_ok=True)
+        except OSError:
+            pass
+    if os.path.exists(UPLOAD_ROOT):
+        app.mount("/static/uploads", StaticFiles(directory=UPLOAD_ROOT), name="static_uploads")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 

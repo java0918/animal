@@ -19,7 +19,7 @@
     </div>
 
     <!-- QUIZ CARD -->
-    <div class="quiz-card">
+    <div id="quizQuestionCard" class="quiz-card">
         
         <!-- Yuqori qism: Savol raqami va Ball -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
@@ -389,7 +389,7 @@ function nextQuestion() {
 
 function showResults() {
     stopSpeaking();
-    document.querySelector('.quiz-card').style.display = 'none';
+    document.getElementById('quizQuestionCard').style.display = 'none';
     const resBox = document.getElementById('quizResultBox');
     resBox.style.display = 'block';
     document.getElementById('finalScoreText').innerText = score;
@@ -402,7 +402,7 @@ function restartQuiz() {
     currentIdx = 0;
     score = 0;
     document.getElementById('quizResultBox').style.display = 'none';
-    document.querySelector('.quiz-card').style.display = 'block';
+    document.getElementById('quizQuestionCard').style.display = 'block';
     loadQuestion();
 }
 
