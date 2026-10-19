@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Zoologik Viktorina (O'yin) — Animora{% endblock %}
+{% block title %}{{ t('quiz_hero_title') }} — Animora{% endblock %}
 
 {% block content %}
 
@@ -8,13 +8,13 @@
 
     <div style="text-align: center; margin-bottom: 2.5rem;">
         <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fbbf24; font-weight: 700; background: rgba(245, 158, 11, 0.15); padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.35);">
-            🧠 Bilimingizni Sinang
+            {{ t('quiz_hero_badge') }}
         </span>
         <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 0.6rem 0 0.4rem;">
-            Zoologik Viktorina & O'yin
+            {{ t('quiz_hero_title') }}
         </h1>
         <p style="color: var(--color-text-dim); max-width: 650px; margin: 0 auto; font-size: 0.95rem;">
-            Hayvonlarni farqlash, ularning ovozlari va Qizil kitob bo'yicha qiziqarli savollarga javob bering va bal to'plang!
+            {{ t('quiz_hero_desc') }}
         </p>
     </div>
 
@@ -24,10 +24,10 @@
         <!-- Yuqori qism: Savol raqami va Ball -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <div style="font-size: 0.9rem; font-weight: 700; color: #34d399;">
-                Savol: <span id="currentQuestionNum">1</span> / <span id="totalQuestionsNum">6</span>
+                {{ t('quiz_question_num') }} <span id="currentQuestionNum">1</span> / <span id="totalQuestionsNum">6</span>
             </div>
             <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24;">
-                To'plangan ball: <span id="currentScore">0</span>
+                {{ t('quiz_score') }} <span id="currentScore">0</span>
             </div>
         </div>
 
@@ -36,15 +36,15 @@
             <div id="quizProgressBar" style="width: 16.6%; height: 100%; background: linear-gradient(90deg, #10b981, #fbbf24); transition: width 0.4s ease;"></div>
         </div>
 
-        <!-- Savol matni va tovush tinglash (agar bor bo'lsa) -->
+        <!-- Savol matni va tovush tinglash -->
         <div id="quizQuestionWrap" style="margin-bottom: 2rem;">
             <h2 id="questionText" style="font-size: 1.35rem; font-weight: 700; color: #ffffff; line-height: 1.5; margin-bottom: 1rem;">
-                Savol yuklanmoqda...
+                ...
             </h2>
             <div id="soundCueWrap" style="margin-bottom: 1.2rem;">
                 <button type="button" id="btnQuizSound" class="btn-sound-play" style="padding: 0.6rem 1.25rem; cursor: pointer;">
                     <span id="quizSoundIcon">🔊</span>
-                    <span id="quizSoundText">Ovozni tinglang</span>
+                    <span id="quizSoundText">{{ t('quiz_listen') }}</span>
                     <div id="quizSoundWaves" class="sound-waves-indicator"><span></span><span></span><span></span></div>
                 </button>
             </div>
@@ -57,14 +57,14 @@
 
         <!-- Izoh (Tushuntirish) bloki -->
         <div id="quizExplanationBox" style="display: none; margin-top: 1.5rem; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--color-border-glass); border-radius: var(--radius-sm); padding: 1.2rem;">
-            <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 0.3rem;">💡 ZOOLOGIK TUSHUNTIRISH:</div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 0.3rem;">{{ t('quiz_expl') }}</div>
             <p id="explanationText" style="font-size: 0.92rem; color: #f1f5f9; line-height: 1.5;"></p>
         </div>
 
         <!-- Pastki harakat tugmasi -->
         <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
             <button type="button" id="btnNextQuestion" onclick="nextQuestion()" class="btn-primary" style="display: none;">
-                Keyingi savol →
+                {{ t('quiz_next') }}
             </button>
         </div>
 
@@ -74,22 +74,22 @@
     <div id="quizResultBox" class="quiz-card" style="display: none; text-align: center;">
         <div style="font-size: 3.5rem; margin-bottom: 1rem;">🏆</div>
         <h2 style="font-size: 2rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem;">
-            Tabriklaymiz, Viktorina Yakunlandi!
+            {{ t('quiz_congrats') }}
         </h2>
         <p style="color: var(--color-text-dim); margin-bottom: 1.5rem;">
-            Siz barcha savollarga javob berdingiz.
+            {{ t('quiz_finished_desc') }}
         </p>
 
         <div style="font-size: 1.8rem; font-weight: 800; color: #34d399; margin-bottom: 2rem;">
-            Natijangiz: <span id="finalScoreText">0</span> / 6 ball (<span id="percentText">0%</span>)
+            {{ t('quiz_your_score') }} <span id="finalScoreText">0</span> / 6 (<span id="percentText">0%</span>)
         </div>
 
         <div style="display: flex; gap: 1rem; justify-content: center;">
             <button type="button" onclick="restartQuiz()" class="btn-primary">
-                Qaytadan Boshlash 🔄
+                {{ t('quiz_restart') }}
             </button>
             <a href="/" class="btn-detail-link" style="padding: 0.8rem 1.6rem;">
-                Bosh Sahifaga Qaytish 🐾
+                {{ t('quiz_back_home') }}
             </a>
         </div>
     </div>
@@ -100,87 +100,317 @@
 
 {% block extra_scripts %}
 <script>
-const QUIZ_QUESTIONS = [
-    {
-        question: "Qaysi mushuksimon hayvonning yuzida ko'zlaridan labiga qadar qora 'ko'z yoshi chizig'i' bo'ladi va tirnoqlari itlarnikidek ichkariga kirmaydi?",
-        soundType: "cheetah",
-        audioUrl: "/static/audio/quiz/q1.mp3",
-        options: [
-            "Leopard (Qoplon)",
-            "Gepard (Cheetah)",
-            "Yaguar",
-            "Sher"
-        ],
-        correct: 1,
-        explanation: "Gepard yer yuzidagi eng tez yuguruvchi hayvon bo'lib, uning yuzidagi 'ko'z yoshi chizig'i' quyosh nurining ko'zga tushishini qaytaradi. Tirnoqlari esa katta tezlikda yerga tayanch bo'lishi uchun hech qachon to'liq ichkariga tortilmaydi."
-    },
-    {
-        question: "Yovvoyi tovushqon (zayats) va xonaki quyon (krolik) o'rtasidagi eng muhim biologik farq nima?",
-        soundType: "rabbit",
-        audioUrl: "/static/audio/quiz/q2.mp3",
-        options: [
-            "Tovushqon faqat go'sht bilan oziqlanadi",
-            "Tovushqon bolalari ko'zi ochiq va yuguradigan bo'lib tug'iladi, krolik bolalari esa ko'zi yumuq va yungsiz tug'iladi",
-            "Kroliklar umuman in qazmaydi",
-            "Tovushqonlarning quloqlari kroliknikidan ancha kalta bo'ladi"
-        ],
-        correct: 1,
-        explanation: "Tovushqonlar yer ustida yashaydi va bolalari to'liq yungli, ko'zlari ochiq tug'iladi. Kroliklar esa yer ostida murakkab in qazib yashaydi, bolalari esa ko'zi yumuq, yungsiz va ojiz tug'iladi."
-    },
-    {
-        question: "Ushbu haybatli tovush qaysi qudratli yirtqichga tegishli?",
-        soundType: "lion",
-        hasSound: true,
-        audioUrl: "/static/audio/quiz/q3.mp3",
-        options: [
-            "Bo'ri",
-            "Yo'lbars",
-            "Sher (Arslon)",
-            "Tyanshan ayig'i"
-        ],
-        correct: 2,
-        explanation: "Bu sherning (arslon) o'kirishi (roar) bo'lib, ovoz to'lqini 8 kilometr masofagacha tarqaladi. Ular o'z hududini belgilash va to'dani chaqirish uchun o'kiradi."
-    },
-    {
-        question: "O'zbekiston Qizil kitobiga kiritilgan qaysi noyob antilopaning dumi qop-qora bo'lgani uchun 'qoraquyruq' deb ataladi?",
-        soundType: "gazelle",
-        audioUrl: "/static/audio/quiz/q4.mp3",
-        options: [
-            "Sayg'oq",
-            "Jayron (Gazella)",
-            "Buxoro bug'usi",
-            "Arxar"
-        ],
-        correct: 1,
-        explanation: "Jayron o'zining go'zalligi va nafisligi bilan mashhur. Qochayotganda qora dumini tik ko'taradi — bu orqadagi to'daga xavf signali vazifasini o'taydi. Sayg'oqda esa xartumsimon egik burun bo'ladi."
-    },
-    {
-        question: "Qaldirg'och va qorayaloq (swift) qanday farqlanadi?",
-        soundType: "swallow",
-        audioUrl: "/static/audio/quiz/q5.mp3",
-        options: [
-            "Qaldirg'och daraxt shoxlariga yoki simlarga qo'na oladi, qorayaloq esa tekis yerdan o'zi ucha olmaydi",
-            "Qorayaloq loydan qadahsimon in quradi",
-            "Qaldirg'och faqat baliq ovlaydi",
-            "Qorayaloqning dumi chuqur ayrilgan"
-        ],
-        correct: 0,
-        explanation: "Qaldirg'ochning oyoqlari sim va shoxlarga qo'nishga moslashgan. Qorayaloqning oyoqlari esa nihoyatda qisqa bo'lib, tekis yerga tushib qolsa, qanotlari yerni urib uchib keta olmaydi."
-    },
-    {
-        question: "O'zbekiston tog'larining ramzi bo'lgan Qor qoploni (Ilbirs) oddiy leopardan qanday anatomik farq qiladi?",
-        soundType: "leopard",
-        audioUrl: "/static/audio/quiz/q6.mp3",
-        options: [
-            "Ilbirs daraxtlarda in quradi",
-            "Ilbirsning dumi deyarli tana uzunligiga teng va juda qalin bo'lib, tik qoyalarda muvozanat saqlaydi hamda sovuqda yuzini isitadi",
-            "Ilbirsning mo'ynasi sarg'ish yaltiroq bo'ladi",
-            "Ilbirs oddiy mushukdan ham kichikroq bo'ladi"
-        ],
-        correct: 1,
-        explanation: "Qor qoploni 3000-5000 metr balandlikdagi qorli qoyalarda yashaydi. Uning ulkan momiq dumi sakrash paytida rul vazifasini bajaradi, qahraton sovuqda esa burni va yuzini o'rab isitadi. Shuningdek, ilbirs o'kirmaydi, faqat xirillaydi."
-    }
-];
+const QUIZ_DATA_I18N = {
+    uz: [
+        {
+            question: "Qaysi mushuksimon hayvonning yuzida ko'zlaridan labiga qadar qora 'ko'z yoshi chizig'i' bo'ladi va tirnoqlari itlarnikidek ichkariga kirmaydi?",
+            soundType: "cheetah",
+            audioUrl: "/static/audio/quiz/q1.mp3",
+            options: ["Leopard (Qoplon)", "Gepard (Cheetah)", "Yaguar", "Sher"],
+            correct: 1,
+            explanation: "Gepard yer yuzidagi eng tez yuguruvchi hayvon bo'lib, uning yuzidagi 'ko'z yoshi chizig'i' quyosh nurining ko'zga tushishini qaytaradi. Tirnoqlari esa hech qachon to'liq ichkariga tortilmaydi."
+        },
+        {
+            question: "Yovvoyi tovushqon (zayats) va xonaki quyon (krolik) o'rtasidagi eng muhim biologik farq nima?",
+            soundType: "rabbit",
+            audioUrl: "/static/audio/quiz/q2.mp3",
+            options: [
+                "Tovushqon faqat go'sht bilan oziqlanadi",
+                "Tovushqon bolalari ko'zi ochiq va yuguradigan bo'lib tug'iladi, krolik bolalari esa ko'zi yumuq va yungsiz tug'iladi",
+                "Kroliklar umuman in qazmaydi",
+                "Tovushqonlarning quloqlari kroliknikidan ancha kalta bo'ladi"
+            ],
+            correct: 1,
+            explanation: "Tovushqonlar yer ustida yashaydi va bolalari to'liq yungli, ko'zlari ochiq tug'iladi. Kroliklar esa yer ostida murakkab in qazib yashaydi, bolalari esa ojiz tug'iladi."
+        },
+        {
+            question: "Ushbu haybatli tovush qaysi qudratli yirtqichga tegishli?",
+            soundType: "lion",
+            hasSound: true,
+            audioUrl: "/static/audio/quiz/q3.mp3",
+            options: ["Bo'ri", "Yo'lbars", "Sher (Arslon)", "Tyanshan ayig'i"],
+            correct: 2,
+            explanation: "Bu sherning (arslon) o'kirishi (roar) bo'lib, ovoz to'lqini 8 kilometr masofagacha tarqaladi."
+        },
+        {
+            question: "O'zbekiston Qizil kitobiga kiritilgan qaysi noyob antilopaning dumi qop-qora bo'lgani uchun 'qoraquyruq' deb ataladi?",
+            soundType: "gazelle",
+            audioUrl: "/static/audio/quiz/q4.mp3",
+            options: ["Sayg'oq", "Jayron (Gazella)", "Buxoro bug'usi", "Arxar"],
+            correct: 1,
+            explanation: "Jayron o'zining go'zalligi va chaqqonligi bilan mashhur. Qochayotganda qora dumini tik ko'taradi — bu orqadagi to'daga xavf signali vazifasini o'taydi."
+        },
+        {
+            question: "Qaldirg'och va qorayaloq (swift) qanday farqlanadi?",
+            soundType: "swallow",
+            audioUrl: "/static/audio/quiz/q5.mp3",
+            options: [
+                "Qaldirg'och daraxt shoxlariga yoki simlarga qo'na oladi, qorayaloq esa tekis yerdan o'zi ucha olmaydi",
+                "Qorayaloq loydan qadahsimon in quradi",
+                "Qaldirg'och faqat baliq ovlaydi",
+                "Qorayaloqning dumi chuqur ayrilgan"
+            ],
+            correct: 0,
+            explanation: "Qaldirg'ochning oyoqlari sim va shoxlarga qo'nishga moslashgan. Qorayaloqning oyoqlari esa nihoyatda qisqa bo'lib, tekis yerga tushib qolsa, qanotlari yerni urib mustaqil ucha olmaydi."
+        },
+        {
+            question: "O'zbekiston tog'larining ramzi bo'lgan Qor qoploni (Ilbirs) oddiy leopardan qanday anatomik farq qiladi?",
+            soundType: "leopard",
+            audioUrl: "/static/audio/quiz/q6.mp3",
+            options: [
+                "Ilbirs daraxtlarda in quradi",
+                "Ilbirsning dumi deyarli tana uzunligiga teng va juda qalin bo'lib, tik qoyalarda muvozanat saqlaydi hamda sovuqda yuzini isitadi",
+                "Ilbirsning mo'ynasi sarg'ish yaltiroq bo'ladi",
+                "Ilbirs oddiy mushukdan ham kichikroq bo'ladi"
+            ],
+            correct: 1,
+            explanation: "Qor qoploni 3000-5000 metr balandlikdagi qoyalarda yashaydi. Uning ulkan momiq dumi tik qoyalarda muvozanat beradi va qahraton sovuqda yuzini isitadi."
+        }
+    ],
+    kaa: [
+        {
+            question: "Qaysı pıshıq tárizli haywannıń júzinde kózinen awzına shekem qara sızıq boladı hám tırnaqları tolıq kirmeydi?",
+            soundType: "cheetah",
+            options: ["Leopard (Qaplan)", "Gepard (Cheetah)", "Yaguar", "Arystan (Sher)"],
+            correct: 1,
+            explanation: "Gepard jer betindegi eń tez júgiriwshi haywan bolıp, kózindegi sızıq quyash nurınan qorǵaydı. Tırnaqları bolsa hesh qashan tolıq kirmeydi."
+        },
+        {
+            question: "Qoyan (zayats) hám úy qoyanı (krolik) arasındaǵı eń tiykarǵı biologiyalıq parıq nede?",
+            soundType: "rabbit",
+            options: [
+                "Qoyan tek gósh jeydi",
+                "Qoyan balaları kózi ashıq hám júgiretuǵın bolıp tuwıladı, krolik balaları kózisiz hám júnisiz tuwıladı",
+                "Krolikler uya qazbaydı",
+                "Qoyannıń qulaǵı kroliknikinen qısqa boladı"
+            ],
+            correct: 1,
+            explanation: "Qoyan jer ústinde jasaydı hám balaları kózi ashıq tuwıladı. Krolik bolsa jer astında uya qazıp jasaydı."
+        },
+        {
+            question: "Bul haybatlı dawıs qaysı jırtqıshqa tiyisli?",
+            soundType: "lion",
+            hasSound: true,
+            options: ["Bóri", "Jolbars", "Arystan (Sher)", "Tyanshan ayıwı"],
+            correct: 2,
+            explanation: "Bul arystannıń (sher) aqırıwı bolıp, dawısı 8 kilometrge shekem esitiledi."
+        },
+        {
+            question: "Ózbekstan Qızıl kitabına kiritilgen qaysı antilopanıń quyrıǵı qara bolǵanı ushın 'qaraquyrıq' dep ataladı?",
+            soundType: "gazelle",
+            options: ["Sayǵaq", "Jeyran (Gazella)", "Buxara buǵısı", "Arxar"],
+            correct: 1,
+            explanation: "Jeyran qashqanda qara quyrıǵın tik kóteredi — bul qáwip belgisi xızmetin atqaradı."
+        },
+        {
+            question: "Qarlıǵash penen qarayaloq (swift) qalay parıqlanadı?",
+            soundType: "swallow",
+            options: [
+                "Qarlıǵash sımǵa qona aladı, qarayaloq bolsa tegis jerden usha almaydı",
+                "Qarayaloq ılaydan uya quradı",
+                "Qarlıǵash tek balıq awlaydı",
+                "Qarayaloqtıń quyrıǵı ayırılǵan"
+            ],
+            correct: 0,
+            explanation: "Qarlıǵashtıń ayaqları sımǵa qonıwǵa sáykeslesken. Qarayaloqtıń ayaqları bolsa júdá qısqa."
+        },
+        {
+            question: "Qar qaplanı (Ilbirs) ápiwayı leopardan qalay anatomiyalıq parıq etedi?",
+            soundType: "leopard",
+            options: [
+                "Ilbirs aǵashta uya quradı",
+                "Ilbirstiń quyrıǵı dene uzınlıǵına teń hám qalıń bolıp, tik qoyalarda teńsalmaqlılıq saqlaydı",
+                "Ilbirstiń reńi sarı boladı",
+                "Ilbirs kishi pıshıqtay boladı"
+            ],
+            correct: 1,
+            explanation: "Qar qaplanı bálent tawlarda jasaydı. Qalıń quyrıǵı qoyalarda teńsalmaqlılıq beredi hám suwıqta júzin ısıtadı."
+        }
+    ],
+    ru: [
+        {
+            question: "У какого кошачьего от глаз к пасти идут черные 'слезные полосы', а когти не втягиваются полностью?",
+            soundType: "cheetah",
+            options: ["Леопард", "Гепард", "Ягуар", "Лев"],
+            correct: 1,
+            explanation: "Гепард — быстрейшее сухопутное животное. 'Слезные дорожки' защищают глаза от слепящего солнца саванны, а невтяжные когти обеспечивают сцепление на бегу."
+        },
+        {
+            question: "В чем главное биологическое отличие дикого зайца от кролика?",
+            soundType: "rabbit",
+            options: [
+                "Заяц питается исключительно мясом",
+                "Зайчата рождаются зрячими, покрытыми шерстью и готовыми бежать; крольчата — слепыми и беспомощными в норе",
+                "Кролики вообще не роют нор",
+                "У зайцев уши намного короче, чем у кроликов"
+            ],
+            correct: 1,
+            explanation: "Зайцы живут на открытых пространствах и их потомство сразу готово к бегству. Кролики выводят потомство в глубоких норах под землей."
+        },
+        {
+            question: "Какому могучему хищнику принадлежит этот грозный акустический рев?",
+            soundType: "lion",
+            hasSound: true,
+            options: ["Волк", "Тигр", "Лев", "Бурый медведь"],
+            correct: 2,
+            explanation: "Это могучий рев льва, раскаты которого слышны на расстоянии до 8 километров в саванне."
+        },
+        {
+            question: "Какая редкая антилопа из Красной книги Узбекистана за свой хвост зовется «чернохвостой газелью»?",
+            soundType: "gazelle",
+            options: ["Сайгак", "Джейран", "Бухарский олень", "Архар"],
+            correct: 1,
+            explanation: "Джейран грациозен и стремителен. При опасности он поднимает черный хвост, подавая сигнал тревоги всему стаду."
+        },
+        {
+            question: "Как отличить деревенскую ласточку от стрижа?",
+            soundType: "swallow",
+            options: [
+                "Ласточка может садиться на ветки и провода, а стриж с плоской земли взлететь сам не способен",
+                "Стриж строит кувшинообразное гнездо из глины",
+                "Ласточка ловит только рыбу",
+                "У стрижа глубоко раздвоенный хвост"
+            ],
+            correct: 0,
+            explanation: "Лапки ласточки приспособлены для сидения на проводах. У стрижа лапки крошечные — упав на ровную землю, он не может оттолкнуться крыльями."
+        },
+        {
+            question: "Чем снежный барс (ирбис) анатомически отличается от обычного леопарда?",
+            soundType: "leopard",
+            options: [
+                "Ирбис строит гнезда на деревьях",
+                "У ирбиса хвост почти равен длине тела и очень пушист: он служит балансиром на скалах и согревает нос в мороз",
+                "Шерсть ирбиса ярко-желтого цвета",
+                "Ирбис меньше домашней кошки"
+            ],
+            correct: 1,
+            explanation: "Снежный барс живет на высоте 3000-5000 метров. Толстый хвост удерживает равновесие на вертикальных скалах и согревает зверя в мороз."
+        }
+    ],
+    en: [
+        {
+            question: "Which big cat has distinctive black 'tear stripes' running from its eyes to mouth and non-retractable claws?",
+            soundType: "cheetah",
+            options: ["Leopard", "Cheetah", "Jaguar", "Lion"],
+            correct: 1,
+            explanation: "The cheetah is the fastest land animal. Its tear marks deflect blinding sunlight, and semi-retractable claws provide tire-like grip during high-speed chases."
+        },
+        {
+            question: "What is the key biological distinction between a wild hare and a rabbit?",
+            soundType: "rabbit",
+            options: [
+                "Hares are strictly carnivorous",
+                "Leverets (hare young) are born fully furred and open-eyed; rabbit kits are born naked and blind in burrows",
+                "Rabbits never dig burrows",
+                "Hares have much shorter ears than rabbits"
+            ],
+            correct: 1,
+            explanation: "Hares live above ground and give birth in the open, so their young must run immediately. Rabbits nest in deep subterranean underground burrows."
+        },
+        {
+            question: "Which apex predator produces this mighty vocal roar?",
+            soundType: "lion",
+            hasSound: true,
+            options: ["Grey Wolf", "Tiger", "Lion", "Brown Bear"],
+            correct: 2,
+            explanation: "This is a lion's mighty territorial roar, capable of carrying over a distance of up to 8 kilometers (5 miles)."
+        },
+        {
+            question: "Which endangered gazelle in Uzbekistan is known as the 'black-tailed gazelle'?",
+            soundType: "gazelle",
+            options: ["Saiga Antelope", "Goitered Gazelle (Jeyran)", "Bactrian Deer", "Argali"],
+            correct: 1,
+            explanation: "The goitered gazelle flashes its black tail upright when fleeing to signal alarm to the rest of the herd."
+        },
+        {
+            question: "How do you distinguish a barn swallow from a common swift?",
+            soundType: "swallow",
+            options: [
+                "Swallows can perch on wires and twigs, whereas swifts have tiny legs and cannot take off from flat ground",
+                "Swifts build mud cup nests under eaves",
+                "Swallows feed exclusively on fish",
+                "Swifts have a deeply forked tail"
+            ],
+            correct: 0,
+            explanation: "Swallows have perching feet adapted for wires and reeds. Swifts spend almost their entire lives airborne and struggle to take off if grounded."
+        },
+        {
+            question: "How is the Snow Leopard anatomically adapted differently from a standard leopard?",
+            soundType: "leopard",
+            options: [
+                "Snow leopards build nests in trees",
+                "Its tail is nearly as long as its body and heavily furred, serving as a cliff stabilizer and face warmer in blizzards",
+                "Snow leopards have yellowish glowing coats",
+                "Snow leopards are smaller than domestic cats"
+            ],
+            correct: 1,
+            explanation: "Dwelling in high alpine mountains up to 5,000 meters, the snow leopard uses its thick, heavy tail for balance on sheer precipices and as a thermal blanket."
+        }
+    ],
+    fr: [
+        {
+            question: "Quel félin possède des « traces de larmes » noires sous les yeux et des griffes non rétractiles comme un canidé ?",
+            soundType: "cheetah",
+            options: ["Léopard", "Guépard", "Jaguar", "Lion"],
+            correct: 1,
+            explanation: "Le guépard est l'animal terrestre le plus rapide. Ses rayures lacrymales absorbent l'éblouissement du soleil et ses griffes non rétractiles agissent comme des crampons."
+        },
+        {
+            question: "Quelle est la principale différence biologique entre un lièvre et un lapin ?",
+            soundType: "rabbit",
+            options: [
+                "Le lièvre est exclusivement carnivore",
+                "Les levrauts naissent les yeux ouverts et couverts de poils; les lapereaux naissent nus et aveugles au fond d'un terrier",
+                "Les lapins ne creusent jamais de terriers",
+                "Le lièvre a des oreilles beaucoup plus courtes que le lapin"
+            ],
+            correct: 1,
+            explanation: "Les lièvres vivent à l'air libre et leurs petits naissent prêts à courir. Les lapins creusent des terriers souterrains où leurs petits naissent vulnérables."
+        },
+        {
+            question: "À quel prédateur appartient ce puissant rugissement acoustique ?",
+            soundType: "lion",
+            hasSound: true,
+            options: ["Loup", "Tigre", "Lion", "Ours brun"],
+            correct: 2,
+            explanation: "Il s'agit du rugissement territorial du lion, audible jusqu'à 8 kilomètres à la ronde."
+        },
+        {
+            question: "Quelle antilope protégée d'Ouzbékistan est surnommée la gazelle à queue noire ?",
+            soundType: "gazelle",
+            options: ["Antilope saïga", "Gazelle à goître (Jeyran)", "Cerf de Bactriane", "Mouflon argali"],
+            correct: 1,
+            explanation: "La gazelle à goître dresse sa queue noire en fuyant pour donner le signal d'alerte à tout le groupe."
+        },
+        {
+            question: "Comment différencier une hirondelle rustique d'un martinet noir ?",
+            soundType: "swallow",
+            options: [
+                "L'hirondelle peut se percher sur des fils ou des branches, tandis que le martinet ne peut pas décoller d'un sol plat",
+                "Le martinet fabrique un nid en coupe de boue",
+                "L'hirondelle ne mange que du poisson",
+                "Le martinet possède une longue queue très fourchue"
+            ],
+            correct: 0,
+            explanation: "L'hirondelle a des pattes adaptées pour se percher. Les pattes du martinet sont si courtes qu'au sol, ses longues ailes touchent terre et l'empêchent de décoller."
+        },
+        {
+            question: "En quoi la Panthère des neiges (Irbis) se distingue-t-elle anatomiquement d'un léopard ordinaire ?",
+            soundType: "leopard",
+            options: [
+                "L'irbis fait son nid dans les arbres",
+                "Sa queue est presque aussi longue que son corps et très épaisse : elle sert de balancier sur les falaises et protège son museau du gel",
+                "La panthère des neiges a un pelage jaune éclatant",
+                "L'irbis est plus petit qu'un chat domestique"
+            ],
+            correct: 1,
+            explanation: "Vivant entre 3000 et 5000 mètres d'altitude, sa queue ultra-épaisse lui sert de gouvernail lors de sauts spectaculaires et d'écharpe thermique."
+        }
+    ]
+};
+
+const currentLang = window.CURRENT_LANG || 'uz';
+const QUIZ_QUESTIONS = QUIZ_DATA_I18N[currentLang] || QUIZ_DATA_I18N['uz'];
 
 let currentIdx = 0;
 let score = 0;
@@ -188,7 +418,6 @@ let answered = false;
 let isSpeaking = false;
 let currentQuizAudio = null;
 
-// O'zbek tili nutqida savolni o'qib berish funksiyasi
 function toggleSpeakQuestion() {
     const q = QUIZ_QUESTIONS[currentIdx];
     if (!q) return;
@@ -200,8 +429,8 @@ function toggleSpeakQuestion() {
 
     stopSpeaking();
 
-    // 1. O'zbek tili nutqi (uz-UZ-MadinaNeural audio)
-    if (q.audioUrl) {
+    // Agar o'zbek tilida bo'lsa va audio mavjud bo'lsa
+    if (currentLang === 'uz' && q.audioUrl) {
         currentQuizAudio = new Audio(q.audioUrl);
         currentQuizAudio.onplay = () => {
             isSpeaking = true;
@@ -210,17 +439,14 @@ function toggleSpeakQuestion() {
         currentQuizAudio.onended = () => {
             isSpeaking = false;
             updateSoundButtonUI(false);
-            // Agar 3-savol hayvon ovozini taxmin qilish bo'lsa, savoldan keyin hayvon o'kirishi chalinadi
             if (q.hasSound && q.soundType && typeof audioEngine !== 'undefined') {
-                audioEngine.playSound(q.soundType, '', null, 'Viktorina tovushi', 'Tovushni taxmin qiling');
+                audioEngine.playSound(q.soundType, '', null, 'Roar', '');
             }
         };
         currentQuizAudio.onerror = () => {
-            console.warn("Audio yuklanmadi, SpeechSynthesis ga o'tilmoqda...");
             fallbackSpeechSynthesis(q.question);
         };
         currentQuizAudio.play().catch(e => {
-            console.warn("Audio play blocked, fallback:", e);
             fallbackSpeechSynthesis(q.question);
         });
         return;
@@ -241,13 +467,14 @@ function fallbackSpeechSynthesis(text) {
         .trim();
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
+    const targetLang = window.CURRENT_SPEECH_LANG || 'uz-UZ';
+    const langPrefix = targetLang.substring(0, 2).toLowerCase();
 
-    // Ovoz tanlash (uzbek -> turkish -> default)
     const voices = window.speechSynthesis.getVoices();
     let selectedVoice = null;
     if (voices && voices.length > 0) {
-        selectedVoice = voices.find(v => v.lang.toLowerCase().includes('uz') || v.name.toLowerCase().includes('uzbek')) ||
-                        voices.find(v => v.lang.toLowerCase().startsWith('tr') || v.name.toLowerCase().includes('turkish')) ||
+        selectedVoice = voices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
+                        voices.find(v => v.lang.toLowerCase().includes(langPrefix)) ||
                         voices.find(v => v.default) ||
                         voices[0];
     }
@@ -256,10 +483,10 @@ function fallbackSpeechSynthesis(text) {
         utterance.voice = selectedVoice;
         utterance.lang = selectedVoice.lang;
     } else {
-        utterance.lang = 'uz-UZ';
+        utterance.lang = targetLang;
     }
 
-    utterance.rate = 0.92;
+    utterance.rate = 0.95;
     utterance.pitch = 1.0;
 
     utterance.onstart = () => {
@@ -270,6 +497,10 @@ function fallbackSpeechSynthesis(text) {
     utterance.onend = () => {
         isSpeaking = false;
         updateSoundButtonUI(false);
+        const q = QUIZ_QUESTIONS[currentIdx];
+        if (q && q.hasSound && q.soundType && typeof audioEngine !== 'undefined') {
+            audioEngine.playSound(q.soundType, '', null, 'Roar', '');
+        }
     };
 
     utterance.onerror = (e) => {
@@ -306,12 +537,12 @@ function updateSoundButtonUI(speaking) {
 
     if (speaking) {
         if (btn) btn.classList.add('playing');
-        if (textSpan) textSpan.innerText = "Savol o'qilmoqda... (To'xtatish)";
+        if (textSpan) textSpan.innerText = "{{ t('quiz_reading') }}";
         if (iconSpan) iconSpan.innerText = "⏹";
         if (waves) waves.style.display = "inline-flex";
     } else {
         if (btn) btn.classList.remove('playing');
-        if (textSpan) textSpan.innerText = "Ovozni tinglang";
+        if (textSpan) textSpan.innerText = "{{ t('quiz_listen') }}";
         if (iconSpan) iconSpan.innerText = "🔊";
         if (waves) waves.style.display = "none";
     }
@@ -328,7 +559,6 @@ function loadQuestion() {
     
     document.getElementById('questionText').innerText = q.question;
     
-    // Savolni o'qib berish tugmasini faollashtirish
     const soundCue = document.getElementById('soundCueWrap');
     const btnSound = document.getElementById('btnQuizSound');
     if (soundCue) soundCue.style.display = 'block';
@@ -337,7 +567,6 @@ function loadQuestion() {
         btnSound.onclick = toggleSpeakQuestion;
     }
 
-    // Variantlar
     const wrap = document.getElementById('quizOptionsWrap');
     wrap.innerHTML = '';
     q.options.forEach((opt, idx) => {
@@ -363,15 +592,14 @@ function selectOption(selectedIdx) {
         score++;
         document.getElementById('currentScore').innerText = score;
         buttons[selectedIdx].classList.add('correct');
-        buttons[selectedIdx].querySelector('.badge-icon').innerText = '✅ To\'g\'ri!';
+        buttons[selectedIdx].querySelector('.badge-icon').innerText = '✅';
     } else {
         buttons[selectedIdx].classList.add('incorrect');
-        buttons[selectedIdx].querySelector('.badge-icon').innerText = '❌ Noto\'g\'ri';
+        buttons[selectedIdx].querySelector('.badge-icon').innerText = '❌';
         buttons[q.correct].classList.add('correct');
-        buttons[q.correct].querySelector('.badge-icon').innerText = '✅ To\'g\'ri javob';
+        buttons[q.correct].querySelector('.badge-icon').innerText = '✅';
     }
 
-    // Izohni ko'rsatish
     document.getElementById('explanationText').innerText = q.explanation;
     document.getElementById('quizExplanationBox').style.display = 'block';
     document.getElementById('btnNextQuestion').style.display = 'inline-flex';

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="{{ current_lang or 'uz' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animora — Hayvonot Olami Portali</title>
+    <title>Animora — {{ t('login_title') }}</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,6 @@
             background: #020704;
         }
 
-        /* Qaldirg'och va Quyon uchun animatsion tasvirlar */
         .swallow-wing-anim {
             animation: swallowGlide 6s ease-in-out infinite;
         }
@@ -43,7 +42,29 @@
 </head>
 <body>
 
-    <!-- AI ANIMATSIYALI SPLASH OVERLAY (Saytga kirish animatsiyasi) -->
+    <!-- TIL TANLASH (YUQORI BURCHAKDA) -->
+    <div style="position: absolute; top: 1.5rem; right: 2rem; z-index: 100;">
+        <div class="lang-dropdown-container">
+            <button type="button" id="langDropdownBtn" class="lang-dropdown-btn" onclick="toggleLangMenu(event)">
+                <span class="lang-flag">{{ current_lang_flag }}</span>
+                <span class="lang-label">{{ current_lang_label }}</span>
+                <span class="lang-caret">▾</span>
+            </button>
+            <div id="langDropdownMenu" class="lang-dropdown-menu">
+                {% for code, info in supported_languages.items() %}
+                <a href="/set-lang/{{ code }}" class="lang-item {% if current_lang == code %}active{% endif %}">
+                    <span class="lang-item-flag">{{ info.flag }}</span>
+                    <span class="lang-item-name">{{ info.native }}</span>
+                    {% if current_lang == code %}
+                    <span class="lang-item-check">✓</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- AI ANIMATSIYALI SPLASH OVERLAY -->
     <div id="aiSplashOverlay" class="ai-entrance-overlay hidden">
         <div class="ai-loader-graphic">
             <div class="ai-ring ring-outer"></div>
@@ -51,8 +72,8 @@
             <div class="ai-ring ring-inner"></div>
             <div class="ai-core-icon">🌿</div>
         </div>
-        <div class="ai-status-text">ANIMORA BIOMATRIX FAOL...</div>
-        <div class="ai-sub-status">Sun'iy intellekt ekotizim muhitini shakllantirmoqda</div>
+        <div class="ai-status-text">{{ t('splash_title') }}</div>
+        <div class="ai-sub-status">{{ t('splash_sub') }}</div>
     </div>
 
     <!-- ASOSIY SPLIT SCREEN HERO EKRANI -->
@@ -67,9 +88,9 @@
                     <img src="https://images.unsplash.com/photo-1555661530-68c8e9894ae6?auto=format&fit=crop&w=400&q=80" alt="Qaldirg'och">
                 </div>
                 <div>
-                    <span style="font-size: 0.72rem; color: #4ade80; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Osmondagi Erkinlik</span>
-                    <h3 class="hero-side-title" style="color: #ffffff;">Qaldirg'och</h3>
-                    <p class="hero-side-desc">Bahor elchisi, soatiga 75 km tezlikda moviy osmonda chaqqon parvoz qiluvchi nafis qush.</p>
+                    <span style="font-size: 0.72rem; color: #4ade80; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Hirundo rustica</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">{{ t('cat_birds') }}</h3>
+                    <p class="hero-side-desc">Acrobatic aerial insectivore with agile flight dynamics.</p>
                 </div>
             </div>
 
@@ -79,9 +100,9 @@
                     <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=400&q=80" alt="Quyon">
                 </div>
                 <div>
-                    <span style="font-size: 0.72rem; color: #22c55e; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Maysazor va O'tloqlar</span>
-                    <h3 class="hero-side-title" style="color: #ffffff;">Chaqqon Quyon</h3>
-                    <p class="hero-side-desc">Yam-yashil maydonda chaqqon sakrovchi, 360° ko'rish burchagiga ega sezgir jonivor.</p>
+                    <span style="font-size: 0.72rem; color: #22c55e; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Lepus tolai</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">{{ t('cat_mammals') }}</h3>
+                    <p class="hero-side-desc">High-alert terrestrial herbivore with 360-degree panoramic vision.</p>
                 </div>
             </div>
 
@@ -91,9 +112,9 @@
         <div class="split-side split-savannah">
             
             <div style="align-self: flex-start; max-width: 320px; background: rgba(30, 15, 3, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem 1.4rem; border-radius: var(--radius-md);">
-                <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Yovvoyi Savanna</span>
-                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.2rem;">Sherlar Saltanati</h4>
-                <p style="font-size: 0.82rem; color: #e2e8f0;">Afrika jaziramasi, oltin quyosh va erkin hayvonot olami.</p>
+                <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Panthera leo</span>
+                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.2rem;">Animora Wildlife</h4>
+                <p style="font-size: 0.82rem; color: #e2e8f0;">{{ t('brand_subtitle') }}</p>
             </div>
 
             <!-- Yotgan sherlar axborot bloki -->
@@ -102,9 +123,9 @@
                     <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=400&q=80" alt="Yotgan sherlar">
                 </div>
                 <div>
-                    <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Savannada Dam Olish</span>
-                    <h3 class="hero-side-title" style="color: #ffffff;">Viqorli Sherlar</h3>
-                    <p class="hero-side-desc">Akatsiya daraxti soyasida prayd a'zolari bilan xotirjam yotgan ulug'vor arslonlar.</p>
+                    <span style="font-size: 0.72rem; color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; display: block;">Savannah Apex</span>
+                    <h3 class="hero-side-title" style="color: #ffffff;">{{ t('nav_animals') }}</h3>
+                    <p class="hero-side-desc">Apex social carnivore of open plains and scrublands.</p>
                 </div>
             </div>
 
@@ -114,39 +135,39 @@
         <div class="gateway-hero-card">
             
             <div class="gateway-badge">
-                <span>🔐</span> Himoyalangan Portal
+                <span>🔐</span> {{ t('login_title') }}
             </div>
 
             <h1 class="gateway-title">Animora</h1>
             <p class="gateway-desc">
-                Hayvonlar anatomiyasi, ularning o'xshash turlaridan farqlanishi, real ovozlari va Qizil kitob maqomi.
+                {{ t('login_desc') }}
             </p>
 
             <!-- LOGIN VA PAROL FORMASI -->
             <form onsubmit="submitLogin(event)" style="text-align: left; margin-top: 1.5rem;">
                 <div style="margin-bottom: 1.1rem;">
-                    <label for="login_user" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">Login:</label>
-                    <input type="text" id="login_user" class="form-control" required placeholder="Loginingizni kiriting" autocomplete="username">
+                    <label for="login_user" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">{{ t('admin_user') }}:</label>
+                    <input type="text" id="login_user" class="form-control" required placeholder="admin" autocomplete="username">
                 </div>
 
                 <div style="margin-bottom: 1.3rem;">
-                    <label for="login_pass" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">Parol:</label>
+                    <label for="login_pass" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">{{ t('admin_pass') }}:</label>
                     <input type="password" id="login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
                 </div>
 
                 <div id="loginError" style="display: none; font-size: 0.82rem; color: #f87171; margin-bottom: 1.2rem; background: rgba(239, 68, 68, 0.15); padding: 0.65rem 0.9rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
 
                 <button type="submit" id="btnLoginSubmit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
-                    Tizimga Kirish 🔓
+                    {{ t('login_title') }} 🔓
                 </button>
             </form>
 
             <div style="margin-top: 1.3rem; font-size: 0.82rem;">
-                <a href="javascript:void(0)" onclick="loginAsDemo('user')" style="color: #94a3b8; text-decoration: underline;">⚡ Mehmon sifatida tezkor ko'rish</a>
+                <a href="javascript:void(0)" onclick="loginAsDemo('user')" style="color: #94a3b8; text-decoration: underline;">⚡ Demo Access</a>
             </div>
 
             <div style="margin-top: 1.5rem; font-size: 0.78rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <span>⚡ Himoyalangan xavfsiz tizim</span>
+                <span>⚡ {{ t('footer_rights') }}</span>
             </div>
 
         </div>
@@ -156,7 +177,7 @@
             <div class="divider-line"></div>
             <div class="divider-badge">
                 <span>🌱</span>
-                <span>BIOLOGIK MATRITSA</span>
+                <span>BIOMATRIX</span>
                 <span>🦁</span>
             </div>
             <div class="divider-line"></div>

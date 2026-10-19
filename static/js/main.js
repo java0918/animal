@@ -336,7 +336,7 @@ class AnimoraAIChat {
             const resp = await fetch('/api/ai/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({ message: text, lang: window.CURRENT_LANG || 'uz' })
             });
             const data = await resp.json();
             this.removeTypingIndicator(typingId);
@@ -490,6 +490,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initialTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('animora_theme') || localStorage.getItem('animore_theme') || 'dark';
     updateThemeToggleUI(initialTheme);
+
+    // H. Til tanlash menyusi boshqaruvi (5 Languages Switcher)
+    window.toggleLangMenu = function(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const container = document.querySelector('.lang-dropdown-container');
+        if (container) {
+            container.classList.toggle('open');
+        }
+    };
+
+    document.addEventListener('click', function(e) {
+        const container = document.querySelector('.lang-dropdown-container');
+        if (container && !container.contains(e.target)) {
+            container.classList.remove('open');
+        }
+    });
 });
+
 
 

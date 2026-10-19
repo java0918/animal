@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="{{ current_lang or 'uz' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Animora — Hayvonot Olami Portali{% endblock %}</title>
+    <title>{% block title %}Animora — {{ t('brand_subtitle', 'Hayvonot Olami Portali') }}{% endblock %}</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Theme Initialization to avoid flicker -->
+    <!-- Theme & Language Initialization -->
     <script>
         (function() {
-            var savedTheme = localStorage.getItem('animora_theme') || localStorage.getItem('animore_theme') || 'dark';
+            var savedTheme = localStorage.getItem('animora_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
@@ -20,7 +20,7 @@
 </head>
 <body>
 
-    <!-- AI ANIMATION SPLASH OVERLAY (Kirish paytidagi animatsiya) -->
+    <!-- AI ANIMATION SPLASH OVERLAY -->
     <div id="aiSplashOverlay" class="ai-entrance-overlay">
         <div class="ai-loader-graphic">
             <div class="ai-ring ring-outer"></div>
@@ -28,8 +28,8 @@
             <div class="ai-ring ring-inner"></div>
             <div class="ai-core-icon">🌿</div>
         </div>
-        <div class="ai-status-text">ANIMORA AI MATRITSA YUKLANMOQDA...</div>
-        <div class="ai-sub-status">Jonli tabiat va ekotizim ma'lumotlari yangilanmoqda</div>
+        <div class="ai-status-text">{{ t('splash_title') }}</div>
+        <div class="ai-sub-status">{{ t('splash_sub') }}</div>
     </div>
 
     <!-- YUQORI NAVIGATION BAR -->
@@ -38,59 +38,82 @@
             <div class="brand-logo-badge">🌿</div>
             <div>
                 <div class="brand-title">Animora</div>
-                <div class="brand-subtitle">Hayvonot Olami Portali</div>
+                <div class="brand-subtitle">{{ t('brand_subtitle') }}</div>
             </div>
         </a>
 
         <ul class="nav-links">
             <li>
                 <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
-                    <span>🐾</span> Hayvonlar
+                    <span>🐾</span> {{ t('nav_animals') }}
                 </a>
             </li>
             <li>
                 <a href="/compare" class="nav-link {% if request.url.path == '/compare' %}active{% endif %}">
-                    <span>⚖️</span> Turlarni Taqqoslash
+                    <span>⚖️</span> {{ t('nav_compare') }}
                 </a>
             </li>
             <li>
                 <a href="/redbook" class="nav-link {% if request.url.path == '/redbook' %}active{% endif %}">
-                    <span>📕</span> Qizil Kitob
+                    <span>📕</span> {{ t('nav_redbook') }}
                 </a>
             </li>
             <li>
                 <a href="/quiz" class="nav-link {% if request.url.path == '/quiz' %}active{% endif %}">
-                    <span>🧠</span> Viktorina (O'yin)
+                    <span>🧠</span> {{ t('nav_quiz') }}
                 </a>
             </li>
             <li>
                 <a href="/ai-chat" class="nav-link {% if request.url.path == '/ai-chat' %}active{% endif %}">
-                    <span>✨</span> Animora AI Yordamchi
+                    <span>✨</span> {{ t('nav_ai') }}
                 </a>
             </li>
             {% if user and user.role == 'admin' %}
             <li>
                 <a href="/admin" class="nav-link {% if request.url.path == '/admin' %}active{% endif %}" style="color: #fbbf24;">
-                    <span>🛡️</span> Admin Panel
+                    <span>🛡️</span> {{ t('nav_admin') }}
                 </a>
             </li>
             {% endif %}
         </ul>
 
         <div class="nav-user-panel">
+
+            <!-- 5 TILLI TIL TANLASH (LANGUAGE SWITCHER) -->
+            <div class="lang-dropdown-container">
+                <button type="button" id="langDropdownBtn" class="lang-dropdown-btn" onclick="toggleLangMenu(event)">
+                    <span class="lang-flag">{{ current_lang_flag }}</span>
+                    <span class="lang-label">{{ current_lang_label }}</span>
+                    <span class="lang-caret">▾</span>
+                </button>
+                <div id="langDropdownMenu" class="lang-dropdown-menu">
+                    {% for code, info in supported_languages.items() %}
+                    <a href="/set-lang/{{ code }}" class="lang-item {% if current_lang == code %}active{% endif %}">
+                        <span class="lang-item-flag">{{ info.flag }}</span>
+                        <span class="lang-item-name">{{ info.native }}</span>
+                        {% if current_lang == code %}
+                        <span class="lang-item-check">✓</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- KUN / TUN REJIM TUGMASI -->
             <button type="button" id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Rejimni almashtirish (Kun / Tun)">
                 <span class="theme-icon-sun">☀️</span>
                 <span class="theme-icon-moon">🌙</span>
-                <span id="themeToggleText">Kun</span>
+                <span id="themeToggleText">{{ t('theme_day') }}</span>
             </button>
+
             {% if user %}
             <div class="user-badge">
                 <img src="{{ user.picture }}" alt="{{ user.name }}" class="user-avatar">
                 <span class="user-name">{{ user.name }}</span>
             </div>
-            <a href="/logout" class="btn-logout" title="Tizimdan chiqish">Chiqish 🚪</a>
+            <a href="/logout" class="btn-logout" title="Tizimdan chiqish">{{ t('nav_logout') }}</a>
             {% else %}
-            <a href="/login" class="nav-link">Kirish</a>
+            <a href="/login" class="nav-link">{{ t('nav_login') }}</a>
             {% endif %}
         </div>
     </nav>
@@ -106,15 +129,15 @@
             <button onclick="closeDiffModal()" style="position: absolute; top: 1.2rem; right: 1.4rem; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
             <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;">
                 <span style="font-size: 1.5rem;">🔬</span>
-                <h3 id="modalAnimalName" style="font-size: 1.5rem;">Hayvon farqi</h3>
+                <h3 id="modalAnimalName" style="font-size: 1.5rem;">{{ t('modal_diff_title') }}</h3>
             </div>
             <div style="font-size: 0.85rem; color: #34d399; margin-bottom: 1.2rem;">
-                <strong>O'xshash turlari:</strong> <span id="modalSimilarSpecies"></span>
+                <strong>{{ t('similar_species_label') }}</strong> <span id="modalSimilarSpecies"></span>
             </div>
             <div id="modalDiffBody" style="padding: 1.2rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary); font-size: 0.92rem; line-height: 1.6; max-height: 350px; overflow-y: auto;">
             </div>
             <div style="margin-top: 1.5rem; text-align: right;">
-                <button onclick="closeDiffModal()" class="btn-detail-link" style="padding: 0.6rem 1.4rem; cursor: pointer;">Tushunarli</button>
+                <button onclick="closeDiffModal()" class="btn-detail-link" style="padding: 0.6rem 1.4rem; cursor: pointer;">{{ t('modal_got_it') }}</button>
             </div>
         </div>
     </div>
@@ -125,7 +148,7 @@
             <img id="audioBarImg" src="https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?auto=format&fit=crop&w=200&q=80" alt="Hayvon" class="audio-bar-avatar">
             <div>
                 <div id="audioBarName" style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Sher (Arslon)</div>
-                <div id="audioBarDesc" style="font-size: 0.78rem; color: #34d399;">Akustik tovush to'lqini ijro etilmoqda...</div>
+                <div id="audioBarDesc" style="font-size: 0.78rem; color: #34d399;">{{ t('status_audio_playing') }}</div>
             </div>
             <!-- Jonli tovush to'lqini Canvas -->
             <canvas id="audioWaveCanvas" class="audio-bar-canvas" width="220" height="38"></canvas>
@@ -138,7 +161,7 @@
         </div>
     </div>
 
-    <!-- IMAGE LIGHTBOX (HD FOTO GALEREYA TO'LIQ EKRAN) -->
+    <!-- IMAGE LIGHTBOX -->
     <div id="imageLightboxModal" class="image-lightbox-overlay" onclick="closeLightbox(event)">
         <div class="image-lightbox-wrap">
             <button type="button" class="lightbox-close-btn" onclick="closeLightbox(event)">✕</button>
@@ -147,22 +170,26 @@
         </div>
     </div>
 
-    <!-- FLOATING AI ASSISTANT TUGMASI (Har bir sahifada) -->
+    <!-- FLOATING AI ASSISTANT TUGMASI -->
     <a href="/ai-chat" class="floating-ai-btn">
-        <span>✨ Animora AI Yordamchi</span>
+        <span>✨ {{ t('nav_ai') }}</span>
     </a>
 
     <!-- FOOTER -->
     <footer style="margin-top: 5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem 2rem; background: rgba(5, 12, 8, 0.9); text-align: center; color: var(--color-text-muted); font-size: 0.88rem;">
         <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #ffffff;">
-                <span>🌿</span> Animora — O'zbekiston va Jahon Hayvonot Olami Portali
+                <span>🌿</span> {{ t('footer_title') }}
             </div>
-            <p>O'zbekiston Qizil kitobi & IUCN Xalqaro Qizil ro'yxati asosida tuzilgan ilmiy-ommabop biologik tizim.</p>
-            <p style="font-size: 0.78rem; color: #64748b;">© 2026 Barcha huquqlar himoyalangan. Himoyalangan xavfsiz tizim.</p>
+            <p>{{ t('footer_sub') }}</p>
+            <p style="font-size: 0.78rem; color: #64748b;">{{ t('footer_rights') }}</p>
         </div>
     </footer>
 
+    <script>
+        window.CURRENT_LANG = "{{ current_lang or 'uz' }}";
+        window.CURRENT_SPEECH_LANG = "{{ supported_languages[current_lang or 'uz']['speech_lang'] }}";
+    </script>
     <script src="/static/js/main.js"></script>
     {% block extra_scripts %}{% endblock %}
 </body>

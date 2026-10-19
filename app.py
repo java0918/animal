@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import shutil
+import urllib.parse
 from typing import Optional, List
 from fastapi import FastAPI, Request, Response, Form, UploadFile, File, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
@@ -16,6 +17,10 @@ from database import (
     get_stats, get_connection
 )
 from ai_service import ask_ai
+from translations import (
+    SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, get_translation,
+    localize_animal, localize_animals_list
+)
 
 app = FastAPI(title="Animora — Hayvonot Olami Portali")
 
@@ -56,8 +61,6 @@ if is_serverless:
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-import urllib.parse
-
 # Helper for current user from cookie
 def get_current_user(request: Request) -> Optional[dict]:
     session_cookie = request.cookies.get("animora_session") or request.cookies.get("animore_session") or request.cookies.get("fauna_session")
@@ -70,28 +73,48 @@ def get_current_user(request: Request) -> Optional[dict]:
     except Exception:
         return None
 
+# Helper for current language
+def get_current_lang(request: Request) -> str:
+    lang_param = request.query_params.get("lang")
+    if lang_param and lang_param in SUPPORTED_LANGUAGES:
+        return lang_param
+    lang_cookie = request.cookies.get("animora_lang")
+    if lang_cookie and lang_cookie in SUPPORTED_LANGUAGES:
+        return lang_cookie
+    return DEFAULT_LANGUAGE
+
+def get_base_context(request: Request, current_lang: str) -> dict:
+    user = get_current_user(request)
+    lang_info = SUPPORTED_LANGUAGES.get(current_lang, SUPPORTED_LANGUAGES[DEFAULT_LANGUAGE])
+    return {
+        "request": request,
+        "user": user,
+        "current_lang": current_lang,
+        "current_lang_label": lang_info["native"],
+        "current_lang_flag": lang_info["flag"],
+        "supported_languages": SUPPORTED_LANGUAGES,
+        "t": lambda key, default=None: get_translation(current_lang, key, default)
+    }
+
 # Middleware for Closed Website Protection
 class ClosedPortalMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
         
-        # Public paths: static assets, login page, auth API endpoints
-        public_prefixes = ["/static", "/login", "/api/auth"]
+        # Public paths: static assets, login page, auth API endpoints, language switch
+        public_prefixes = ["/static", "/login", "/api/auth", "/set-lang"]
         if any(path.startswith(prefix) for prefix in public_prefixes):
             return await call_next(request)
             
         user = get_current_user(request)
         if not user:
-            # If API request, return 401
             if path.startswith("/api/"):
                 return JSONResponse(
                     status_code=401,
                     content={"detail": "Sayt yopiq. Avval Google hisob bilan kiring."}
                 )
-            # If browser request, redirect to login page
             return RedirectResponse(url="/login?redirect=" + path)
             
-        # User is authenticated
         return await call_next(request)
 
 app.add_middleware(ClosedPortalMiddleware)
@@ -100,10 +123,32 @@ app.add_middleware(ClosedPortalMiddleware)
 async def startup_event():
     init_db()
 
+# ================= LANGUAGE SWITCH ROUTE =================
+
+@app.get("/set-lang/{lang_code}")
+async def set_language(lang_code: str, request: Request):
+    if lang_code not in SUPPORTED_LANGUAGES:
+        lang_code = DEFAULT_LANGUAGE
+    referer = request.headers.get("referer") or "/"
+    try:
+        parsed = urllib.parse.urlparse(referer)
+        qs = urllib.parse.parse_qs(parsed.query)
+        qs.pop("lang", None)
+        new_query = urllib.parse.urlencode(qs, doseq=True)
+        clean_url = urllib.parse.urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment))
+    except Exception:
+        clean_url = "/"
+    if not clean_url:
+        clean_url = "/"
+    res = RedirectResponse(url=clean_url, status_code=303)
+    res.set_cookie(key="animora_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
+    return res
+
 # ================= AUTH & LOGIN ROUTES =================
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
+    current_lang = get_current_lang(request)
     user = get_current_user(request)
     if user:
         return RedirectResponse(url="/")
@@ -115,143 +160,98 @@ async def login_page(request: Request):
     google_client_id = row["value"] if row and row["value"] else ""
     conn.close()
     
+    ctx = get_base_context(request, current_lang)
+    ctx["google_client_id"] = google_client_id
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"google_client_id": google_client_id}
+        context=ctx
     )
 
 @app.post("/api/auth/google")
 async def google_auth(request: Request, response: Response):
-    """
-    Handle Google OAuth credential or token.
-    Accepts credential token or simulated Google payload.
-    """
     try:
         data = await request.json()
         credential = data.get("credential")
-        # In case demo or custom payload:
         email = data.get("email")
         name = data.get("name")
         picture = data.get("picture")
         sub = data.get("sub", str(uuid.uuid4()))
         
-        # If real Google JWT token provided, can decode or parse
         if credential and not email:
             import base64
-            # JWT payload is 2nd part
             parts = credential.split(".")
             if len(parts) >= 2:
                 payload_part = parts[1]
-                padded = payload_part + "=" * (-len(payload_part) % 4)
-                decoded = base64.b64decode(padded).decode("utf-8")
-                jwt_data = json.loads(decoded)
-                email = jwt_data.get("email", "user@gmail.com")
-                name = jwt_data.get("name", "Google Foydalanuvchi")
-                picture = jwt_data.get("picture", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80")
-                sub = jwt_data.get("sub", str(uuid.uuid4()))
+                payload_part += "=" * ((4 - len(payload_part) % 4) % 4)
+                decoded = base64.b64decode(payload_part).decode("utf-8")
+                user_info = json.loads(decoded)
+                email = user_info.get("email")
+                name = user_info.get("name", "Foydalanuvchi")
+                picture = user_info.get("picture", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80")
+                sub = user_info.get("sub", sub)
 
         if not email:
-            return JSONResponse({"success": False, "message": "Email topilmadi"}, status_code=400)
-
-        # Check if email is admin
-        role = "admin" if email in ["admin@hayvonlar.uz", "shamsiyev@gmail.com"] or "admin" in email.lower() else "user"
-        user = get_or_create_user(sub, email, name, picture, role=role)
+            email = f"user_{sub[:8]}@animora.uz"
+        if not name:
+            name = "Tabiat Shaydosi"
+        if not picture:
+            picture = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
+            
+        role = "user"
+        if email.lower() in ["admin@animora.uz", "admin@fauna.uz", "java0918@gmail.com", "admin@gmail.com"]:
+            role = "admin"
+            
+        user = get_or_create_user(google_id=sub, email=email, name=name, picture=picture, role=role)
         
-        user_session = {
-            "id": user["id"],
-            "email": user["email"],
-            "name": user["name"],
-            "picture": user.get("picture") or "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-            "role": user["role"]
-        }
-        
-        res = JSONResponse({"success": True, "user": user_session})
-        cookie_val = urllib.parse.quote(json.dumps(user_session))
-        res.set_cookie(
-            key="fauna_session",
-            value=cookie_val,
-            httponly=True,
-            max_age=86400 * 7, # 7 days
-            samesite="lax"
-        )
+        res = JSONResponse({"success": True, "user": user})
+        cookie_val = urllib.parse.quote(json.dumps(user))
+        res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
+        res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
         return res
     except Exception as e:
-        return JSONResponse({"success": False, "message": str(e)}, status_code=500)
+        return JSONResponse({"success": False, "error": str(e)}, status_code=400)
 
-@app.post("/api/auth/login")
 @app.post("/api/auth/admin-login")
-@app.post("/api/auth/step2-login")
-async def user_login(request: Request, response: Response):
-    """Faqat login va parol orqali kirish (Admin: admin / java0918, Foydalanuvchi: username / password)"""
-    body = await request.json()
-    username = body.get("username", "").strip()
-    password = body.get("password", "").strip()
+async def admin_login(request: Request, response: Response):
+    data = await request.json()
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
     
-    if not username or not password:
-        return JSONResponse(
-            {"success": False, "message": "Iltimos, login va parolni kiriting!"},
-            status_code=400
-        )
-        
-    if username.lower() == "admin":
-        if password == "java0918":
-            user_session = {
-                "id": 1,
-                "email": "admin@hayvonlar.uz",
-                "name": "Bosh Administrator",
-                "picture": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-                "role": "admin"
-            }
-            get_or_create_user(
-                google_id="admin-java0918",
-                email=user_session["email"],
-                name=user_session["name"],
-                picture=user_session["picture"],
-                role="admin"
-            )
-            res = JSONResponse({"success": True, "redirect": "/admin", "role": "admin", "user": user_session})
-            cookie_val = urllib.parse.quote(json.dumps(user_session))
-            res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-            res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-            return res
-        else:
-            return JSONResponse(
-                {"success": False, "message": "Login yoki parol noto'g'ri!"},
-                status_code=401
-            )
-    else:
-        # Oddiy foydalanuvchi
-        user_session = {
-            "id": 2,
-            "email": f"{username.lower()}@animora.uz",
-            "name": username.capitalize(),
-            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-            "role": "user"
+    if username == "admin" and password == "java0918":
+        admin_user = {
+            "id": 9999,
+            "google_id": "system-admin-01",
+            "email": "admin@animora.uz",
+            "name": "Bosh Administrator",
+            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
+            "role": "admin"
         }
         get_or_create_user(
-            google_id=f"user-{username.lower()}",
-            email=user_session["email"],
-            name=user_session["name"],
-            picture=user_session["picture"],
-            role="user"
+            google_id=admin_user["google_id"],
+            email=admin_user["email"],
+            name=admin_user["name"],
+            picture=admin_user["picture"],
+            role="admin"
         )
-        res = JSONResponse({"success": True, "redirect": "/", "role": "user", "user": user_session})
-        cookie_val = urllib.parse.quote(json.dumps(user_session))
+        res = JSONResponse({"success": True, "user": admin_user})
+        cookie_val = urllib.parse.quote(json.dumps(admin_user))
         res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         return res
+    else:
+        return JSONResponse({"success": False, "message": "Login yoki parol noto'g'ri!"}, status_code=401)
 
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
-    """Foydalanuvchi tezkor kirish"""
-    user_session = {
-        "id": 2,
-        "email": "mehmon@animora.uz",
-        "name": "Mehmon",
-        "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-        "role": "user"
-    }
+    demo_users = [
+        {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@animora.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@animora.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@animora.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
+    ]
+    import random
+    user_session = random.choice(demo_users)
+    user_session["role"] = "user"
     
     get_or_create_user(
         google_id=f"demo-{user_session['id']}",
@@ -279,105 +279,118 @@ async def logout(response: Response):
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request, category: Optional[str] = None, search: Optional[str] = None):
-    user = get_current_user(request)
+    current_lang = get_current_lang(request)
     animals = get_all_animals(category=category, search=search)
+    localized_animals = localize_animals_list(animals, current_lang)
     stats = get_stats()
     
+    ctx = get_base_context(request, current_lang)
+    ctx.update({
+        "animals": localized_animals,
+        "current_category": category or "all",
+        "search_query": search or "",
+        "stats": stats
+    })
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={
-            "user": user,
-            "animals": animals,
-            "current_category": category or "all",
-            "search_query": search or "",
-            "stats": stats
-        }
+        context=ctx
     )
 
 @app.get("/animal/{animal_id}", response_class=HTMLResponse)
 async def animal_detail(animal_id: int, request: Request):
-    user = get_current_user(request)
+    current_lang = get_current_lang(request)
     animal = get_animal_by_id(animal_id)
     if not animal:
         raise HTTPException(status_code=404, detail="Hayvon topilmadi")
         
+    animal = localize_animal(animal, current_lang)
     all_animals = get_all_animals()
-    similar_animals = [a for a in all_animals if a["id"] != animal_id and a["category"] == animal["category"]][:4]
+    similar_animals = [localize_animal(a, current_lang) for a in all_animals if a["id"] != animal_id and a["category"] == animal["category"]][:4]
     
+    ctx = get_base_context(request, current_lang)
+    ctx.update({
+        "animal": animal,
+        "similar_animals": similar_animals
+    })
     return templates.TemplateResponse(
         request=request,
         name="animal_detail.html",
-        context={
-            "user": user,
-            "animal": animal,
-            "similar_animals": similar_animals
-        }
+        context=ctx
     )
 
 @app.get("/redbook", response_class=HTMLResponse)
 async def redbook_page(request: Request, status_filter: Optional[str] = None):
-    user = get_current_user(request)
+    current_lang = get_current_lang(request)
     all_animals = get_all_animals()
     
-    # Filter red book animals
     red_animals = []
     for a in all_animals:
         is_uz_red = a["uz_red_book_status"] != "Kiritilmagan"
         is_iucn_red = a["iucn_status"] in ["CR", "EN", "VU"]
         if is_uz_red or is_iucn_red:
             if not status_filter or status_filter == "all" or status_filter in a["uz_red_book_status"] or status_filter == a["iucn_status"]:
-                red_animals.append(a)
+                red_animals.append(localize_animal(a, current_lang))
                 
+    ctx = get_base_context(request, current_lang)
+    ctx.update({
+        "animals": red_animals,
+        "status_filter": status_filter or "all"
+    })
     return templates.TemplateResponse(
         request=request,
         name="redbook.html",
-        context={
-            "user": user,
-            "animals": red_animals,
-            "status_filter": status_filter or "all"
-        }
+        context=ctx
     )
 
 @app.get("/compare", response_class=HTMLResponse)
 async def compare_page(request: Request, left: Optional[int] = 1, right: Optional[int] = 5):
-    user = get_current_user(request)
-    all_animals = get_all_animals()
+    current_lang = get_current_lang(request)
+    all_animals = localize_animals_list(get_all_animals(), current_lang)
     
     left_animal = get_animal_by_id(left) or (all_animals[0] if all_animals else None)
     right_animal = get_animal_by_id(right) or (all_animals[1] if len(all_animals) > 1 else None)
     
+    if left_animal:
+        left_animal = localize_animal(left_animal, current_lang)
+    if right_animal:
+        right_animal = localize_animal(right_animal, current_lang)
+        
+    ctx = get_base_context(request, current_lang)
+    ctx.update({
+        "all_animals": all_animals,
+        "left_animal": left_animal,
+        "right_animal": right_animal
+    })
     return templates.TemplateResponse(
         request=request,
         name="comparison.html",
-        context={
-            "user": user,
-            "all_animals": all_animals,
-            "left_animal": left_animal,
-            "right_animal": right_animal
-        }
+        context=ctx
     )
 
 @app.get("/ai-chat", response_class=HTMLResponse)
 async def ai_chat_page(request: Request):
-    user = get_current_user(request)
+    current_lang = get_current_lang(request)
+    ctx = get_base_context(request, current_lang)
     return templates.TemplateResponse(
         request=request,
         name="ai_chat.html",
-        context={"user": user}
+        context=ctx
     )
 
 @app.get("/quiz", response_class=HTMLResponse)
 async def quiz_page(request: Request):
-    user = get_current_user(request)
+    current_lang = get_current_lang(request)
+    ctx = get_base_context(request, current_lang)
     return templates.TemplateResponse(
         request=request,
         name="quiz.html",
-        context={"user": user}
+        context=ctx
     )
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
+    current_lang = get_current_lang(request)
     user = get_current_user(request)
     if not user or user.get("role") != "admin":
         return RedirectResponse(url="/login?redirect=/admin")
@@ -393,16 +406,17 @@ async def admin_page(request: Request):
     settings_dict = {row["key"]: row["value"] for row in settings_rows}
     conn.close()
     
+    ctx = get_base_context(request, current_lang)
+    ctx.update({
+        "animals": animals,
+        "users": users,
+        "stats": stats,
+        "settings": settings_dict
+    })
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
-        context={
-            "user": user,
-            "animals": animals,
-            "users": users,
-            "stats": stats,
-            "settings": settings_dict
-        }
+        context=ctx
     )
 
 # ================= API ENDPOINTS =================
@@ -411,9 +425,17 @@ async def admin_page(request: Request):
 async def api_ai_ask(request: Request):
     body = await request.json()
     message = body.get("message", "").strip()
+    lang = body.get("lang") or get_current_lang(request)
     if not message:
-        return JSONResponse({"answer": "Iltimos, biror savol kiriting."})
-    answer = ask_ai(message)
+        no_msg = {
+            "uz": "Iltimos, biror savol kiriting.",
+            "kaa": "Iltimos, biror soraw kiritiń.",
+            "ru": "Пожалуйста, введите вопрос.",
+            "en": "Please enter a question.",
+            "fr": "Veuillez entrer une question."
+        }.get(lang, "Iltimos, biror savol kiriting.")
+        return JSONResponse({"answer": no_msg})
+    answer = ask_ai(message, lang=lang)
     return JSONResponse({"answer": answer})
 
 @app.post("/api/upload")
@@ -509,6 +531,5 @@ async def api_github_push(request: Request):
         return JSONResponse({"success": False, "message": f"GitHub xatosi: {str(e)}"}, status_code=500)
 
 if __name__ == "__main__":
-
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

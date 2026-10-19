@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ animal.name_uz }} — Animora Batafsil Ma'lumot{% endblock %}
+{% block title %}{{ animal.name_uz }} — Animora{% endblock %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
     <!-- Orqaga qaytish havolasi -->
     <div style="margin-bottom: 1.5rem;">
         <a href="/" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #a7f3d0; font-size: 0.9rem; font-weight: 600;">
-            <span>←</span> Barcha hayvonlarga qaytish
+            <span>←</span> {{ t('back_link') }}
         </a>
     </div>
 
@@ -27,7 +27,7 @@
                     <span>📕</span>
                     <span>
                         {% if animal.uz_red_book_status != 'Kiritilmagan' %}
-                        O'zbekiston Qizil kitobi: {{ animal.uz_red_book_status }}
+                        {{ animal.uz_red_book_status }}
                         {% else %}
                         IUCN: {{ animal.iucn_status }}
                         {% endif %}
@@ -49,8 +49,8 @@
             <!-- OVOZ PLEYERI BLOKI -->
             <div style="margin-top: 1.5rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                    <div style="font-size: 0.82rem; color: #7dd3fc; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">Akustik Ovoz</div>
-                    <div style="font-size: 0.95rem; color: #ffffff; font-weight: 600;">{{ animal.name_uz }}ning tovush signali</div>
+                    <div style="font-size: 0.82rem; color: #7dd3fc; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">{{ t('acoustic_title') }}</div>
+                    <div style="font-size: 0.95rem; color: #ffffff; font-weight: 600;">{{ animal.name_uz }} {{ t('acoustic_sub') }}</div>
                     <div style="font-size: 0.82rem; color: var(--color-text-dim); margin-top: 0.2rem;">{{ animal.sound_description }}</div>
                 </div>
 
@@ -60,7 +60,7 @@
                         data-sound-file="{{ animal.sound_file }}"
                         style="padding: 0.75rem 1.4rem; font-size: 0.95rem;">
                     <span>🔊</span>
-                    <span>Tinglash</span>
+                    <span>{{ t('listen') }}</span>
                     <div class="sound-waves-indicator">
                         <span></span><span></span><span></span>
                     </div>
@@ -82,7 +82,7 @@
                 </h1>
                 
                 <div style="font-style: italic; font-size: 1.05rem; color: #34d399; margin-bottom: 1.5rem;">
-                    {{ animal.name_latin }} (Inglizcha: {{ animal.name_en }})
+                    {{ animal.name_latin }} ({{ animal.name_en }})
                 </div>
 
                 <p style="font-size: 0.98rem; line-height: 1.7; color: #cbd5e1; margin-bottom: 2rem;">
@@ -92,19 +92,19 @@
                 <!-- Parametrlar kataklari -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
                     <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 0.85rem 1.1rem; border-radius: var(--radius-sm);">
-                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">🌿 Yashash joyi</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">{{ t('habitat') }}</div>
                         <div style="font-size: 0.92rem; font-weight: 600; color: #ffffff;">{{ animal.habitat }}</div>
                     </div>
                     <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 0.85rem 1.1rem; border-radius: var(--radius-sm);">
-                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">🥩 Oziqlanishi</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">{{ t('diet') }}</div>
                         <div style="font-size: 0.92rem; font-weight: 600; color: #ffffff;">{{ animal.diet }}</div>
                     </div>
                     <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 0.85rem 1.1rem; border-radius: var(--radius-sm);">
-                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">⚡ Tezligi</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">{{ t('speed') }}</div>
                         <div style="font-size: 0.92rem; font-weight: 600; color: #ffffff;">{{ animal.speed }}</div>
                     </div>
                     <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 0.85rem 1.1rem; border-radius: var(--radius-sm);">
-                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">⚖️ O'rtacha vazni</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted);">{{ t('weight') }}</div>
                         <div style="font-size: 0.92rem; font-weight: 600; color: #ffffff;">{{ animal.weight }}</div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
             <div>
                 <a href="/compare?left={{ animal.id }}" class="btn-primary" style="width: 100%; justify-content: center;">
                     <span>⚖️</span>
-                    <span>Boshqa hayvon bilan solishtirish (Laboratoriya)</span>
+                    <span>{{ t('compare_btn') }}</span>
                 </a>
             </div>
 
@@ -130,8 +130,8 @@
                 🔬
             </div>
             <div>
-                <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">O'xshash Turlaridan Qanday Farqlanadi?</h2>
-                <div style="font-size: 0.88rem; color: var(--color-text-muted);">Taqqoslanuvchi turlar: <strong>{{ animal.similar_species }}</strong></div>
+                <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">{{ t('diff_title') }}</h2>
+                <div style="font-size: 0.88rem; color: var(--color-text-muted);">{{ t('diff_sub') }} <strong>{{ animal.similar_species }}</strong></div>
             </div>
         </div>
 
@@ -149,20 +149,20 @@
                 📕
             </div>
             <div>
-                <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">Qizil Kitob Maqomi va Muhofazasi</h2>
-                <div style="font-size: 0.88rem; color: var(--color-text-muted);">O'zbekiston Respublikasi Qizil kitobi & IUCN Xalqaro Qizil ro'yxati</div>
+                <h2 style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">{{ t('redbook_title') }}</h2>
+                <div style="font-size: 0.88rem; color: var(--color-text-muted);">{{ t('footer_sub') }}</div>
             </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem;">
             <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-md); padding: 1.5rem;">
-                <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #f87171;">O'zbekiston Qizil Kitobi</span>
+                <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #f87171;">{{ t('redbook_uz') }}</span>
                 <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin: 0.4rem 0;">{{ animal.uz_red_book_status }}</div>
                 <p style="font-size: 0.9rem; color: #fecaca; line-height: 1.5;">{{ animal.uz_red_book_desc }}</p>
             </div>
 
             <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 1.5rem;">
-                <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #fbbf24;">Xalqaro IUCN Qizil Ro'yxati</span>
+                <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #fbbf24;">{{ t('redbook_iucn') }}</span>
                 <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin: 0.4rem 0;">{{ animal.iucn_status }}</div>
                 <p style="font-size: 0.9rem; color: #fef08a; line-height: 1.5;">{{ animal.iucn_desc }}</p>
             </div>
@@ -174,7 +174,7 @@
     {% if animal.fun_facts and animal.fun_facts|length > 0 %}
     <div style="background: var(--color-bg-card); backdrop-filter: blur(20px); border: 1px solid var(--color-border-glass); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-card); margin-bottom: 3rem;">
         <h3 style="font-size: 1.5rem; font-weight: 700; color: #ffffff; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
-            <span>✨</span> Kam Ma'lum Bo'lgan Qiziqarli Faktlar
+            <span>✨</span> {{ t('facts_title') }}
         </h3>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.8rem;">
             {% for fact in animal.fun_facts %}
