@@ -20,7 +20,7 @@
 
     <!-- MAQOM BO'YICHA FILTR -->
     <div style="background: var(--color-bg-card); border: 1px solid var(--color-border-glass); border-radius: var(--radius-md); padding: 1rem 1.5rem; margin-bottom: 2.5rem; display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
-        <span style="font-size: 0.88rem; font-weight: 600; color: #cbd5e1;">Filtr:</span>
+        <span style="font-size: 0.88rem; font-weight: 600; color: #cbd5e1;">{{ t('filter_label') }}:</span>
         <a href="/redbook" class="category-pill {% if status_filter == 'all' %}active{% endif %}">{{ t('filter_all') }}</a>
         <a href="/redbook?status_filter=1" class="category-pill {% if status_filter == '1' %}active{% endif %}">{{ t('filter_cr') }}</a>
         <a href="/redbook?status_filter=EN" class="category-pill {% if status_filter == 'EN' %}active{% endif %}">{{ t('filter_en') }}</a>

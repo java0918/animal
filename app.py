@@ -461,10 +461,12 @@ async def api_upload(
     return JSONResponse({"url": f"{url_prefix}{unique_name}"})
 
 @app.get("/api/animals/{animal_id}")
-async def api_get_animal(animal_id: int):
+async def api_get_animal(animal_id: int, request: Request):
+    lang = get_request_language(request)
     animal = get_animal_by_id(animal_id)
     if not animal:
         raise HTTPException(status_code=404, detail="Hayvon topilmadi")
+    animal = localize_animal(animal, lang)
     return JSONResponse(animal)
 
 @app.post("/api/animals")

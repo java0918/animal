@@ -8,6 +8,33 @@ Tillar:
 5. Fransuz (fr) - 🇫🇷
 """
 
+try:
+    from animal_content_en import ANIMALS_EN
+except ImportError:
+    ANIMALS_EN = {}
+
+try:
+    from animal_content_ru import ANIMALS_RU
+except ImportError:
+    ANIMALS_RU = {}
+
+try:
+    from animal_content_kaa import ANIMALS_KAA
+except ImportError:
+    ANIMALS_KAA = {}
+
+try:
+    from animal_content_fr import ANIMALS_FR
+except ImportError:
+    ANIMALS_FR = {}
+
+ANIMAL_CONTENT_I18N = {
+    "en": ANIMALS_EN,
+    "ru": ANIMALS_RU,
+    "kaa": ANIMALS_KAA,
+    "fr": ANIMALS_FR
+}
+
 SUPPORTED_LANGUAGES = {
     "uz": {
         "code": "uz",
@@ -173,7 +200,13 @@ TRANSLATIONS = {
         "footer_rights": "© 2026 Barcha huquqlar himoyalangan. Himoyalangan xavfsiz tizim.",
         "modal_diff_title": "Hayvon farqi",
         "modal_got_it": "Tushunarli",
-        "status_audio_playing": "Akustik tovush to'lqini ijro etilmoqda..."
+        "status_audio_playing": "Akustik tovush to'lqini ijro etilmoqda...",
+        "feature_latin_name": "Lotincha nomi",
+        "feature_category": "Kategoriyasi",
+        "filter_label": "Filtr",
+        "hero_swallow_desc": "Epchil parvoz dinamikasiga ega havoyi hasharotxo'r.",
+        "hero_rabbit_desc": "360 darajali panoramik ko'rish qobiliyatiga ega hushyor o'txo'r.",
+        "hero_lion_desc": "Ochiq tekisliklar va savannalarning oliy ijtimoiy yirtqichi."
     },
 
     "kaa": {
@@ -300,7 +333,13 @@ TRANSLATIONS = {
         "footer_rights": "© 2026 Barlıq huqıqlar qorǵalǵan.",
         "modal_diff_title": "Haywan parqı",
         "modal_got_it": "Túsindim",
-        "status_audio_playing": "Akustikalıq dawıs tolqını esitilmekte..."
+        "status_audio_playing": "Akustikalıq dawıs tolqını esitilmekte...",
+        "feature_latin_name": "Latınsha atı",
+        "feature_category": "Kategoriyası",
+        "filter_label": "Filtr",
+        "hero_swallow_desc": "Shaqqan ushıw qábilyetine iye shıbın-shirkeyxor qus.",
+        "hero_rabbit_desc": "360 graduslı panoroma kóriwge iye sezgir ósimlikxor.",
+        "hero_lion_desc": "Ashıq maydanlar hám savannalardıń eń kúshli toparlı yırtqıshı."
     },
 
     "ru": {
@@ -427,7 +466,13 @@ TRANSLATIONS = {
         "footer_rights": "© 2026 Все права защищены. Защищенная безопасная система.",
         "modal_diff_title": "Отличия животного",
         "modal_got_it": "Понятно",
-        "status_audio_playing": "Воспроизведение акустической звуковой волны..."
+        "status_audio_playing": "Воспроизведение акустической звуковой волны...",
+        "feature_latin_name": "Научное название",
+        "feature_category": "Категория",
+        "filter_label": "Фильтр",
+        "hero_swallow_desc": "Виртуозный воздушный охотник за летающими насекомыми.",
+        "hero_rabbit_desc": "Чуткое травоядное с панорамным круговым зрением 360°.",
+        "hero_lion_desc": "Верховный социальный хищник открытых равнин и саванн."
     },
 
     "en": {
@@ -554,7 +599,13 @@ TRANSLATIONS = {
         "footer_rights": "© 2026 All rights reserved. Secure protected system.",
         "modal_diff_title": "Species distinction",
         "modal_got_it": "Understood",
-        "status_audio_playing": "Playing acoustic sound waveform..."
+        "status_audio_playing": "Playing acoustic sound waveform...",
+        "feature_latin_name": "Scientific Name",
+        "feature_category": "Category",
+        "filter_label": "Filter",
+        "hero_swallow_desc": "Acrobatic aerial insectivore with agile flight dynamics.",
+        "hero_rabbit_desc": "High-alert terrestrial herbivore with 360-degree panoramic vision.",
+        "hero_lion_desc": "Apex social carnivore of open plains and scrublands."
     },
 
     "fr": {
@@ -681,7 +732,13 @@ TRANSLATIONS = {
         "footer_rights": "© 2026 Tous droits réservés. Système sécurisé.",
         "modal_diff_title": "Distinction de l'espèce",
         "modal_got_it": "Compris",
-        "status_audio_playing": "Lecture de l'onde acoustique en cours..."
+        "status_audio_playing": "Lecture de l'onde acoustique en cours...",
+        "feature_latin_name": "Nom scientifique",
+        "feature_category": "Catégorie",
+        "filter_label": "Filtre",
+        "hero_swallow_desc": "Insectivore aérien acrobatique au vol extrêmement agile.",
+        "hero_rabbit_desc": "Herbivore terrestre très vigilant doté d'une vision panoramique à 360°.",
+        "hero_lion_desc": "Superprédateur social régnant sur les savanes et plaines ouvertes."
     }
 }
 
@@ -923,20 +980,28 @@ def get_translation(lang: str, key: str, default: str = None) -> str:
     return default or key
 
 def localize_animal(animal: dict, lang: str = "uz") -> dict:
-    """Return localized animal dictionary."""
+    """Return fully localized animal dictionary with all scientific, biological, and conservation fields."""
     if not animal or lang == "uz":
         return animal
     item = dict(animal)
     animal_id = item.get("id")
-    if animal_id in ANIMAL_NAMES_I18N and lang in ANIMAL_NAMES_I18N[animal_id]:
-        item["name_uz"] = ANIMAL_NAMES_I18N[animal_id][lang]
-    elif lang == "en" and item.get("name_en"):
-        item["name_uz"] = item["name_en"]
-        
-    cat = item.get("category")
-    if cat in CATEGORY_I18N and lang in CATEGORY_I18N[cat]:
-        item["category"] = CATEGORY_I18N[cat][lang]
-        
+
+    # If full localized dataset exists for this language and animal ID
+    if lang in ANIMAL_CONTENT_I18N and animal_id in ANIMAL_CONTENT_I18N[lang]:
+        content = ANIMAL_CONTENT_I18N[lang][animal_id]
+        for field, value in content.items():
+            if value is not None:
+                item[field] = value
+    else:
+        if animal_id in ANIMAL_NAMES_I18N and lang in ANIMAL_NAMES_I18N[animal_id]:
+            item["name_uz"] = ANIMAL_NAMES_I18N[animal_id][lang]
+        elif lang == "en" and item.get("name_en"):
+            item["name_uz"] = item["name_en"]
+            
+        cat = item.get("category")
+        if cat in CATEGORY_I18N and lang in CATEGORY_I18N[cat]:
+            item["category"] = CATEGORY_I18N[cat][lang]
+            
     return item
 
 def localize_animals_list(animals: list, lang: str = "uz") -> list:
