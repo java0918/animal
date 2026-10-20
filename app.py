@@ -462,7 +462,7 @@ async def api_upload(
 
 @app.get("/api/animals/{animal_id}")
 async def api_get_animal(animal_id: int, request: Request):
-    lang = get_request_language(request)
+    lang = get_current_lang(request)
     animal = get_animal_by_id(animal_id)
     if not animal:
         raise HTTPException(status_code=404, detail="Hayvon topilmadi")
