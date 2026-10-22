@@ -1,5 +1,5 @@
 /**
- * ANIMORA — Login va Parol orqali Kirish Tizimi
+ * ANIMIND — Login va Parol orqali Kirish Tizimi
  */
 
 function submitLogin(e) {
