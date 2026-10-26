@@ -1,5 +1,5 @@
 """
-ANIMIND - English Wildlife Content (All 27 Animals)
+ZOOVENTURE - English Wildlife Content (All 27 Animals)
 Full encyclopedic translations: Description, Differences, Habitat, Diet, Speed, Weight, Lifespan, Red Book, Sound, Facts.
 """
 

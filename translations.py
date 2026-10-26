@@ -1,5 +1,5 @@
 """
-ANIMIND - 5 Tilda Xalqaro Lokalizatsiya Moduli (i18n)
+ZOOVENTURE - 5 Tilda Xalqaro Lokalizatsiya Moduli (i18n)
 Tillar:
 1. O'zbek (uz) - 🇺🇿
 2. Qoraqalpoq (kaa) - 🟩🟨🟦
@@ -83,7 +83,7 @@ TRANSLATIONS = {
         "nav_compare": "Turlarni Taqqoslash",
         "nav_redbook": "Qizil Kitob",
         "nav_quiz": "Viktorina (O'yin)",
-        "nav_ai": "Animind AI Yordamchi",
+        "nav_ai": "Zooventure AI Yordamchi",
         "nav_admin": "Admin Panel",
         "nav_login": "Kirish",
         "nav_logout": "Chiqish 🚪",
@@ -92,7 +92,7 @@ TRANSLATIONS = {
         "lang_name": "O'zbekcha",
 
         # Splash
-        "splash_title": "ANIMIND AI MATRITSA YUKLANMOQDA...",
+        "splash_title": "ZOOVENTURE AI MATRITSA YUKLANMOQDA...",
         "splash_sub": "Jonli tabiat va ekotizim ma'lumotlari yangilanmoqda",
 
         # Home
@@ -175,9 +175,9 @@ TRANSLATIONS = {
 
         # AI Chat
         "ai_hero_badge": "✨ 3.8 Aqlli Zoologik Neyron Tarmog'i",
-        "ai_hero_title": "Animind AI Zoologik Maslahatchi",
+        "ai_hero_title": "Zooventure AI Zoologik Maslahatchi",
         "ai_hero_desc": "Hayvonlar bir-biridan qanday farqlanishi, O'zbekiston Qizil kitobi, yashash tarzi va ovozlari bo'yicha istalgan savolingizni bering!",
-        "ai_welcome": "Salom! Men Animind AI biologik yordamchingizman. Hayvonlar, ularning o'xshash turlaridan qanday farqlanishi yoki Qizil kitob bo'yicha savolingizni bering.",
+        "ai_welcome": "Salom! Men Zooventure AI biologik yordamchingizman. Hayvonlar, ularning o'xshash turlaridan qanday farqlanishi yoki Qizil kitob bo'yicha savolingizni bering.",
         "ai_chip1": "Gepard va qoplon farqi",
         "ai_chip2": "Sayg'oq haqida ma'lumot",
         "ai_chip3": "Qizil kitobga nimalar kirgan?",
@@ -186,7 +186,7 @@ TRANSLATIONS = {
 
         # Login
         "login_title": "Tizimga Kirish",
-        "login_desc": "Animind — yopiq ilmiy-ommabop biologik portal. Saytdan foydalanish uchun Google hisobingiz orqali kiring.",
+        "login_desc": "Zooventure — yopiq ilmiy-ommabop biologik portal. Saytdan foydalanish uchun Google hisobingiz orqali kiring.",
         "login_btn_google": "Google Hisob bilan Kirish",
         "login_btn_admin": "🛡️ Administrator Kirishi (Parol bilan)",
         "admin_modal_title": "Administrator Kirishi",
@@ -195,7 +195,7 @@ TRANSLATIONS = {
         "admin_submit": "Kirish 🚀",
 
         # Footer & Modal
-        "footer_title": "Animind — O'zbekiston va Jahon Hayvonot Olami Portali",
+        "footer_title": "Zooventure — O'zbekiston va Jahon Hayvonot Olami Portali",
         "footer_sub": "O'zbekiston Qizil kitobi & IUCN Xalqaro Qizil ro'yxati asosida tuzilgan ilmiy-ommabop biologik tizim.",
         "footer_rights": "© 2026 Barcha huquqlar himoyalangan. Himoyalangan xavfsiz tizim.",
         "modal_diff_title": "Hayvon farqi",
@@ -216,7 +216,7 @@ TRANSLATIONS = {
         "nav_compare": "Túrlerdi Salıstırıw",
         "nav_redbook": "Qızıl Kitap",
         "nav_quiz": "Viktorina (Oyın)",
-        "nav_ai": "Animind AI Járdemshi",
+        "nav_ai": "Zooventure AI Járdemshi",
         "nav_admin": "Admin Panel",
         "nav_login": "Kiriw",
         "nav_logout": "Shıǵıw 🚪",
@@ -225,7 +225,7 @@ TRANSLATIONS = {
         "lang_name": "Qaraqalpaqsha",
 
         # Splash
-        "splash_title": "ANIMIND AI MATRITSA JÚKLENBEKTE...",
+        "splash_title": "ZOOVENTURE AI MATRITSA JÚKLENBEKTE...",
         "splash_sub": "Tiri tábiyat hám ekosistema maǵlıwmatları jańalanbaqta",
 
         # Home
@@ -308,9 +308,9 @@ TRANSLATIONS = {
 
         # AI Chat
         "ai_hero_badge": "✨ 3.8 Aqıllı Zoologiyalıq Neyron Tarmaǵı",
-        "ai_hero_title": "Animind AI Zoologiyalıq Másláhátshi",
+        "ai_hero_title": "Zooventure AI Zoologiyalıq Másláhátshi",
         "ai_hero_desc": "Haywanlar qalay parıqlanıwı, Qızıl kitap, jasaw tárizi haqqında soraw berip kórıń!",
-        "ai_welcome": "Sálem! Men Animind AI biologiyalıq járdemshisimen. Haywanlar, olardıń parıqları yamasa Qızıl kitap boyınsha sorawıńızdı beriń.",
+        "ai_welcome": "Sálem! Men Zooventure AI biologiyalıq járdemshisimen. Haywanlar, olardıń parıqları yamasa Qızıl kitap boyınsha sorawıńızdı beriń.",
         "ai_chip1": "Gepard penen qaplan parqı",
         "ai_chip2": "Sayǵaq haqqında maǵlıwmat",
         "ai_chip3": "Qızıl kitapqa nelar kirgen?",
@@ -319,7 +319,7 @@ TRANSLATIONS = {
 
         # Login
         "login_title": "Sistemaǵa Kiriw",
-        "login_desc": "Animind — jabıq biologiyalıq portal. Paydalanıw ushın Google akkauntıńız arqalı kiriń.",
+        "login_desc": "Zooventure — jabıq biologiyalıq portal. Paydalanıw ushın Google akkauntıńız arqalı kiriń.",
         "login_btn_google": "Google Akkaunt penen Kiriw",
         "login_btn_admin": "🛡️ Administrator Kiriwi (Parol menen)",
         "admin_modal_title": "Administrator Kiriwi",
@@ -328,7 +328,7 @@ TRANSLATIONS = {
         "admin_submit": "Kiriw 🚀",
 
         # Footer & Modal
-        "footer_title": "Animind — Ózbekstan hám Dúnya Haywanat Dúnyası Portalı",
+        "footer_title": "Zooventure — Ózbekstan hám Dúnya Haywanat Dúnyası Portalı",
         "footer_sub": "Ózbekstan Qızıl kitabı & IUCN Xalıqaralıq Qızıl dizimi tiykarında dúzilgen biologiyalıq sistema.",
         "footer_rights": "© 2026 Barlıq huqıqlar qorǵalǵan.",
         "modal_diff_title": "Haywan parqı",
@@ -349,7 +349,7 @@ TRANSLATIONS = {
         "nav_compare": "Сравнение видов",
         "nav_redbook": "Красная книга",
         "nav_quiz": "Викторина (Игра)",
-        "nav_ai": "Animind AI Помощник",
+        "nav_ai": "Zooventure AI Помощник",
         "nav_admin": "Админ-панель",
         "nav_login": "Войти",
         "nav_logout": "Выход 🚪",
@@ -358,7 +358,7 @@ TRANSLATIONS = {
         "lang_name": "Русский",
 
         # Splash
-        "splash_title": "ЗАГРУЗКА МАТРИЦЫ ANIMIND AI...",
+        "splash_title": "ЗАГРУЗКА МАТРИЦЫ ZOOVENTURE AI...",
         "splash_sub": "Синхронизация данных о живой природе и экосистемах",
 
         # Home
@@ -441,9 +441,9 @@ TRANSLATIONS = {
 
         # AI Chat
         "ai_hero_badge": "✨ 3.8 Умная нейросеть по зоологии",
-        "ai_hero_title": "Animind AI Зоологический консультант",
+        "ai_hero_title": "Zooventure AI Зоологический консультант",
         "ai_hero_desc": "Задайте любой вопрос об отличиях животных, Красной книге, среде обитания и повадках!",
-        "ai_welcome": "Здравствуйте! Я Animind AI — ваш биологический помощник. Задайте любой вопрос об отличиях животных или Красной книге.",
+        "ai_welcome": "Здравствуйте! Я Zooventure AI — ваш биологический помощник. Задайте любой вопрос об отличиях животных или Красной книге.",
         "ai_chip1": "Разница между гепардом и леопардом",
         "ai_chip2": "Информация о сайгаке",
         "ai_chip3": "Кто занесен в Красную книгу?",
@@ -452,7 +452,7 @@ TRANSLATIONS = {
 
         # Login
         "login_title": "Вход в систему",
-        "login_desc": "Animind — закрытый научно-популярный портал о животном мире. Для доступа войдите через Google-аккаунт.",
+        "login_desc": "Zooventure — закрытый научно-популярный портал о животном мире. Для доступа войдите через Google-аккаунт.",
         "login_btn_google": "Войти через аккаунт Google",
         "login_btn_admin": "🛡️ Вход для администратора (по паролю)",
         "admin_modal_title": "Вход администратора",
@@ -461,7 +461,7 @@ TRANSLATIONS = {
         "admin_submit": "Войти 🚀",
 
         # Footer & Modal
-        "footer_title": "Animind — Портал животного мира Узбекистана и планеты",
+        "footer_title": "Zooventure — Портал животного мира Узбекистана и планеты",
         "footer_sub": "Научно-популярная система на основе Красной книги Узбекистана и Красного списка МСОП.",
         "footer_rights": "© 2026 Все права защищены. Защищенная безопасная система.",
         "modal_diff_title": "Отличия животного",
@@ -482,7 +482,7 @@ TRANSLATIONS = {
         "nav_compare": "Species Comparison",
         "nav_redbook": "Red Book",
         "nav_quiz": "Quiz Game",
-        "nav_ai": "Animind AI Assistant",
+        "nav_ai": "Zooventure AI Assistant",
         "nav_admin": "Admin Panel",
         "nav_login": "Log In",
         "nav_logout": "Log Out 🚪",
@@ -491,7 +491,7 @@ TRANSLATIONS = {
         "lang_name": "English",
 
         # Splash
-        "splash_title": "LOADING ANIMIND AI MATRIX...",
+        "splash_title": "LOADING ZOOVENTURE AI MATRIX...",
         "splash_sub": "Live wildlife and ecosystem intelligence synchronizing",
 
         # Home
@@ -574,9 +574,9 @@ TRANSLATIONS = {
 
         # AI Chat
         "ai_hero_badge": "✨ 3.8 Smart Zoological Neural Engine",
-        "ai_hero_title": "Animind AI Wildlife Consultant",
+        "ai_hero_title": "Zooventure AI Wildlife Consultant",
         "ai_hero_desc": "Ask any question regarding animal distinctions, the Red Book, natural habitats, acoustic sounds, and animal behavior!",
-        "ai_welcome": "Hello! I am Animind AI, your wildlife assistant. Ask me anything about animal distinctions, species traits, or the Red Book.",
+        "ai_welcome": "Hello! I am Zooventure AI, your wildlife assistant. Ask me anything about animal distinctions, species traits, or the Red Book.",
         "ai_chip1": "Difference between cheetah and leopard",
         "ai_chip2": "Information about Saiga antelope",
         "ai_chip3": "Which species are in the Red Book?",
@@ -585,7 +585,7 @@ TRANSLATIONS = {
 
         # Login
         "login_title": "Sign In to Portal",
-        "login_desc": "Animind is an exclusive zoological wildlife portal. Please sign in with your Google account to explore.",
+        "login_desc": "Zooventure is an exclusive zoological wildlife portal. Please sign in with your Google account to explore.",
         "login_btn_google": "Sign in with Google",
         "login_btn_admin": "🛡️ Administrator Login (Password)",
         "admin_modal_title": "Administrator Login",
@@ -594,7 +594,7 @@ TRANSLATIONS = {
         "admin_submit": "Log In 🚀",
 
         # Footer & Modal
-        "footer_title": "Animind — Wildlife & Zoological Portal of Uzbekistan and the World",
+        "footer_title": "Zooventure — Wildlife & Zoological Portal of Uzbekistan and the World",
         "footer_sub": "Scientific-educational intelligence system based on the Red Data Book of Uzbekistan and IUCN Red List.",
         "footer_rights": "© 2026 All rights reserved. Secure protected system.",
         "modal_diff_title": "Species distinction",
@@ -615,7 +615,7 @@ TRANSLATIONS = {
         "nav_compare": "Comparaison des espèces",
         "nav_redbook": "Livre Rouge",
         "nav_quiz": "Quiz Éducatif",
-        "nav_ai": "Assistant IA Animind",
+        "nav_ai": "Assistant IA Zooventure",
         "nav_admin": "Panneau d'administration",
         "nav_login": "Connexion",
         "nav_logout": "Déconnexion 🚪",
@@ -624,7 +624,7 @@ TRANSLATIONS = {
         "lang_name": "Français",
 
         # Splash
-        "splash_title": "CHARGEMENT DE LA MATRICE ANIMIND IA...",
+        "splash_title": "CHARGEMENT DE LA MATRICE ZOOVENTURE IA...",
         "splash_sub": "Synchronisation des données sur la faune et les écosystèmes",
 
         # Home
@@ -707,9 +707,9 @@ TRANSLATIONS = {
 
         # AI Chat
         "ai_hero_badge": "✨ Moteur Neuronal Zoologique 3.8",
-        "ai_hero_title": "Animind IA Consultant Zoologique",
+        "ai_hero_title": "Zooventure IA Consultant Zoologique",
         "ai_hero_desc": "Posez toutes vos questions sur les différences entre espèces, le Livre Rouge, les habitats naturels et les cris d'animaux !",
-        "ai_welcome": "Bonjour ! Je suis Animind IA, votre assistant zoologique. Posez-moi vos questions sur les animaux, leurs distinctions ou le Livre Rouge.",
+        "ai_welcome": "Bonjour ! Je suis Zooventure IA, votre assistant zoologique. Posez-moi vos questions sur les animaux, leurs distinctions ou le Livre Rouge.",
         "ai_chip1": "Différence entre guépard et léopard",
         "ai_chip2": "Informations sur l'antilope saïga",
         "ai_chip3": "Quelles espèces sont dans le Livre Rouge ?",
@@ -718,7 +718,7 @@ TRANSLATIONS = {
 
         # Login
         "login_title": "Connexion au Portail",
-        "login_desc": "Animind est un portail zoologique exclusif. Veuillez vous connecter avec votre compte Google.",
+        "login_desc": "Zooventure est un portail zoologique exclusif. Veuillez vous connecter avec votre compte Google.",
         "login_btn_google": "Se connecter avec Google",
         "login_btn_admin": "🛡️ Connexion Administrateur (Mot de passe)",
         "admin_modal_title": "Connexion Administrateur",
@@ -727,7 +727,7 @@ TRANSLATIONS = {
         "admin_submit": "Connexion 🚀",
 
         # Footer & Modal
-        "footer_title": "Animind — Portail de la Faune Sauvage d'Ouzbékistan et du Monde",
+        "footer_title": "Zooventure — Portail de la Faune Sauvage d'Ouzbékistan et du Monde",
         "footer_sub": "Système d'intelligence scientifique basé sur le Livre Rouge d'Ouzbékistan et la Liste Rouge de l'UICN.",
         "footer_rights": "© 2026 Tous droits réservés. Système sécurisé.",
         "modal_diff_title": "Distinction de l'espèce",

@@ -1,5 +1,5 @@
 /**
- * ANIMIND — Asosiy Interaktiv Skript
+ * ZOOVENTURE — Asosiy Interaktiv Skript
  * Web Audio Tovush Sintezi, AI Yordamchi, Kirish Animatsiyasi
  */
 
@@ -305,7 +305,7 @@ class AnimalAudioEngine {
 const audioEngine = new AnimalAudioEngine();
 
 // 2. AI ASSISTANT CHAT ENGINE
-class AnimindAIChat {
+class ZooventureAIChat {
     constructor() {
         this.chatBox = document.getElementById('aiMessagesContainer');
         this.inputEl = document.getElementById('aiChatInput');
@@ -367,7 +367,7 @@ class AnimindAIChat {
         const bubble = document.createElement('div');
         bubble.id = id;
         bubble.className = 'chat-bubble assistant';
-        bubble.innerHTML = '<em>Animind AI o\'ylamoqda... 🐾</em>';
+        bubble.innerHTML = '<em>Zooventure AI o\'ylamoqda... 🐾</em>';
         this.chatBox.appendChild(bubble);
         this.chatBox.scrollTop = this.chatBox.scrollHeight;
         return id;
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // C. AI Chatni ishga tushirish
-    new AnimindAIChat();
+    new ZooventureAIChat();
 
     // D. Tezkor farq modalini ochish
     window.openDiffModal = function(name, diffText, similarSpecies) {
@@ -484,11 +484,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('animind_theme', newTheme); localStorage.setItem('animora_theme', newTheme);
+        localStorage.setItem('zooventure_theme', newTheme); localStorage.setItem('animora_theme', newTheme);
         updateThemeToggleUI(newTheme);
     };
 
-    const initialTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('animind_theme') || localStorage.getItem('animora_theme') || localStorage.getItem('animore_theme') || 'dark';
+    const initialTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('zooventure_theme') || localStorage.getItem('animora_theme') || localStorage.getItem('animore_theme') || 'dark';
     updateThemeToggleUI(initialTheme);
 
     // H. Til tanlash menyusi boshqaruvi (5 Languages Switcher)

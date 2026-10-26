@@ -22,7 +22,7 @@ from translations import (
     localize_animal, localize_animals_list
 )
 
-app = FastAPI(title="Animind — Hayvonot Olami Portali")
+app = FastAPI(title="Zooventure — Hayvonot Olami Portali")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -63,7 +63,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Helper for current user from cookie
 def get_current_user(request: Request) -> Optional[dict]:
-    session_cookie = request.cookies.get("animind_session") or request.cookies.get("animora_session") or request.cookies.get("animore_session") or request.cookies.get("fauna_session")
+    session_cookie = request.cookies.get("zooventure_session") or request.cookies.get("animind_session") or request.cookies.get("animora_session") or request.cookies.get("animore_session") or request.cookies.get("fauna_session")
     if not session_cookie:
         return None
     try:
@@ -78,7 +78,7 @@ def get_current_lang(request: Request) -> str:
     lang_param = request.query_params.get("lang")
     if lang_param and lang_param in SUPPORTED_LANGUAGES:
         return lang_param
-    lang_cookie = request.cookies.get("animind_lang") or request.cookies.get("animora_lang")
+    lang_cookie = request.cookies.get("zooventure_lang") or request.cookies.get("animind_lang") or request.cookies.get("animora_lang")
     if lang_cookie and lang_cookie in SUPPORTED_LANGUAGES:
         return lang_cookie
     return DEFAULT_LANGUAGE
@@ -141,6 +141,7 @@ async def set_language(lang_code: str, request: Request):
     if not clean_url:
         clean_url = "/"
     res = RedirectResponse(url=clean_url, status_code=303)
+    res.set_cookie(key="zooventure_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
     res.set_cookie(key="animind_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
     res.set_cookie(key="animora_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
     return res
@@ -193,20 +194,21 @@ async def google_auth(request: Request, response: Response):
                 sub = user_info.get("sub", sub)
 
         if not email:
-            email = f"user_{sub[:8]}@animind.uz"
+            email = f"user_{sub[:8]}@zooventure.uz"
         if not name:
             name = "Tabiat Shaydosi"
         if not picture:
             picture = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
             
         role = "user"
-        if email.lower() in ["admin@animind.uz", "admin@animind.uz", "admin@fauna.uz", "java0918@gmail.com", "admin@gmail.com"]:
+        if email.lower() in ["admin@zooventure.uz", "admin@animind.uz", "admin@animora.uz", "admin@fauna.uz", "java0918@gmail.com", "admin@gmail.com"]:
             role = "admin"
             
         user = get_or_create_user(google_id=sub, email=email, name=name, picture=picture, role=role)
         
         res = JSONResponse({"success": True, "user": user})
         cookie_val = urllib.parse.quote(json.dumps(user))
+        res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
         res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
         res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
         res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
@@ -224,7 +226,7 @@ async def admin_login(request: Request, response: Response):
         admin_user = {
             "id": 9999,
             "google_id": "system-admin-01",
-            "email": "admin@animind.uz",
+            "email": "admin@zooventure.uz",
             "name": "Bosh Administrator",
             "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
             "role": "admin"
@@ -238,6 +240,7 @@ async def admin_login(request: Request, response: Response):
         )
         res = JSONResponse({"success": True, "user": admin_user})
         cookie_val = urllib.parse.quote(json.dumps(admin_user))
+        res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
         res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
@@ -248,9 +251,9 @@ async def admin_login(request: Request, response: Response):
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
     demo_users = [
-        {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@animind.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
-        {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@animind.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
-        {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@animind.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
+        {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@zooventure.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@zooventure.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@zooventure.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
     ]
     import random
     user_session = random.choice(demo_users)
@@ -266,6 +269,7 @@ async def demo_login(request: Request, response: Response):
     
     res = JSONResponse({"success": True, "user": user_session})
     cookie_val = urllib.parse.quote(json.dumps(user_session))
+    res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
     res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
     res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
     res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
@@ -275,6 +279,7 @@ async def demo_login(request: Request, response: Response):
 @app.post("/api/auth/logout")
 async def logout(response: Response):
     res = RedirectResponse(url="/login")
+    res.delete_cookie("zooventure_session")
     res.delete_cookie("animind_session")
     res.delete_cookie("animora_session")
     res.delete_cookie("fauna_session")

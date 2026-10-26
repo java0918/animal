@@ -1,5 +1,5 @@
 /**
- * ANIMIND — Login va Parol orqali Kirish Tizimi
+ * ZOOVENTURE — Login va Parol orqali Kirish Tizimi
  */
 
 function submitLogin(e) {

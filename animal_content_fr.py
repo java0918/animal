@@ -1,5 +1,5 @@
 """
-ANIMIND - French Wildlife Content (All 27 Animals)
+ZOOVENTURE - French Wildlife Content (All 27 Animals)
 Traductions encyclopédiques complètes: Description, Différences, Habitat, Régime, Vitesse, Poids, Longévité, Livre Rouge, Sons, Faits fascinants.
 """
 
@@ -254,7 +254,7 @@ ANIMALS_FR = {
         "weight": "200 - 450 kg",
         "description": "Le grand dauphin est l'un des cétacés les plus évolués et emblématiques de l'océan. Doué d'une sociabilité développée et d'un système d'écholocalisation exceptionnel, il nage en groupes soudés et communique par de riches signaux sonores.",
         "uz_red_book_status": "Non inscrit (Espèce marine océanique)",
-        "uz_red_book_desc": "Présent dans les modules comparatifs d'Animind comme étalon mondial d'hydrodynamisme et d'écholocalisation.",
+        "uz_red_book_desc": "Présent dans les modules comparatifs d'Zooventure comme étalon mondial d'hydrodynamisme et d'écholocalisation.",
         "iucn_status": "LC",
         "iucn_desc": "Préoccupation mineure (Least Concern). Protégé par les conventions internationales maritimes.",
         "similar_species": "Dauphin commun (Delphinus delphis), Marsouin commun",
@@ -326,7 +326,7 @@ ANIMALS_FR = {
         "weight": "4 000 - 7 000 kg (le plus grand animal terrestre)",
         "description": "L'éléphant de savane africain est le titan de la terre ferme. Doué d'une conscience de soi, d'une mémoire légendaire et d'une cohésion familiale remarquable, il façonne son environnement. Sa trompe renferme plus de 40 000 muscles capables de déraciner des arbres comme de cueillir un brin d'herbe.",
         "uz_red_book_status": "Non inscrit (Espèce tropicale mondiale)",
-        "uz_red_book_desc": "Figure dans le laboratoire zoologique Animind comme référence mondiale de la mégafaune terrestre.",
+        "uz_red_book_desc": "Figure dans le laboratoire zoologique Zooventure comme référence mondiale de la mégafaune terrestre.",
         "iucn_status": "EN",
         "iucn_desc": "En danger (Endangered). Victime du braconnage pour l'ivoire et de la fragmentation de son habitat.",
         "similar_species": "Éléphant d'Asie (Elephas maximus), Éléphant de forêt",
@@ -350,7 +350,7 @@ ANIMALS_FR = {
         "weight": "800 - 1 900 kg (hauteur de 5.8 à 6 mètres)",
         "description": "La girafe est le plus haut animal vivant sur Terre. Son immense cou, sa langue préhensile bleu violacé de 50 cm et son cœur musclé pesant plus de 11 kg lui permettent d'exploiter la cime des arbres inaccessibles aux autres herbivores.",
         "uz_red_book_status": "Non inscrit (Espèce africaine)",
-        "uz_red_book_desc": "Analysée dans le comparateur d'Animind comme exemple suprême de spécialisation végétale verticale.",
+        "uz_red_book_desc": "Analysée dans le comparateur d'Zooventure comme exemple suprême de spécialisation végétale verticale.",
         "iucn_status": "VU",
         "iucn_desc": "Vulnérable (Vulnerable). Ses effectifs diminuent sous l'effet de l'essor agricole en Afrique.",
         "similar_species": "Okapi (Okapia johnstoni)",
@@ -374,7 +374,7 @@ ANIMALS_FR = {
         "weight": "150 000 - 200 000 kg (longueur de 30 à 33 mètres)",
         "description": "La baleine bleue est le géant absolu de la Terre, le plus grand animal ayant jamais existé, surpassant même les plus colossaux dinosaures sauropodes. Elle engouffre des dizaines de tonnes d'eau par goulée pour filtrer le krill à travers ses imposants fanons.",
         "uz_red_book_status": "Non inscrit (Titan pélagique marin)",
-        "uz_red_book_desc": "Présente dans la galerie mondiale d'Animind comme référence suprême de la vie aquatique.",
+        "uz_red_book_desc": "Présente dans la galerie mondiale d'Zooventure comme référence suprême de la vie aquatique.",
         "iucn_status": "EN",
         "iucn_desc": "En danger (Endangered). Se remet très lentement des massacres de l'ère de la chasse baleinière industrielle.",
         "similar_species": "Rorqual commun (Balaenoptera physalus), Rorqual boréal",
@@ -398,7 +398,7 @@ ANIMALS_FR = {
         "weight": "400 - 750 kg (le plus grand carnivore terrestre)",
         "description": "L'ours polaire est le maître des solitudes de glace du grand Nord. Ses poils creux et translucides captent les rayons solaires vers sa peau noire sous-jacente, tandis qu'une couche de graisse de 10 cm lui permet de fendre les mers glaciales durant des heures.",
         "uz_red_book_status": "Non inscrit (Superprédateur arctique)",
-        "uz_red_book_desc": "Intégré dans Animind pour analyser les adaptations physiologiques au froid polaire extrême.",
+        "uz_red_book_desc": "Intégré dans Zooventure pour analyser les adaptations physiologiques au froid polaire extrême.",
         "iucn_status": "VU",
         "iucn_desc": "Vulnérable (Vulnerable). La fonte de la banquise sous l'impact du réchauffement climatique menace sa survie.",
         "similar_species": "Ours brun (Ursus arctos), Grizzly",
@@ -422,7 +422,7 @@ ANIMALS_FR = {
         "weight": "70 - 125 kg",
         "description": "Le grand panda est l'icône mondiale de la sauvegarde de la biodiversité. Reconnaissable à son pelage contrasté noir et blanc et à son tempérament paisible, il passe de 12 à 16 heures par jour à mastiquer du bambou à l'aide d'un 'sixième doigt' préhensile opposable.",
         "uz_red_book_status": "Non inscrit (Espèce endémique de Chine)",
-        "uz_red_book_desc": "Symbole de la protection animale internationale sur Animind.",
+        "uz_red_book_desc": "Symbole de la protection animale internationale sur Zooventure.",
         "iucn_status": "VU",
         "iucn_desc": "Vulnérable (Vulnerable). Le statut a été reclassé d''en danger' grâce à la préservation rigoureuse de ses forêts.",
         "similar_species": "Panda roux (Ailurus fulgens), Ours à lunettes",

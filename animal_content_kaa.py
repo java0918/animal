@@ -1,5 +1,5 @@
 """
-ANIMIND - Karakalpak Wildlife Content (All 27 Animals)
+ZOOVENTURE - Karakalpak Wildlife Content (All 27 Animals)
 Tolıq enciklopediyalıq qaraqalpaqsha maǵlıwmatlar: Táriyp, Ayırmashılıqlar, Jasaw ornı, Awqatlanıwı, Tezligi, Salmaǵı, Ómir súriw dawamıylıǵı, Qızıl kitap, Dawısları, Qızıqlı faktler.
 """
 
@@ -254,7 +254,7 @@ ANIMALS_KAA = {
         "weight": "200 - 450 kg",
         "description": "Afalina — eń aqıllı hám dos qatnasıqlı teńiz haywanlarınıń biri. Denesi suwda júziwge júdá qolaylı bolıp, exolokaciya (dawıs tosqınlıqları) arqalı jol tabadı hám topar bolıp háreket etedi.",
         "uz_red_book_status": "Kirgizilmegen (Okean haywanı)",
-        "uz_red_book_desc": "Animind portalında oqıw hám salıstırıw ushın qosılǵan.",
+        "uz_red_book_desc": "Zooventure portalında oqıw hám salıstırıw ushın qosılǵan.",
         "iucn_status": "LC",
         "iucn_desc": "Qáwip joq (Least Concern). Xalıqaralıq konvenciyalar menen qorǵaladı.",
         "similar_species": "Teńiz shoshqası",
@@ -326,7 +326,7 @@ ANIMALS_KAA = {
         "weight": "4 000 - 7 000 kg (qurǵaqlıqtaǵı eń iri haywan)",
         "description": "Afrika pili — qurǵaqlıqta jasawshı eń úlken gigant haywan. Ol joqarı aqıl-oyǵa, kúshli yadqa hám quramalı jámiyetlik qatnasıqlarǵa iye. 40 mıńnan aslam bulshıq etten ibarat xartumi awır júklerdi de, kishi zatlardı da uslay aladı.",
         "uz_red_book_status": "Kirgizilmegen (Afrika haywanı)",
-        "uz_red_book_desc": "Animind portalında salıstırıw ushın úyreniledi.",
+        "uz_red_book_desc": "Zooventure portalında salıstırıw ushın úyreniledi.",
         "iucn_status": "EN",
         "iucn_desc": "Qáwip astında (Endangered). Pıl súyegi ushın awlanıwı sebepli qadaǵalanǵan.",
         "similar_species": "Aziya pili (Elephas maximus)",
@@ -350,7 +350,7 @@ ANIMALS_KAA = {
         "weight": "800 - 1 900 kg (boyı 5.8 - 6 metr)",
         "description": "Jiraf — dúnyadaǵı eń biyik boylı haywan. Onıń uzın moynı hám 50 sm ge jetetuǵın qara-kók tili tikenli akaciyalardıń eń biyik búrshiklerin ańsat jeydi. Miyine qan jetkiziw ushın júdá kúshli júregi bar (11 kg).",
         "uz_red_book_status": "Kirgizilmegen (Afrika haywanı)",
-        "uz_red_book_desc": "Animind enciklopediyasında bálentlik boyınsha úlgi retinde berilgen.",
+        "uz_red_book_desc": "Zooventure enciklopediyasında bálentlik boyınsha úlgi retinde berilgen.",
         "iucn_status": "VU",
         "iucn_desc": "Qáwip astında (Vulnerable).",
         "similar_species": "Okapi (Okapia johnstoni)",

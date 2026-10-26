@@ -1,6 +1,6 @@
-# 🌿 Animind — Hayvonot Olami Portali
+# 🌿 Zooventure — Hayvonot Olami Portali
 
-O'zbekiston va butun dunyo hayvonot olami, ularning o'xshash turlaridan qanday farqlanishi, real akustik tovushlari, O'zbekiston va Xalqaro Qizil kitob maqomi hamda Animind AI aqlli yordamchisiga ega bo'lgan himoyalangan (yopiq) veb-portal.
+O'zbekiston va butun dunyo hayvonot olami, ularning o'xshash turlaridan qanday farqlanishi, real akustik tovushlari, O'zbekiston va Xalqaro Qizil kitob maqomi hamda Zooventure AI aqlli yordamchisiga ega bo'lgan himoyalangan (yopiq) veb-portal.
 
 ---
 
@@ -26,7 +26,7 @@ O'zbekiston va butun dunyo hayvonot olami, ularning o'xshash turlaridan qanday f
 7. **O'zbekiston va Xalqaro Qizil Kitob:**
    - O'zbekiston Qizil kitobi maqomi (1-toifa, 2-toifa, 3-toifa, yo'qolgan turlar) va IUCN Xalqaro maqomi (CR, EN, VU, NT, LC).
    - Maxsus `/redbook` bo'limi va filtrlar.
-8. **Animind AI Yordamchisi:**
+8. **Zooventure AI Yordamchisi:**
    - Zoologiya va tabiat bo'yicha integratsiyalangan chat yordamchisi (`/ai-chat` va barcha sahifalardagi suzuvchi tugma).
    - Gemini API kaliti kiritilsa Gemini orqali ishlaydi, kalitsiz ham o'rnatilgan aqlli biologik bilim moduli orqali o'zbek tilida savol-javob beradi.
 9. **Admin Panel (`/admin`):**
