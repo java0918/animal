@@ -141,9 +141,9 @@ async def set_language(lang_code: str, request: Request):
     if not clean_url:
         clean_url = "/"
     res = RedirectResponse(url=clean_url, status_code=303)
-    res.set_cookie(key="zooventure_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
-    res.set_cookie(key="animind_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
-    res.set_cookie(key="animora_lang", value=lang_code, max_age=86400 * 365, samesite="lax")
+    res.set_cookie(key="zooventure_lang", value=lang_code, max_age=86400 * 365, samesite="lax", path="/")
+    res.set_cookie(key="animind_lang", value=lang_code, max_age=86400 * 365, samesite="lax", path="/")
+    res.set_cookie(key="animora_lang", value=lang_code, max_age=86400 * 365, samesite="lax", path="/")
     return res
 
 # ================= AUTH & LOGIN ROUTES =================
@@ -152,8 +152,8 @@ async def set_language(lang_code: str, request: Request):
 async def login_page(request: Request):
     current_lang = get_current_lang(request)
     user = get_current_user(request)
-    if user:
-        return RedirectResponse(url="/")
+    if user and user.get("role") == "admin" and not request.query_params.get("switch"):
+        return RedirectResponse(url="/admin")
         
     conn = get_connection()
     c = conn.cursor()
@@ -164,6 +164,7 @@ async def login_page(request: Request):
     
     ctx = get_base_context(request, current_lang)
     ctx["google_client_id"] = google_client_id
+    ctx["redirect_target"] = request.query_params.get("redirect", "")
     return templates.TemplateResponse(
         request=request,
         name="login.html",
@@ -208,15 +209,14 @@ async def google_auth(request: Request, response: Response):
         
         res = JSONResponse({"success": True, "user": user})
         cookie_val = urllib.parse.quote(json.dumps(user))
-        res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
-        res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
-        res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
-        res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax")
+        for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
+            res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax", path="/")
         return res
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=400)
 
 @app.post("/api/auth/admin-login")
+@app.post("/api/auth/login")
 async def admin_login(request: Request, response: Response):
     data = await request.json()
     username = data.get("username", "").strip()
@@ -238,51 +238,72 @@ async def admin_login(request: Request, response: Response):
             picture=admin_user["picture"],
             role="admin"
         )
-        res = JSONResponse({"success": True, "user": admin_user})
+        res = JSONResponse({
+            "success": True,
+            "user": admin_user,
+            "role": "admin",
+            "redirect": "/admin"
+        })
         cookie_val = urllib.parse.quote(json.dumps(admin_user))
-        res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-        res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-        res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-        res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
+        for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
+            res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax", path="/")
         return res
     else:
         return JSONResponse({"success": False, "message": "Login yoki parol noto'g'ri!"}, status_code=401)
 
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
-    demo_users = [
-        {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@zooventure.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
-        {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@zooventure.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
-        {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@zooventure.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
-    ]
-    import random
-    user_session = random.choice(demo_users)
-    user_session["role"] = "user"
+    data = {}
+    try:
+        data = await request.json()
+    except Exception:
+        pass
+    requested_role = data.get("role", "user")
     
+    if requested_role == "admin":
+        user_session = {
+            "id": 9999,
+            "google_id": "system-admin-01",
+            "email": "admin@zooventure.uz",
+            "name": "Bosh Administrator",
+            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
+            "role": "admin"
+        }
+    else:
+        demo_users = [
+            {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@zooventure.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
+            {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@zooventure.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
+            {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@zooventure.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
+        ]
+        import random
+        user_session = random.choice(demo_users)
+        user_session["role"] = "user"
+        
     get_or_create_user(
-        google_id=f"demo-{user_session['id']}",
+        google_id=user_session.get("google_id", f"demo-{user_session['id']}"),
         email=user_session["email"],
         name=user_session["name"],
         picture=user_session["picture"],
-        role="user"
+        role=user_session["role"]
     )
     
-    res = JSONResponse({"success": True, "user": user_session})
+    res = JSONResponse({
+        "success": True,
+        "user": user_session,
+        "role": user_session["role"],
+        "redirect": "/admin" if user_session["role"] == "admin" else "/"
+    })
     cookie_val = urllib.parse.quote(json.dumps(user_session))
-    res.set_cookie(key="zooventure_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-    res.set_cookie(key="animind_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-    res.set_cookie(key="animora_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
-    res.set_cookie(key="fauna_session", value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax")
+    for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
+        res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax", path="/")
     return res
 
 @app.get("/logout")
 @app.post("/api/auth/logout")
 async def logout(response: Response):
     res = RedirectResponse(url="/login")
-    res.delete_cookie("zooventure_session")
-    res.delete_cookie("animind_session")
-    res.delete_cookie("animora_session")
-    res.delete_cookie("fauna_session")
+    for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
+        res.delete_cookie(k, path="/")
     return res
 
 # ================= MAIN PORTAL PAGES =================

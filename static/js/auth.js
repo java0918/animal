@@ -27,7 +27,7 @@ function submitLogin(e) {
     }
     if (errorEl) errorEl.style.display = 'none';
 
-    fetch('/api/auth/login', {
+    fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -39,7 +39,7 @@ function submitLogin(e) {
     .then(data => {
         if (data.success) {
             const isAdmin = data.role === 'admin' || (data.user && data.user.role === 'admin');
-            const msg = isAdmin ? 'ADMIN TASDIQLANDI... BOSHQARUV PANELIGA O\'TILMOQDA!' : 'TASDIQLANDI... XUSH KELIBSIZ!';
+            const msg = isAdmin ? "ADMIN TASDIQLANDI... BOSHQARUV PANELIGA O'TILMOQDA!" : 'TASDIQLANDI... XUSH KELIBSIZ!';
             playEntranceTransition(msg, data.redirect || (isAdmin ? '/admin' : '/'));
         } else {
             if (btn) {
@@ -71,6 +71,14 @@ function submitLogin(e) {
     });
 }
 
+function fillAdminCredentials() {
+    const userInput = document.getElementById('login_user');
+    const passInput = document.getElementById('login_pass');
+    if (userInput) userInput.value = 'admin';
+    if (passInput) passInput.value = 'java0918';
+    submitLogin();
+}
+
 function loginAsDemo(role, e) {
     const btn = (e && e.target) || (window.event ? window.event.target : null);
     if (btn) btn.innerHTML = 'Kirilmoqda... ⏳';
@@ -83,16 +91,18 @@ function loginAsDemo(role, e) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            playEntranceTransition('MEHMON SIFATIDA IDENTIFIKATSIYA QILINDI...');
+            const isAdmin = data.role === 'admin' || (data.user && data.user.role === 'admin');
+            const msg = isAdmin ? "ADMIN TASDIQLANDI... BOSHQARUV PANELIGA O'TILMOQDA!" : 'MEHMON SIFATIDA IDENTIFIKATSIYA QILINDI...';
+            playEntranceTransition(msg, data.redirect || (isAdmin ? '/admin' : '/'));
         } else {
             alert('Kirishda xatolik: ' + (data.message || ''));
-            if (btn) btn.innerHTML = "⚡ Mehmon sifatida tezkor ko'rish";
+            if (btn) btn.innerHTML = "⚡ Demo Access";
         }
     })
     .catch(err => {
         console.error('Demo login error:', err);
         alert("Server bilan bog'lanishda xatolik yuz berdi.");
-        if (btn) btn.innerHTML = "⚡ Mehmon sifatida tezkor ko'rish";
+        if (btn) btn.innerHTML = "⚡ Demo Access";
     });
 }
 
