@@ -845,6 +845,19 @@ a:hover {
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
+.brand-logo-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 8px rgba(16, 185, 129, 0.45));
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+
+.nav-brand:hover .brand-logo-img {
+  transform: scale(1.1) rotate(-3deg);
+}
+
 .brand-title {
   font-size: 1.35rem;
   font-weight: 800;

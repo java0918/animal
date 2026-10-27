@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         body {
@@ -70,7 +72,9 @@
             <div class="ai-ring ring-outer"></div>
             <div class="ai-ring ring-middle"></div>
             <div class="ai-ring ring-inner"></div>
-            <div class="ai-core-icon">🌿</div>
+            <div class="ai-core-icon">
+                <img src="/static/images/logo.png" alt="Zooventure" style="width: 44px; height: 44px; object-fit: contain;">
+            </div>
         </div>
         <div class="ai-status-text">{{ t('splash_title') }}</div>
         <div class="ai-sub-status">{{ t('splash_sub') }}</div>
@@ -134,6 +138,8 @@
         <!-- ================= MARKAZIY KIRISH PANELI ================= -->
         <div class="gateway-hero-card">
             
+            <img src="/static/images/logo.png" alt="Zooventure Logo" style="width: 110px; height: auto; margin: 0 auto 0.8rem; display: block; filter: drop-shadow(0 4px 18px rgba(16, 185, 129, 0.45));">
+
             <div class="gateway-badge">
                 <span>🔐</span> {{ t('login_title') }}
             </div>

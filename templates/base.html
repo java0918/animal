@@ -15,6 +15,8 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
     {% block extra_head %}{% endblock %}
 </head>
@@ -26,7 +28,9 @@
             <div class="ai-ring ring-outer"></div>
             <div class="ai-ring ring-middle"></div>
             <div class="ai-ring ring-inner"></div>
-            <div class="ai-core-icon">🌿</div>
+            <div class="ai-core-icon">
+                <img src="/static/images/logo.png" alt="Zooventure" style="width: 44px; height: 44px; object-fit: contain;">
+            </div>
         </div>
         <div class="ai-status-text">{{ t('splash_title') }}</div>
         <div class="ai-sub-status">{{ t('splash_sub') }}</div>
@@ -35,7 +39,7 @@
     <!-- YUQORI NAVIGATION BAR -->
     <nav class="navbar">
         <a href="/" class="nav-brand">
-            <div class="brand-logo-badge">🌿</div>
+            <img src="/static/images/logo.png" alt="Zooventure Logo" class="brand-logo-img">
             <div>
                 <div class="brand-title">Zooventure</div>
                 <div class="brand-subtitle">{{ t('brand_subtitle') }}</div>
@@ -178,8 +182,9 @@
     <!-- FOOTER -->
     <footer style="margin-top: 5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2.5rem 2rem; background: rgba(5, 12, 8, 0.9); text-align: center; color: var(--color-text-muted); font-size: 0.88rem;">
         <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.6rem; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #ffffff;">
-                <span>🌿</span> {{ t('footer_title') }}
+            <div style="display: flex; align-items: center; gap: 0.75rem; font-weight: 700; color: #ffffff;">
+                <img src="/static/images/logo.png" alt="Zooventure Logo" style="height: 38px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.4));">
+                <span>Zooventure — {{ t('footer_title') }}</span>
             </div>
             <p>{{ t('footer_sub') }}</p>
             <p style="font-size: 0.78rem; color: #64748b;">{{ t('footer_rights') }} · <a href="/admin" style="color: #64748b; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#64748b'">🛡️ Admin panel</a></p>
