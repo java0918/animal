@@ -7,14 +7,11 @@
 <div class="portal-content-wrap">
 
     <div style="text-align: center; margin-bottom: 2.5rem;">
-        <span style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fbbf24; font-weight: 700; background: rgba(245, 158, 11, 0.15); padding: 0.35rem 0.9rem; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.35);">
-            🎯 1 000 ta savoldan 20 ta takrorlanmas viktorina
-        </span>
-        <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 0.6rem 0 0.4rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #ffffff; margin: 0 0 0.6rem;">
             {{ t('quiz_hero_title') }}
         </h1>
         <p style="color: var(--color-text-dim); max-width: 650px; margin: 0 auto; font-size: 0.95rem;">
-            10 000 ta hayvonlar bazasidan tuzilgan 1 000 ta savoldan 20 ta tasodifiy savol. Savollar har bir ishtirokchiga qayta takrorlanmaydi!
+            {{ t('quiz_hero_desc') }}
         </p>
     </div>
 
@@ -97,7 +94,7 @@
 
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <button type="button" onclick="restartQuiz()" class="btn-primary" style="padding: 0.85rem 1.8rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669);">
-                🔄 Yangi 20 ta savol (Takrorlanmas)
+                🔄 {{ t('quiz_restart') }}
             </button>
             <a href="/" class="btn-detail-link" style="padding: 0.85rem 1.8rem;">
                 {{ t('quiz_back_home') }}
