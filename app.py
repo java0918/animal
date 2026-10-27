@@ -12,7 +12,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 import aiofiles
 
 from database import (
-    init_db, get_all_animals, get_animal_by_id, insert_animal,
+    init_db, get_all_animals, get_animals_count, get_animal_by_id, insert_animal,
     update_animal, delete_animal, get_or_create_user, get_all_users,
     get_stats, get_connection
 )
@@ -292,18 +292,49 @@ async def logout(response: Response):
 # ================= MAIN PORTAL PAGES =================
 
 @app.get("/", response_class=HTMLResponse)
-async def home_page(request: Request, category: Optional[str] = None, search: Optional[str] = None):
+async def home_page(
+    request: Request, 
+    category: Optional[str] = None, 
+    search: Optional[str] = None,
+    page: int = 1
+):
     current_lang = get_current_lang(request)
-    animals = get_all_animals(category=category, search=search)
+    per_page = 24
+    if page < 1:
+        page = 1
+        
+    total_count = get_animals_count(category=category, search=search)
+    import math
+    total_pages = max(1, math.ceil(total_count / per_page))
+    if page > total_pages:
+        page = total_pages
+        
+    offset = (page - 1) * per_page
+    animals = get_all_animals(category=category, search=search, limit=per_page, offset=offset)
     localized_animals = localize_animals_list(animals, current_lang)
     stats = get_stats()
+    
+    start_page = max(1, page - 2)
+    end_page = min(total_pages, page + 2)
+    pages_range = list(range(start_page, end_page + 1))
     
     ctx = get_base_context(request, current_lang)
     ctx.update({
         "animals": localized_animals,
         "current_category": category or "all",
         "search_query": search or "",
-        "stats": stats
+        "stats": stats,
+        "page": page,
+        "total_pages": total_pages,
+        "total_count": total_count,
+        "per_page": per_page,
+        "pages_range": pages_range,
+        "has_prev": page > 1,
+        "has_next": page < total_pages,
+        "prev_page": page - 1,
+        "next_page": page + 1,
+        "start_item": offset + 1 if total_count > 0 else 0,
+        "end_item": min(offset + per_page, total_count)
     })
     return templates.TemplateResponse(
         request=request,
@@ -319,8 +350,12 @@ async def animal_detail(animal_id: int, request: Request):
         raise HTTPException(status_code=404, detail="Hayvon topilmadi")
         
     animal = localize_animal(animal, current_lang)
-    all_animals = get_all_animals()
-    similar_animals = [localize_animal(a, current_lang) for a in all_animals if a["id"] != animal_id and a["category"] == animal["category"]][:4]
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM animals WHERE category = ? AND id != ? LIMIT 4", (animal["category"], animal_id))
+    similar_rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+    similar_animals = [localize_animal(a, current_lang) for a in similar_rows]
     
     ctx = get_base_context(request, current_lang)
     ctx.update({
@@ -334,22 +369,46 @@ async def animal_detail(animal_id: int, request: Request):
     )
 
 @app.get("/redbook", response_class=HTMLResponse)
-async def redbook_page(request: Request, status_filter: Optional[str] = None):
+async def redbook_page(
+    request: Request, 
+    status_filter: Optional[str] = None,
+    search: Optional[str] = None,
+    page: int = 1
+):
     current_lang = get_current_lang(request)
-    all_animals = get_all_animals()
+    per_page = 24
+    if page < 1:
+        page = 1
+        
+    total_count = get_animals_count(red_book_only=True, search=search)
+    import math
+    total_pages = max(1, math.ceil(total_count / per_page))
+    if page > total_pages:
+        page = total_pages
+        
+    offset = (page - 1) * per_page
+    animals = get_all_animals(red_book_only=True, search=search, limit=per_page, offset=offset)
+    localized_animals = localize_animals_list(animals, current_lang)
     
-    red_animals = []
-    for a in all_animals:
-        is_uz_red = a["uz_red_book_status"] != "Kiritilmagan"
-        is_iucn_red = a["iucn_status"] in ["CR", "EN", "VU"]
-        if is_uz_red or is_iucn_red:
-            if not status_filter or status_filter == "all" or status_filter in a["uz_red_book_status"] or status_filter == a["iucn_status"]:
-                red_animals.append(localize_animal(a, current_lang))
-                
+    start_page = max(1, page - 2)
+    end_page = min(total_pages, page + 2)
+    pages_range = list(range(start_page, end_page + 1))
+    
     ctx = get_base_context(request, current_lang)
     ctx.update({
-        "animals": red_animals,
-        "status_filter": status_filter or "all"
+        "animals": localized_animals,
+        "status_filter": status_filter or "all",
+        "search_query": search or "",
+        "page": page,
+        "total_pages": total_pages,
+        "total_count": total_count,
+        "pages_range": pages_range,
+        "has_prev": page > 1,
+        "has_next": page < total_pages,
+        "prev_page": page - 1,
+        "next_page": page + 1,
+        "start_item": offset + 1 if total_count > 0 else 0,
+        "end_item": min(offset + per_page, total_count)
     })
     return templates.TemplateResponse(
         request=request,
@@ -360,7 +419,7 @@ async def redbook_page(request: Request, status_filter: Optional[str] = None):
 @app.get("/compare", response_class=HTMLResponse)
 async def compare_page(request: Request, left: Optional[int] = 1, right: Optional[int] = 5):
     current_lang = get_current_lang(request)
-    all_animals = localize_animals_list(get_all_animals(), current_lang)
+    all_animals = localize_animals_list(get_all_animals(limit=150), current_lang)
     
     left_animal = get_animal_by_id(left) or (all_animals[0] if all_animals else None)
     right_animal = get_animal_by_id(right) or (all_animals[1] if len(all_animals) > 1 else None)
@@ -409,7 +468,7 @@ async def admin_page(request: Request):
     if not user or user.get("role") != "admin":
         return RedirectResponse(url="/login?redirect=/admin")
         
-    animals = get_all_animals()
+    animals = get_all_animals(limit=100)
     users = get_all_users()
     stats = get_stats()
     

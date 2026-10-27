@@ -85,6 +85,43 @@
         {% endfor %}
     </div>
 
+    <!-- SAHIFALASH (PAGINATION) -->
+    {% if total_pages > 1 %}
+    <div class="pagination-container">
+        <div class="pagination-info">
+            Qizil Kitob turlaridan {{ start_item }} - {{ end_item }} ko'rsatilmoqda (Jami: {{ total_count }})
+        </div>
+
+        <div class="pagination-controls">
+            {% if has_prev %}
+            <a href="/redbook?page={{ prev_page }}{% if status_filter != 'all' %}&status_filter={{ status_filter }}{% endif %}" class="page-btn">◀</a>
+            {% else %}
+            <span class="page-btn disabled">◀</span>
+            {% endif %}
+
+            {% if pages_range[0] > 1 %}
+            <a href="/redbook?page=1{% if status_filter != 'all' %}&status_filter={{ status_filter }}{% endif %}" class="page-btn">1</a>
+            {% if pages_range[0] > 2 %}<span class="page-ellipsis">...</span>{% endif %}
+            {% endif %}
+
+            {% for p in pages_range %}
+            <a href="/redbook?page={{ p }}{% if status_filter != 'all' %}&status_filter={{ status_filter }}{% endif %}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+            {% endfor %}
+
+            {% if pages_range[-1] < total_pages %}
+            {% if pages_range[-1] < total_pages - 1 %}<span class="page-ellipsis">...</span>{% endif %}
+            <a href="/redbook?page={{ total_pages }}{% if status_filter != 'all' %}&status_filter={{ status_filter }}{% endif %}" class="page-btn">{{ total_pages }}</a>
+            {% endif %}
+
+            {% if has_next %}
+            <a href="/redbook?page={{ next_page }}{% if status_filter != 'all' %}&status_filter={{ status_filter }}{% endif %}" class="page-btn">▶</a>
+            {% else %}
+            <span class="page-btn disabled">▶</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
 {% endblock %}

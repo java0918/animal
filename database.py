@@ -119,7 +119,27 @@ def init_db():
             print(f"Auto-seed warning: {e}")
 
 
-def get_all_animals(category: Optional[str] = None, red_book_only: bool = False, search: Optional[str] = None) -> List[Dict[str, Any]]:
+def get_animals_count(category: Optional[str] = None, red_book_only: bool = False, search: Optional[str] = None) -> int:
+    conn = get_connection()
+    cursor = conn.cursor()
+    query = "SELECT COUNT(*) FROM animals WHERE 1=1"
+    params = []
+    if category and category != 'all':
+        query += " AND category = ?"
+        params.append(category)
+    if red_book_only:
+        query += " AND (uz_red_book_status != 'Kiritilmagan' OR iucn_status IN ('CR', 'EN', 'VU'))"
+    if search:
+        cleaned_search = normalize_uz_text(search)
+        query += " AND (NORMALIZE_UZ(name_uz) LIKE ? OR NORMALIZE_UZ(name_latin) LIKE ? OR NORMALIZE_UZ(name_en) LIKE ? OR NORMALIZE_UZ(description) LIKE ?)"
+        s = f"%{cleaned_search}%"
+        params.extend([s, s, s, s])
+    cursor.execute(query, params)
+    count = cursor.fetchone()[0]
+    conn.close()
+    return count
+
+def get_all_animals(category: Optional[str] = None, red_book_only: bool = False, search: Optional[str] = None, limit: Optional[int] = None, offset: int = 0) -> List[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -140,6 +160,10 @@ def get_all_animals(category: Optional[str] = None, red_book_only: bool = False,
         params.extend([s, s, s, s])
         
     query += " ORDER BY id ASC"
+    if limit is not None:
+        query += " LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+        
     cursor.execute(query, params)
     rows = cursor.fetchall()
     

@@ -122,6 +122,22 @@
         </form>
     </div>
 
+    <!-- BAZA MA'LUMOTI VA SAHIFA INDIKATORI -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;">
+        <div style="font-size: 0.92rem; color: #94a3b8; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🦁</span>
+            <span>Jami <strong>{{ total_count }}</strong> ta biologik tur</span>
+            {% if search_query %}
+            <span style="color: #38bdf8;">• Qidiruv: "<strong>{{ search_query }}</strong>"</span>
+            {% elif current_category != 'all' %}
+            <span style="color: #4ade80;">• Kategoriya: <strong>{{ current_category }}</strong></span>
+            {% endif %}
+        </div>
+        <div style="font-size: 0.84rem; color: #34d399; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 0.35rem 0.95rem; border-radius: 9999px; font-weight: 600;">
+            Sahifa: {{ page }} / {{ total_pages }} ({{ start_item }} - {{ end_item }})
+        </div>
+    </div>
+
     <!-- HAYVONLAR KARTALARI RO'YXATI -->
     <div class="animals-grid">
         {% for a in animals %}
@@ -199,9 +215,80 @@
         <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: var(--color-bg-card); border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
             <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
             <h3 style="color: #ffffff;">{{ t('no_results') }}</h3>
-            <a href="/" class="btn-primary" style="margin-top: 1.5rem;">{{ t('cat_all') }}</a>
+            <p style="color: #94a3b8; margin: 0.8rem auto 1.5rem; max-width: 500px;">10,000 talik bazamizda topilmadi. Gemini AI yordamida dunyodagi 1.5 million hayvon bazasidan qidirishingiz mumkin!</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="/" class="btn-primary">{{ t('cat_all') }}</a>
+                <a href="/ai-chat" class="btn-primary" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">✨ Gemini 1.5M Bazasidan qidirish</a>
+            </div>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- SAHIFALASH (PAGINATION) -->
+    {% if total_pages > 1 %}
+    <div class="pagination-container">
+        <div class="pagination-info">
+            10,000 ta turdan {{ start_item }} - {{ end_item }} ko'rsatilmoqda (Jami: {{ total_count }})
+        </div>
+
+        <div class="pagination-controls">
+            <!-- Oldingi sahifa -->
+            {% if has_prev %}
+            <a href="/?page={{ prev_page }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">
+                ◀
+            </a>
+            {% else %}
+            <span class="page-btn disabled">◀</span>
+            {% endif %}
+
+            <!-- 1-sahifa agar oraliqda bo'lmasa -->
+            {% if pages_range[0] > 1 %}
+            <a href="/?page=1{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">1</a>
+            {% if pages_range[0] > 2 %}
+            <span class="page-ellipsis">...</span>
+            {% endif %}
+            {% endif %}
+
+            <!-- Oraliq sahifalar -->
+            {% for p in pages_range %}
+            <a href="/?page={{ p }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn {% if p == page %}active{% endif %}">
+                {{ p }}
+            </a>
+            {% endfor %}
+
+            <!-- Oxirgi sahifa agar oraliqda bo'lmasa -->
+            {% if pages_range[-1] < total_pages %}
+            {% if pages_range[-1] < total_pages - 1 %}
+            <span class="page-ellipsis">...</span>
+            {% endif %}
+            <a href="/?page={{ total_pages }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">{{ total_pages }}</a>
+            {% endif %}
+
+            <!-- Keyingi sahifa -->
+            {% if has_next %}
+            <a href="/?page={{ next_page }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">
+                ▶
+            </a>
+            {% else %}
+            <span class="page-btn disabled">▶</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- GEMINI 1.5 MILLION GLOBAL AI HAYVONLAR KASHFIYOTI BANNERI -->
+    <div style="margin-top: 4.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 78, 59, 0.25)); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-lg); padding: 2.4rem; text-align: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">✨ 🧠 🦁</div>
+        <h3 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 0.6rem; font-weight: 800;">
+            Gemini AI — Dunyodagi 1.5 Million Hayvon Global Birligi
+        </h3>
+        <p style="color: #cbd5e1; max-width: 700px; margin: 0 auto 1.5rem; font-size: 0.95rem; line-height: 1.6;">
+            Saytimizda <strong>10,000 ta eng muhim va mashhur turlar</strong> to'liq ma'lumotlar bazasiga joylashtirildi. Agar siz Yer yuzidagi istalgan boshqa noyob, qadimiy yoki ekzotik hayvon haqida bilmoqchi bo'lsangiz, Gemini AI uning ilmiy pasporti, xatti-harakati va xususiyatlarini darhol taqdim etadi!
+        </p>
+        <a href="/ai-chat" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1.8rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);">
+            <span>Zooventure AI orqali 1.5M hayvonni kashf qilish</span>
+            <span>→</span>
+        </a>
     </div>
 
 </div>
