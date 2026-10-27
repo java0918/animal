@@ -14,7 +14,7 @@ import aiofiles
 from database import (
     init_db, get_all_animals, get_animals_count, get_animal_by_id, insert_animal,
     update_animal, delete_animal, get_or_create_user, get_all_users,
-    get_stats, get_connection
+    get_stats, get_connection, get_random_quizzes, get_quizzes_total_count
 )
 from ai_service import ask_ai
 from translations import (
@@ -455,11 +455,41 @@ async def ai_chat_page(request: Request):
 async def quiz_page(request: Request):
     current_lang = get_current_lang(request)
     ctx = get_base_context(request, current_lang)
+    ctx["total_quiz_pool"] = get_quizzes_total_count()
     return templates.TemplateResponse(
         request=request,
         name="quiz.html",
         context=ctx
     )
+
+@app.get("/api/quiz/session")
+@app.post("/api/quiz/session")
+async def api_quiz_session(request: Request):
+    current_lang = get_current_lang(request)
+    seen_raw = request.query_params.get("seen_ids", "")
+    if not seen_raw and request.method == "POST":
+        try:
+            body = await request.json()
+            seen_raw = body.get("seen_ids", [])
+        except Exception:
+            seen_raw = []
+    
+    exclude_ids = []
+    if isinstance(seen_raw, str):
+        exclude_ids = [int(x.strip()) for x in seen_raw.split(",") if x.strip().isdigit()]
+    elif isinstance(seen_raw, list):
+        exclude_ids = [int(x) for x in seen_raw if str(x).isdigit()]
+        
+    quizzes = get_random_quizzes(count=20, exclude_ids=exclude_ids, lang=current_lang)
+    total_pool = get_quizzes_total_count()
+    
+    return JSONResponse({
+        "success": True,
+        "total_pool": total_pool,
+        "session_count": len(quizzes),
+        "seen_count": len(exclude_ids),
+        "quizzes": quizzes
+    })
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):

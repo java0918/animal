@@ -103,6 +103,31 @@ def init_db():
         value TEXT
     )
     """)
+
+    # Quizzes table (1000 questions bank)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS quizzes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question TEXT NOT NULL,
+        question_kaa TEXT,
+        question_ru TEXT,
+        question_en TEXT,
+        sound_type TEXT DEFAULT 'roar',
+        audio_url TEXT,
+        options TEXT NOT NULL,
+        options_kaa TEXT,
+        options_ru TEXT,
+        options_en TEXT,
+        correct INTEGER NOT NULL,
+        explanation TEXT NOT NULL,
+        explanation_kaa TEXT,
+        explanation_ru TEXT,
+        explanation_en TEXT,
+        category TEXT,
+        animal_id INTEGER
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_quizzes_id ON quizzes(id)")
     
     conn.commit()
     
@@ -367,3 +392,83 @@ def get_stats() -> Dict[str, Any]:
         "categories_count": categories_count,
         "users_count": users_count
     }
+
+
+def get_quizzes_total_count() -> int:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM quizzes")
+    count = cursor.fetchone()[0]
+    conn.close()
+    return count
+
+def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None, lang: str = "uz") -> List[Dict[str, Any]]:
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    exclude_clean = []
+    if exclude_ids:
+        for x in exclude_ids:
+            try:
+                exclude_clean.append(int(x))
+            except (ValueError, TypeError):
+                pass
+                
+    results = []
+    # 1. Try to fetch from questions NOT seen by user
+    if exclude_clean:
+        placeholders = ",".join(["?"] * len(exclude_clean))
+        cursor.execute(f"SELECT * FROM quizzes WHERE id NOT IN ({placeholders}) ORDER BY RANDOM() LIMIT ?", (*exclude_clean, count))
+        results = [dict(r) for r in cursor.fetchall()]
+    else:
+        cursor.execute("SELECT * FROM quizzes ORDER BY RANDOM() LIMIT ?", (count,))
+        results = [dict(r) for r in cursor.fetchall()]
+        
+    # 2. If unseen questions are fewer than count (e.g. user answered 990 questions), supplement from remaining
+    if len(results) < count:
+        needed = count - len(results)
+        chosen_ids = [r["id"] for r in results]
+        if chosen_ids:
+            sub_placeholders = ",".join(["?"] * len(chosen_ids))
+            cursor.execute(f"SELECT * FROM quizzes WHERE id NOT IN ({sub_placeholders}) ORDER BY RANDOM() LIMIT ?", (*chosen_ids, needed))
+        else:
+            cursor.execute("SELECT * FROM quizzes ORDER BY RANDOM() LIMIT ?", (needed,))
+        for r in cursor.fetchall():
+            results.append(dict(r))
+            
+    conn.close()
+    
+    # 3. Format according to requested language
+    formatted = []
+    for q in results:
+        q_text = q.get(f"question_{lang}") or q["question"]
+        expl_text = q.get(f"explanation_{lang}") or q["explanation"]
+        
+        opts_raw = q.get(f"options_{lang}") or q["options"]
+        opts = []
+        if isinstance(opts_raw, str):
+            try:
+                opts = json.loads(opts_raw)
+            except Exception:
+                opts = []
+        elif isinstance(opts_raw, list):
+            opts = opts_raw
+            
+        if not opts:
+            try:
+                opts = json.loads(q["options"])
+            except Exception:
+                opts = ["Variant A", "Variant B", "Variant C", "Variant D"]
+                
+        formatted.append({
+            "id": q["id"],
+            "question": q_text,
+            "options": opts,
+            "correct": q["correct"],
+            "explanation": expl_text,
+            "soundType": q.get("sound_type", "roar"),
+            "audioUrl": q.get("audio_url", ""),
+            "category": q.get("category", "")
+        })
+        
+    return formatted
