@@ -17,6 +17,7 @@ from database import (
     get_stats, get_connection, get_random_quizzes, get_quizzes_total_count
 )
 from ai_service import ask_ai
+from audio_resolver import resolve_animal_audio
 from translations import (
     SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, get_translation,
     localize_animal, localize_animals_list
@@ -634,6 +635,31 @@ async def api_github_push(request: Request):
         return JSONResponse({"success": True, "message": "Barcha kodlar muvaffaqiyatli GitHub ga yuklandi!"})
     except Exception as e:
         return JSONResponse({"success": False, "message": f"GitHub xatosi: {str(e)}"}, status_code=500)
+
+
+@app.get("/api/audio/resolve")
+async def api_resolve_audio(scientific_name: Optional[str] = None, name_uz: Optional[str] = None, category: Optional[str] = None):
+    res = resolve_animal_audio(scientific_name=scientific_name, name_uz=name_uz or "", category=category or "")
+    return JSONResponse(res)
+
+@app.get("/api/animals/{animal_id}/audio")
+async def api_animal_audio(animal_id: int):
+    animal = get_animal_by_id(animal_id)
+    if not animal:
+        raise HTTPException(status_code=404, detail="Hayvon topilmadi")
+    audio_url = animal.get("audioUrl") or animal.get("audio_url") or animal.get("sound_file")
+    if not audio_url:
+        resolved = resolve_animal_audio(animal.get("name_latin"), animal.get("name_uz"), animal.get("category"))
+        audio_url = resolved.get("audioUrl")
+    return JSONResponse({
+        "id": animal["id"],
+        "name_uz": animal.get("name_uz"),
+        "name_latin": animal.get("name_latin"),
+        "audioUrl": audio_url,
+        "soundType": animal.get("sound_type", "roar"),
+        "soundDescription": animal.get("sound_description", "Tabiiy jonli tovush")
+    })
+
 
 if __name__ == "__main__":
     import uvicorn

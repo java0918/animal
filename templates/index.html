@@ -193,10 +193,13 @@
                     <button type="button" 
                             class="btn-sound-play" 
                             data-sound-type="{{ a.sound_type }}" 
-                            data-sound-file="{{ a.sound_file }}"
+                            data-sound-file="{{ a.audioUrl or a.sound_file }}"
+                            data-animal-name="{{ a.name_uz }}"
+                            data-animal-latin="{{ a.name_latin }}"
+                            data-animal-img="{{ a.image_url }}"
                             title="{{ t('listen_sound') }}">
-                        <span>🔊</span>
-                        <span>{{ t('listen') }}</span>
+                        <span class="sound-icon">🔊</span>
+                        <span class="sound-btn-text">{{ t('listen') }}</span>
                         <div class="sound-waves-indicator">
                             <span></span><span></span><span></span>
                         </div>

@@ -73,10 +73,13 @@
             <button type="button" 
                     class="btn-sound-play" 
                     data-sound-type="{{ left_animal.sound_type }}" 
-                    data-sound-file="{{ left_animal.sound_file }}"
+                    data-sound-file="{{ left_animal.audioUrl or left_animal.sound_file }}"
+                    data-animal-name="{{ left_animal.name_uz }}"
+                    data-animal-latin="{{ left_animal.name_latin }}"
+                    data-animal-img="{{ left_animal.image_url }}"
                     style="width: 100%; justify-content: center; margin-bottom: 1.5rem;">
-                <span>🔊</span>
-                <span>{{ left_animal.name_uz }} ({{ t('listen') }})</span>
+                <span class="sound-icon">🔊</span>
+                <span class="sound-btn-text">{{ left_animal.name_uz }} ({{ t('listen') }})</span>
                 <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
             </button>
 
@@ -119,10 +122,13 @@
             <button type="button" 
                     class="btn-sound-play" 
                     data-sound-type="{{ right_animal.sound_type }}" 
-                    data-sound-file="{{ right_animal.sound_file }}"
+                    data-sound-file="{{ right_animal.audioUrl or right_animal.sound_file }}"
+                    data-animal-name="{{ right_animal.name_uz }}"
+                    data-animal-latin="{{ right_animal.name_latin }}"
+                    data-animal-img="{{ right_animal.image_url }}"
                     style="width: 100%; justify-content: center; margin-bottom: 1.5rem; border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; background: rgba(245, 158, 11, 0.15);">
-                <span>🔊</span>
-                <span>{{ right_animal.name_uz }} ({{ t('listen') }})</span>
+                <span class="sound-icon">🔊</span>
+                <span class="sound-btn-text">{{ right_animal.name_uz }} ({{ t('listen') }})</span>
                 <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
             </button>
 

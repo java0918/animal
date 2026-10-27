@@ -13,6 +13,7 @@ class AnimalAudioEngine {
         this.canvasCtx = null;
         this.animationFrameId = null;
         this.isPlaying = false;
+        this.originalBtnContent = new Map();
     }
 
     initContext() {
@@ -48,7 +49,7 @@ class AnimalAudioEngine {
 
             ctx.clearRect(0, 0, w, h);
 
-            // Chiroyli neon to'lqin chizish
+            // Neon yashil to'lqin
             ctx.beginPath();
             ctx.lineWidth = 2.5;
             ctx.strokeStyle = '#34d399';
@@ -64,7 +65,7 @@ class AnimalAudioEngine {
             }
             ctx.stroke();
 
-            // 2-oltin to'lqin
+            // Oltin to'lqin
             ctx.beginPath();
             ctx.lineWidth = 1.5;
             ctx.strokeStyle = '#fbbf24';
@@ -98,7 +99,7 @@ class AnimalAudioEngine {
         const bar = document.getElementById('globalAudioBar');
         if (!bar) return;
         if (name) document.getElementById('audioBarName').innerText = name;
-        if (desc) document.getElementById('audioBarDesc').innerText = desc || 'Tovush signali';
+        if (desc) document.getElementById('audioBarDesc').innerText = desc || 'Jonli biologik audio';
         if (imgUrl) document.getElementById('audioBarImg').src = imgUrl;
         bar.classList.add('active');
         this.startWaveAnimation();
@@ -110,69 +111,164 @@ class AnimalAudioEngine {
         this.stopWaveAnimation();
     }
 
+    setButtonState(btn, state) {
+        if (!btn) return;
+        const iconSpan = btn.querySelector('.sound-icon') || btn.querySelector('span:first-child');
+        const textSpan = btn.querySelector('.sound-btn-text') || btn.querySelector('span:nth-child(2)');
+        const waves = btn.querySelector('.sound-waves-indicator');
+
+        // Boshlang'ich matnni eslab qolish
+        if (!this.originalBtnContent.has(btn) && textSpan) {
+            this.originalBtnContent.set(btn, textSpan.innerText.trim());
+        }
+
+        if (state === 'playing') {
+            btn.classList.add('playing');
+            if (iconSpan) iconSpan.innerText = '⏸️';
+            if (textSpan) textSpan.innerText = "To'xtatish";
+            if (waves) waves.style.display = 'inline-flex';
+        } else if (state === 'loading') {
+            btn.classList.add('playing');
+            if (iconSpan) iconSpan.innerText = '⏳';
+            if (textSpan) textSpan.innerText = "Yuklanmoqda...";
+            if (waves) waves.style.display = 'inline-flex';
+        } else {
+            // idle
+            btn.classList.remove('playing');
+            if (iconSpan) iconSpan.innerText = '🔊';
+            if (textSpan) {
+                const original = this.originalBtnContent.get(btn) || 'Tinglash';
+                textSpan.innerText = original;
+            }
+            if (waves) waves.style.display = 'inline-flex';
+        }
+    }
+
     stopSound() {
         if (this.currentAudio) {
-            this.currentAudio.pause();
+            try {
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+            } catch (e) {}
             this.currentAudio = null;
         }
         if (this.currentBtn) {
-            this.currentBtn.classList.remove('playing');
+            this.setButtonState(this.currentBtn, 'idle');
             this.currentBtn = null;
         }
+        this.isPlaying = false;
         this.hideBottomBar();
     }
 
-    playSound(soundType, audioUrl, buttonEl, animalName = '', animalDesc = '', animalImg = '') {
+    playSound(soundType, audioUrl, buttonEl, animalName = '', animalDesc = '', animalImg = '', scientificName = '') {
         this.initContext();
 
-        if (this.currentAudio) {
-            this.currentAudio.pause();
-            this.currentAudio = null;
-        }
-        if (this.currentBtn) {
-            this.currentBtn.classList.remove('playing');
-        }
-
-        if (this.currentBtn === buttonEl) {
+        // 1. Agar aynan shu tugma hozir ijro etilayotgan bo'lsa -> To'xtatish (Toggle Pause / Stop)
+        if (this.currentBtn === buttonEl && this.isPlaying) {
             this.stopSound();
             return;
         }
 
-        buttonEl.classList.add('playing');
-        this.currentBtn = buttonEl;
+        // 2. Oldingi ijroni to'xtatish va tugmasini tiklash
+        if (this.currentAudio) {
+            try {
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+            } catch (e) {}
+            this.currentAudio = null;
+        }
+        if (this.currentBtn) {
+            this.setButtonState(this.currentBtn, 'idle');
+        }
 
-        // Bottom bar yangilash
+        this.currentBtn = buttonEl;
+        this.setButtonState(buttonEl, 'loading');
         this.showBottomBar(animalName, animalDesc, animalImg);
 
-        if (audioUrl && audioUrl.endsWith('.mp3')) {
-            const audio = new Audio(audioUrl);
-            this.currentAudio = audio;
-            audio.play().then(() => {
+        // 3. Audio URL tekshiruvi (Haqiqiy wildlife audio manbalari)
+        const hasValidUrl = audioUrl && (
+            audioUrl.startsWith('http://') || 
+            audioUrl.startsWith('https://') || 
+            audioUrl.startsWith('/') ||
+            audioUrl.includes('.mp3') ||
+            audioUrl.includes('.wav') ||
+            audioUrl.includes('.m4a') ||
+            audioUrl.includes('.ogg')
+        );
+
+        if (hasValidUrl) {
+            try {
+                const audio = new Audio(audioUrl);
+                this.currentAudio = audio;
+
+                audio.onplaying = () => {
+                    if (this.currentBtn === buttonEl) {
+                        this.isPlaying = true;
+                        this.setButtonState(buttonEl, 'playing');
+                        this.startWaveAnimation();
+                    }
+                };
+
                 audio.onended = () => {
                     this.stopSound();
                 };
-            }).catch(() => {
+
+                audio.onerror = (err) => {
+                    console.warn("Real audio URL o'qishda xatolik, sintezga o'tish:", err);
+                    this.synthesizeAnimalSound(soundType, buttonEl);
+                };
+
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.isPlaying = true;
+                        this.setButtonState(buttonEl, 'playing');
+                        this.startWaveAnimation();
+                    }).catch(err => {
+                        console.warn("Autoplay / Audio xatoligi, sintezga o'tish:", err);
+                        this.synthesizeAnimalSound(soundType, buttonEl);
+                    });
+                }
+            } catch (err) {
                 this.synthesizeAnimalSound(soundType, buttonEl);
-            });
+            }
+        } else if (scientificName) {
+            // Dinamik tarzda API orqali qidirib ko'rish
+            fetch(`/api/audio/resolve?scientific_name=${encodeURIComponent(scientificName)}&name_uz=${encodeURIComponent(animalName)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.audioUrl && this.currentBtn === buttonEl) {
+                        this.playSound(soundType, data.audioUrl, buttonEl, animalName, animalDesc, animalImg);
+                    } else {
+                        this.synthesizeAnimalSound(soundType, buttonEl);
+                    }
+                })
+                .catch(() => {
+                    this.synthesizeAnimalSound(soundType, buttonEl);
+                });
         } else {
             this.synthesizeAnimalSound(soundType, buttonEl);
         }
     }
 
-    // Har bir hayvon uchun fizik va akustik tovush sintezi
+    // Har bir hayvon uchun fizik va akustik tovush sintezi (Fallback mexanizmi)
     synthesizeAnimalSound(type, buttonEl) {
+        this.initContext();
         const ctx = this.audioCtx;
         const now = ctx.currentTime;
+        this.isPlaying = true;
+        this.setButtonState(buttonEl, 'playing');
+        this.startWaveAnimation();
 
         const cleanup = (duration) => {
             setTimeout(() => {
-                buttonEl.classList.remove('playing');
-                if (this.currentBtn === buttonEl) this.currentBtn = null;
+                if (this.currentBtn === buttonEl) {
+                    this.stopSound();
+                }
             }, duration * 1000);
         };
 
         if (type === 'lion') {
-            // Sherning chuqur vahimali o'kirishi (past chastotali modulyatsiyalangan rezonans)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
@@ -199,7 +295,6 @@ class AnimalAudioEngine {
             cleanup(2.5);
 
         } else if (type === 'swallow') {
-            // Qaldirg'ochning quvnoq va ohangdor sayrashi (chirp/trill)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
@@ -222,7 +317,6 @@ class AnimalAudioEngine {
             cleanup(1.6);
 
         } else if (type === 'wolf') {
-            // Bo'rining cho'ziq mungli uvillashi (harmonic sweep)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
@@ -244,7 +338,6 @@ class AnimalAudioEngine {
             cleanup(3.2);
 
         } else if (type === 'eagle') {
-            // Burgutning o'tkir qichqirig'i
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
@@ -264,7 +357,6 @@ class AnimalAudioEngine {
             cleanup(1.5);
 
         } else if (type === 'dolphin') {
-            // Delfinning sonik chertishlari
             for (let i = 0; i < 12; i++) {
                 const clickOsc = ctx.createOscillator();
                 const clickGain = ctx.createGain();
@@ -283,7 +375,6 @@ class AnimalAudioEngine {
             cleanup(1.2);
 
         } else {
-            // Standart tovush (quyon ogohlantirish signali / yumshoq zarba)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = 'sine';
@@ -303,6 +394,8 @@ class AnimalAudioEngine {
 }
 
 const audioEngine = new AnimalAudioEngine();
+window.audioEngine = audioEngine;
+window.audioController = audioEngine;
 
 // 2. AI ASSISTANT CHAT ENGINE
 class ZooventureAIChat {
@@ -389,20 +482,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1200);
     }
 
-    // B. Audio tinglash tugmalarini ulash
-    document.querySelectorAll('.btn-sound-play').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const soundType = btn.getAttribute('data-sound-type') || 'roar';
-            const audioUrl = btn.getAttribute('data-sound-file') || '';
-            const card = btn.closest('.animal-card') || btn.closest('.compare-card') || document;
-            const name = card.querySelector('.animal-title, h1, h2')?.innerText || 'Hayvon ovozi';
-            const desc = card.querySelector('.animal-latin, .animal-desc-short')?.innerText || 'Akustik tovush';
-            const img = card.querySelector('img')?.src || '';
-            audioEngine.playSound(soundType, audioUrl, btn, name, desc, img);
+    // B. Audio tinglash tugmalarini ulash (Yagona Zooventure Audio Controller)
+    window.bindAllAudioButtons = function() {
+        document.querySelectorAll('.btn-sound-play').forEach(btn => {
+            if (btn.hasAttribute('data-audio-bound')) return;
+            btn.setAttribute('data-audio-bound', 'true');
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const soundType = btn.getAttribute('data-sound-type') || 'roar';
+                const audioUrl = btn.getAttribute('data-sound-file') || btn.getAttribute('data-audio-url') || '';
+                const card = btn.closest('.animal-card') || btn.closest('.compare-card') || btn.closest('.portal-content-wrap') || document;
+                const name = btn.getAttribute('data-animal-name') || card.querySelector('.animal-title, h1, h2')?.innerText || 'Hayvon ovozi';
+                const desc = btn.getAttribute('data-animal-latin') || card.querySelector('.animal-latin, .animal-desc-short')?.innerText || 'Akustik jonli audio';
+                const img = btn.getAttribute('data-animal-img') || card.querySelector('img')?.src || '';
+                const latin = btn.getAttribute('data-animal-latin') || '';
+
+                audioEngine.playSound(soundType, audioUrl, btn, name, desc, img, latin);
+            });
         });
-    });
+    };
+    window.bindAllAudioButtons();
 
     // C. AI Chatni ishga tushirish
     new ZooventureAIChat();

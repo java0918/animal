@@ -74,6 +74,7 @@ def init_db():
         similar_species TEXT NOT NULL,
         differences TEXT NOT NULL,
         sound_file TEXT,
+        audio_url TEXT,
         sound_description TEXT,
         sound_type TEXT DEFAULT 'roar',
         image_url TEXT NOT NULL,
@@ -82,6 +83,10 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    try:
+        cursor.execute("ALTER TABLE animals ADD COLUMN audio_url TEXT")
+    except Exception:
+        pass
     
     # Users table (for Google Sign-In & Admins)
     cursor.execute("""
@@ -195,6 +200,10 @@ def get_all_animals(category: Optional[str] = None, red_book_only: bool = False,
     results = []
     for r in rows:
         item = dict(r)
+        audio_val = item.get("audio_url") or item.get("sound_file") or ""
+        item["audioUrl"] = audio_val
+        item["audio_url"] = audio_val
+        item["sound_file"] = audio_val
         if item.get("gallery_images"):
             try:
                 item["gallery_images"] = json.loads(item["gallery_images"])
@@ -223,6 +232,10 @@ def get_animal_by_id(animal_id: int) -> Optional[Dict[str, Any]]:
     if not row:
         return None
     item = dict(row)
+    audio_val = item.get("audio_url") or item.get("sound_file") or ""
+    item["audioUrl"] = audio_val
+    item["audio_url"] = audio_val
+    item["sound_file"] = audio_val
     if item.get("gallery_images"):
         try:
             item["gallery_images"] = json.loads(item["gallery_images"])
