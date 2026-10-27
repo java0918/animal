@@ -253,45 +253,28 @@ async def admin_login(request: Request, response: Response):
 
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
-    data = {}
-    try:
-        data = await request.json()
-    except Exception:
-        pass
-    requested_role = data.get("role", "user")
+    demo_users = [
+        {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@zooventure.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@zooventure.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
+        {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@zooventure.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
+    ]
+    import random
+    user_session = random.choice(demo_users)
+    user_session["role"] = "user"
     
-    if requested_role == "admin":
-        user_session = {
-            "id": 9999,
-            "google_id": "system-admin-01",
-            "email": "admin@zooventure.uz",
-            "name": "Bosh Administrator",
-            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-            "role": "admin"
-        }
-    else:
-        demo_users = [
-            {"id": "d1", "name": "Zoolog Tadqiqotchi", "email": "zoolog@zooventure.uz", "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"},
-            {"id": "d2", "name": "Biologiya Talabasi", "email": "talaba@zooventure.uz", "picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"},
-            {"id": "d3", "name": "Tabiat Havaskori", "email": "tabiat@zooventure.uz", "picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"}
-        ]
-        import random
-        user_session = random.choice(demo_users)
-        user_session["role"] = "user"
-        
     get_or_create_user(
-        google_id=user_session.get("google_id", f"demo-{user_session['id']}"),
+        google_id=f"demo-{user_session['id']}",
         email=user_session["email"],
         name=user_session["name"],
         picture=user_session["picture"],
-        role=user_session["role"]
+        role="user"
     )
     
     res = JSONResponse({
         "success": True,
         "user": user_session,
-        "role": user_session["role"],
-        "redirect": "/admin" if user_session["role"] == "admin" else "/"
+        "role": "user",
+        "redirect": "/"
     })
     cookie_val = urllib.parse.quote(json.dumps(user_session))
     for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:

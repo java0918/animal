@@ -71,14 +71,6 @@ function submitLogin(e) {
     });
 }
 
-function fillAdminCredentials() {
-    const userInput = document.getElementById('login_user');
-    const passInput = document.getElementById('login_pass');
-    if (userInput) userInput.value = 'admin';
-    if (passInput) passInput.value = 'java0918';
-    submitLogin();
-}
-
 function loginAsDemo(role, e) {
     const btn = (e && e.target) || (window.event ? window.event.target : null);
     if (btn) btn.innerHTML = 'Kirilmoqda... ⏳';
@@ -86,14 +78,12 @@ function loginAsDemo(role, e) {
     fetch('/api/auth/demo-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: role || 'user' })
+        body: JSON.stringify({ role: 'user' })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            const isAdmin = data.role === 'admin' || (data.user && data.user.role === 'admin');
-            const msg = isAdmin ? "ADMIN TASDIQLANDI... BOSHQARUV PANELIGA O'TILMOQDA!" : 'MEHMON SIFATIDA IDENTIFIKATSIYA QILINDI...';
-            playEntranceTransition(msg, data.redirect || (isAdmin ? '/admin' : '/'));
+            playEntranceTransition('MEHMON SIFATIDA IDENTIFIKATSIYA QILINDI...', data.redirect || '/');
         } else {
             alert('Kirishda xatolik: ' + (data.message || ''));
             if (btn) btn.innerHTML = "⚡ Demo Access";
