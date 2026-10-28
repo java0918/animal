@@ -487,6 +487,17 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
         if isinstance(opts, list):
             opts = [str(o).replace("\ufffd", '"') for o in opts]
                 
+        # Avtomatik o'zbekcha audio manzilini ulash
+        audio_url = q.get("audio_url", "")
+        if not audio_url:
+            quiz_id = q["id"]
+            static_audio = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "audio", "quiz", f"quiz_{quiz_id}.mp3")
+            if os.path.exists(static_audio):
+                audio_url = f"/static/audio/quiz/quiz_{quiz_id}.mp3"
+            else:
+                import urllib.parse
+                audio_url = f"/api/tts?quiz_id={quiz_id}&text={urllib.parse.quote(q_text)}&lang={lang}"
+
         formatted.append({
             "id": q["id"],
             "question": q_text,
@@ -494,7 +505,7 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
             "correct": q["correct"],
             "explanation": expl_text,
             "soundType": q.get("sound_type", "roar"),
-            "audioUrl": q.get("audio_url", ""),
+            "audioUrl": audio_url,
             "category": q.get("category", "")
         })
         

@@ -523,8 +523,28 @@ TTS_VOICE_MAP = {
 }
 
 @app.get("/api/tts")
-async def api_tts(request: Request, text: str = Query(..., min_length=1, max_length=1500), lang: str = "uz", voice: Optional[str] = None):
-    text_clean = text.replace("", '"').strip()
+async def api_tts(request: Request, text: str = Query(..., min_length=1, max_length=1500), lang: str = "uz", quiz_id: Optional[str] = None, voice: Optional[str] = None):
+    app_base = os.path.dirname(os.path.abspath(__file__))
+    
+    # 1. Diskdagi tayyor audio faylni tekshirish (2ms javob tezligi)
+    if quiz_id and str(quiz_id).isdigit():
+        for prefix in ["quiz_", "q"]:
+            static_audio = os.path.join(app_base, "static", "audio", "quiz", f"{prefix}{quiz_id}.mp3")
+            if os.path.exists(static_audio):
+                with open(static_audio, "rb") as f:
+                    content = f.read()
+                return Response(
+                    content=content,
+                    media_type="audio/mpeg",
+                    headers={
+                        "Cache-Control": "public, max-age=2592000, immutable",
+                        "Content-Disposition": "inline; filename=speech.mp3",
+                        "Accept-Ranges": "bytes",
+                        "Content-Length": str(len(content))
+                    }
+                )
+
+    text_clean = text.replace("\ufffd", '"').replace('"', '"').strip()
     if not text_clean:
         raise HTTPException(status_code=400, detail="Bo'sh matn")
         
@@ -532,12 +552,15 @@ async def api_tts(request: Request, text: str = Query(..., min_length=1, max_len
     cache_key = hashlib.md5(f"{chosen_voice}:{text_clean}".encode("utf-8")).hexdigest()
     
     if cache_key in _tts_cache:
+        cached_bytes = _tts_cache[cache_key]
         return Response(
-            content=_tts_cache[cache_key],
+            content=cached_bytes,
             media_type="audio/mpeg",
             headers={
                 "Cache-Control": "public, max-age=604800, immutable",
-                "Content-Disposition": "inline; filename=speech.mp3"
+                "Content-Disposition": "inline; filename=speech.mp3",
+                "Accept-Ranges": "bytes",
+                "Content-Length": str(len(cached_bytes))
             }
         )
         
@@ -558,7 +581,9 @@ async def api_tts(request: Request, text: str = Query(..., min_length=1, max_len
                 media_type="audio/mpeg",
                 headers={
                     "Cache-Control": "public, max-age=604800, immutable",
-                    "Content-Disposition": "inline; filename=speech.mp3"
+                    "Content-Disposition": "inline; filename=speech.mp3",
+                    "Accept-Ranges": "bytes",
+                    "Content-Length": str(len(audio_bytes))
                 }
             )
         else:
