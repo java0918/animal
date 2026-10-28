@@ -113,6 +113,7 @@ let currentQuestionIndex = 0;
 let userScore = 0;
 let hasAnsweredCurrent = false;
 let isQuizSpeechActive = false;
+window.CURRENT_SPEECH_LANG = '{{ current_lang or "uz" }}';
 
 // Brauzer ovozlarini oldindan keshga yuklash
 if ('speechSynthesis' in window) {
@@ -184,103 +185,18 @@ function updateScoreUI() {
     if (scoreEl) scoreEl.innerText = userScore;
 }
 
-// --- Ovozli O'qish (Web Speech API O'zbekcha Sintez) ---
-function stopQuizSpeech() {
-    if ('speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (e) {}
-    }
-    isQuizSpeechActive = false;
+// --- Ovozli O'qish (Haqiqiy O'zbekcha Neyron Nutq Sintezi) ---
+let currentQuizAudio = null;
+let prefetchedQuizAudio = null;
+let prefetchedAudioText = '';
+
+function updateQuizSoundUI(isPlaying) {
     const btnSound = document.getElementById('btnQuizSound');
     const soundText = document.getElementById('quizSoundText');
     const soundIcon = document.getElementById('quizSoundIcon');
     const soundWaves = document.getElementById('quizSoundWaves');
 
-    if (soundText) soundText.innerText = "{{ t('quiz_listen') }}";
-    if (soundIcon) soundIcon.innerText = "🔊";
-    if (soundWaves) soundWaves.style.display = 'none';
-    if (btnSound) {
-        btnSound.classList.remove('playing');
-        btnSound.style.borderColor = 'rgba(56, 189, 248, 0.35)';
-        btnSound.style.background = 'rgba(56, 189, 248, 0.15)';
-        btnSound.style.boxShadow = 'none';
-    }
-}
-
-function getBestSpeechVoice(targetLang) {
-    if (!('speechSynthesis' in window)) return null;
-    const voices = window.speechSynthesis.getVoices() || [];
-    if (!voices || voices.length === 0) return null;
-
-    const langTarget = (targetLang || 'uz-UZ').toLowerCase().replace('_', '-');
-    const primaryCode = langTarget.split('-')[0]; // 'uz'
-
-    // 1. To'g'ridan-to'g'ri o'zbek tili kodi bo'yicha (uz-UZ yoki uz)
-    let matched = voices.find(v => {
-        const vl = (v.lang || '').toLowerCase().replace('_', '-');
-        return vl === langTarget || vl === primaryCode;
-    });
-    if (matched) return matched;
-
-    // 2. Nomida "uzbek", "o'zbek", "madina", "sardor" bor ovozlar
-    matched = voices.find(v => {
-        const vn = (v.name || '').toLowerCase();
-        return vn.includes('uzbek') || vn.includes("o'zbek") || vn.includes('madina') || vn.includes('sardor');
-    });
-    if (matched) return matched;
-
-    // 3. Til prefiksi bo'yicha
-    matched = voices.find(v => (v.lang || '').toLowerCase().startsWith(primaryCode));
-    if (matched) return matched;
-
-    // 4. Turkiy tillar fonetikasi (agar uz ovozi o'rnatilmagan bo'lsa, tr-TR talaffuzi o'zbek tiliga eng yaqin)
-    if (primaryCode === 'uz') {
-        matched = voices.find(v => (v.lang || '').toLowerCase().startsWith('tr'));
-        if (matched) return matched;
-    }
-
-    // 5. Standart brauzer ovozi
-    return voices.find(v => v.default) || voices[0];
-}
-
-function toggleQuizSpeech() {
-    if (!('speechSynthesis' in window)) {
-        alert("Kechirasiz, brauzeringiz matnni ovoz chiqarib o'qish imkoniyatini qo'llab-quvvatlamaydi.");
-        return;
-    }
-
-    // Agar allaqachon o'qilayotgan bo'lsa, bosilganda to'xtatamiz
-    if (isQuizSpeechActive || window.speechSynthesis.speaking) {
-        stopQuizSpeech();
-        return;
-    }
-
-    if (!currentQuizSession || !currentQuizSession[currentQuestionIndex]) return;
-    const q = currentQuizSession[currentQuestionIndex];
-    if (!q || !q.question) return;
-
-    window.speechSynthesis.cancel();
-
-    // Matnni o'zbekcha talaffuz uchun tozalash (apostrof va belgilarni tekislash)
-    const questionToRead = q.question.replace(/[ʻ‘’`]/g, "'").trim();
-
-    const utterance = new SpeechSynthesisUtterance(questionToRead);
-    const targetLang = window.CURRENT_SPEECH_LANG || 'uz-UZ';
-    utterance.lang = targetLang;
-    utterance.rate = 0.92; // Tushunarli va ravon nutq sur'ati
-    utterance.pitch = 1.0;
-
-    const chosenVoice = getBestSpeechVoice(targetLang);
-    if (chosenVoice) {
-        utterance.voice = chosenVoice;
-    }
-
-    const btnSound = document.getElementById('btnQuizSound');
-    const soundText = document.getElementById('quizSoundText');
-    const soundIcon = document.getElementById('quizSoundIcon');
-    const soundWaves = document.getElementById('quizSoundWaves');
-
-    utterance.onstart = function() {
-        isQuizSpeechActive = true;
+    if (isPlaying) {
         if (soundText) soundText.innerText = "{{ t('quiz_reading') }}";
         if (soundIcon) soundIcon.innerText = "⏹️";
         if (soundWaves) soundWaves.style.display = 'inline-flex';
@@ -290,18 +206,116 @@ function toggleQuizSpeech() {
             btnSound.style.background = 'rgba(56, 189, 248, 0.35)';
             btnSound.style.boxShadow = '0 0 15px rgba(56, 189, 248, 0.4)';
         }
-    };
+    } else {
+        if (soundText) soundText.innerText = "{{ t('quiz_listen') }}";
+        if (soundIcon) soundIcon.innerText = "🔊";
+        if (soundWaves) soundWaves.style.display = 'none';
+        if (btnSound) {
+            btnSound.classList.remove('playing');
+            btnSound.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+            btnSound.style.background = 'rgba(56, 189, 248, 0.15)';
+            btnSound.style.boxShadow = 'none';
+        }
+    }
+}
 
-    utterance.onend = function() {
+function stopQuizSpeech() {
+    if (currentQuizAudio) {
+        try {
+            currentQuizAudio.pause();
+            currentQuizAudio.currentTime = 0;
+        } catch (_) {}
+        currentQuizAudio = null;
+    }
+    if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+    }
+    isQuizSpeechActive = false;
+    updateQuizSoundUI(false);
+}
+
+// Savol matnini oldindan fon rejimida keshga yuklash (0ms kechikish bilan o'ynashi uchun)
+function prefetchCurrentQuestionAudio(text) {
+    if (!text || text === prefetchedAudioText) return;
+    prefetchedAudioText = text;
+    try {
+        const lang = window.CURRENT_SPEECH_LANG || 'uz';
+        const url = `/api/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang)}`;
+        prefetchedQuizAudio = new Audio(url);
+        prefetchedQuizAudio.preload = 'auto';
+    } catch (_) {}
+}
+
+function toggleQuizSpeech() {
+    // Agar allaqachon o'qilayotgan bo'lsa, bosilganda to'xtatamiz
+    if (isQuizSpeechActive) {
+        stopQuizSpeech();
+        return;
+    }
+
+    if (!currentQuizSession || !currentQuizSession[currentQuestionIndex]) return;
+    const q = currentQuizSession[currentQuestionIndex];
+    if (!q || !q.question) return;
+
+    // Matnni o'zbekcha talaffuz uchun tozalash
+    const questionToRead = q.question.replace(//g, '"').replace(/[ʻ‘’`]/g, "'").trim();
+    if (!questionToRead) return;
+
+    stopQuizSpeech();
+    isQuizSpeechActive = true;
+    updateQuizSoundUI(true);
+
+    const lang = window.CURRENT_SPEECH_LANG || 'uz';
+    const ttsUrl = `/api/tts?text=${encodeURIComponent(questionToRead)}&lang=${encodeURIComponent(lang)}`;
+
+    let audio;
+    if (prefetchedQuizAudio && prefetchedAudioText === questionToRead) {
+        audio = prefetchedQuizAudio;
+    } else {
+        audio = new Audio(ttsUrl);
+    }
+    currentQuizAudio = audio;
+
+    audio.onended = function() {
         stopQuizSpeech();
     };
 
-    utterance.onerror = function(err) {
-        console.warn('SpeechSynthesis xatolik:', err);
-        stopQuizSpeech();
+    audio.onerror = function(e) {
+        console.warn('Server TTS audio xatosi, Web Speech fallback ga o\'tilmoqda:', e);
+        playSpeechSynthesisFallback(questionToRead, lang);
     };
 
-    window.speechSynthesis.speak(utterance);
+    audio.play().catch(function(err) {
+        console.warn('Audio play ruxsati yoki xatosi:', err);
+        playSpeechSynthesisFallback(questionToRead, lang);
+    });
+}
+
+function playSpeechSynthesisFallback(text, lang) {
+    if (!('speechSynthesis' in window)) {
+        stopQuizSpeech();
+        return;
+    }
+    try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const targetLang = lang === 'uz' ? 'uz-UZ' : (lang || 'uz-UZ');
+        utterance.lang = targetLang;
+        utterance.rate = 0.92;
+
+        const voices = window.speechSynthesis.getVoices() || [];
+        const uzVoice = voices.find(v => (v.lang || '').toLowerCase().startsWith('uz') || (v.name || '').toLowerCase().includes('uzbek'));
+        if (uzVoice) {
+            utterance.voice = uzVoice;
+        }
+
+        utterance.onend = function() { stopQuizSpeech(); };
+        utterance.onerror = function() { stopQuizSpeech(); };
+
+        window.speechSynthesis.speak(utterance);
+    } catch (_) {
+        stopQuizSpeech();
+    }
 }
 
 // 3. Savolni ekranga chiqarish
@@ -339,6 +353,10 @@ function renderQuestion() {
 
     // Savol matni
     document.getElementById('questionText').innerText = q.question;
+
+    // O'zbekcha ovozli o'qish uchun audio faylni oldindan fon rejimida keshlab qo'yish (0ms kechikish bilan o'ynashi uchun)
+    const cleanQ = (q.question || '').replace(//g, '"').replace(/[ʻ‘’`]/g, "'").trim();
+    prefetchCurrentQuestionAudio(cleanQ);
 
     // Tovush tugmasi doim faol (har bir savol o'qib beriladi)
     const soundWrap = document.getElementById('soundCueWrap');

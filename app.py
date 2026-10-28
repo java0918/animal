@@ -4,7 +4,8 @@ import uuid
 import shutil
 import urllib.parse
 from typing import Optional, List
-from fastapi import FastAPI, Request, Response, Form, UploadFile, File, Depends, HTTPException, status
+import hashlib
+from fastapi import FastAPI, Request, Response, Form, UploadFile, File, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -104,7 +105,7 @@ class ClosedPortalMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         
         # Public paths: static assets, login page, auth API endpoints, language switch
-        public_prefixes = ["/static", "/login", "/api/auth", "/set-lang"]
+        public_prefixes = ["/static", "/login", "/api/auth", "/set-lang", "/api/tts"]
         if any(path.startswith(prefix) for prefix in public_prefixes):
             return await call_next(request)
             
@@ -504,6 +505,62 @@ async def quiz_page(request: Request):
         name="quiz.html",
         context=ctx
     )
+
+
+# ================= REAL NEURAL TTS (O'ZBEKCHA OVOZLI O'QISH) =================
+_tts_cache = {}
+TTS_VOICE_MAP = {
+    "uz": "uz-UZ-MadinaNeural",
+    "kaa": "uz-UZ-MadinaNeural",
+    "ru": "ru-RU-SvetlanaNeural",
+    "en": "en-US-JennyNeural",
+    "fr": "fr-FR-DeniseNeural"
+}
+
+@app.get("/api/tts")
+async def api_tts(request: Request, text: str = Query(..., min_length=1, max_length=1500), lang: str = "uz", voice: Optional[str] = None):
+    text_clean = text.replace("", '"').strip()
+    if not text_clean:
+        raise HTTPException(status_code=400, detail="Bo'sh matn")
+        
+    chosen_voice = voice or TTS_VOICE_MAP.get(lang.lower(), "uz-UZ-MadinaNeural")
+    cache_key = hashlib.md5(f"{chosen_voice}:{text_clean}".encode("utf-8")).hexdigest()
+    
+    if cache_key in _tts_cache:
+        return Response(
+            content=_tts_cache[cache_key],
+            media_type="audio/mpeg",
+            headers={
+                "Cache-Control": "public, max-age=604800, immutable",
+                "Content-Disposition": "inline; filename=speech.mp3"
+            }
+        )
+        
+    try:
+        import edge_tts
+        comm = edge_tts.Communicate(text_clean, chosen_voice, rate="-2%")
+        chunks = []
+        async for chunk in comm.stream():
+            if chunk["type"] == "audio":
+                chunks.append(chunk["data"])
+        audio_bytes = b"".join(chunks)
+        if audio_bytes:
+            if len(_tts_cache) > 500:
+                _tts_cache.clear()
+            _tts_cache[cache_key] = audio_bytes
+            return Response(
+                content=audio_bytes,
+                media_type="audio/mpeg",
+                headers={
+                    "Cache-Control": "public, max-age=604800, immutable",
+                    "Content-Disposition": "inline; filename=speech.mp3"
+                }
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Audio generatsiya qilinmadi")
+    except Exception as e:
+        print(f"TTS xatosi: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/quiz/session")
 @app.post("/api/quiz/session")
