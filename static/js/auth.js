@@ -1,7 +1,112 @@
 /**
- * ZOOVENTURE — Login va Parol orqali Kirish Tizimi
+ * ZOOVENTURE — Foydalanuvchi va Admin Kirish / Ro'yxatdan o'tish tizimi
+ * 
+ * Birinchi tashrif buyuruvchi o'zi yangi login va parol o'rnatadi.
+ * Keyingi barcha tashriflarda aynan o'sha login va paroli bilan kiradi.
  */
 
+// Tablar orasida o'tish (Kirish <-> Birinchi marta kirish)
+function switchAuthTab(tab) {
+    const tabLogin = document.getElementById('tabBtnLogin');
+    const tabRegister = document.getElementById('tabBtnRegister');
+    const formLogin = document.getElementById('formLogin');
+    const formRegister = document.getElementById('formRegister');
+    const loginError = document.getElementById('loginError');
+    const registerError = document.getElementById('registerError');
+    const registerSuccess = document.getElementById('registerSuccess');
+
+    if (loginError) loginError.style.display = 'none';
+    if (registerError) registerError.style.display = 'none';
+    if (registerSuccess) registerSuccess.style.display = 'none';
+
+    if (tab === 'register') {
+        if (formLogin) formLogin.style.display = 'none';
+        if (formRegister) {
+            formRegister.style.display = 'block';
+            formRegister.animate([
+                { opacity: 0, transform: 'translateY(8px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+            ], { duration: 250, fill: 'forwards' });
+        }
+
+        if (tabRegister) {
+            tabRegister.style.background = '#10b981';
+            tabRegister.style.color = '#ffffff';
+            tabRegister.style.boxShadow = '0 2px 10px rgba(16, 185, 129, 0.4)';
+        }
+        if (tabLogin) {
+            tabLogin.style.background = 'transparent';
+            tabLogin.style.color = '#94a3b8';
+            tabLogin.style.boxShadow = 'none';
+        }
+
+        const regUser = document.getElementById('reg_user');
+        if (regUser && !regUser.value) regUser.focus();
+    } else {
+        if (formRegister) formRegister.style.display = 'none';
+        if (formLogin) {
+            formLogin.style.display = 'block';
+            formLogin.animate([
+                { opacity: 0, transform: 'translateY(8px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+            ], { duration: 250, fill: 'forwards' });
+        }
+
+        if (tabLogin) {
+            tabLogin.style.background = '#10b981';
+            tabLogin.style.color = '#ffffff';
+            tabLogin.style.boxShadow = '0 2px 10px rgba(16, 185, 129, 0.4)';
+        }
+        if (tabRegister) {
+            tabRegister.style.background = 'transparent';
+            tabRegister.style.color = '#94a3b8';
+            tabRegister.style.boxShadow = 'none';
+        }
+
+        const loginUser = document.getElementById('login_user');
+        const loginPass = document.getElementById('login_pass');
+        if (loginUser && loginUser.value && loginPass) {
+            loginPass.focus();
+        } else if (loginUser) {
+            loginUser.focus();
+        }
+    }
+}
+
+// Parolni ko'rsatish yoki yashirish
+function togglePasswordVisibility(inputId, triggerEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    if (triggerEl) {
+        triggerEl.innerHTML = isPass ? 'Yashirish 🔒' : "Ko'rsatish 👁️";
+    }
+}
+
+// Foydalanuvchi topilmaganda bir martalik o'tish yordamchisi
+function switchToRegisterWithUser(username) {
+    switchAuthTab('register');
+    const regUser = document.getElementById('reg_user');
+    const regPass = document.getElementById('reg_pass');
+    if (regUser) {
+        regUser.value = username;
+    }
+    if (regPass) {
+        regPass.focus();
+    }
+}
+
+function getQueryRedirect() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('redirect') || '/';
+    } catch (_) {
+        return '/';
+    }
+}
+
+// 1. Tizimga Kirish (Doimiy login)
 function submitLogin(e) {
     if (e) e.preventDefault();
 
@@ -15,7 +120,7 @@ function submitLogin(e) {
 
     if (!username || !password) {
         if (errorEl) {
-            errorEl.innerText = "Iltimos, login va parolni to'liq kiriting!";
+            errorEl.innerHTML = "<span>⚠️ Iltimos, login va parolni to'liq kiriting!</span>";
             errorEl.style.display = 'block';
         }
         return;
@@ -27,19 +132,26 @@ function submitLogin(e) {
     }
     if (errorEl) errorEl.style.display = 'none';
 
-    fetch('/api/auth/admin-login', {
+    fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             username: username,
-            password: password
+            password: password,
+            redirect: getQueryRedirect()
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            const isAdmin = data.role === 'admin' || (data.user && data.user.role === 'admin');
-            const msg = isAdmin ? "ADMIN TASDIQLANDI... BOSHQARUV PANELIGA O'TILMOQDA!" : 'TASDIQLANDI... XUSH KELIBSIZ!';
+            // Muvaffaqiyatli kirilganda loginni eslab qolish
+            try {
+                localStorage.setItem('zooventure_saved_username', username);
+            } catch (_) {}
+
+            const role = data.role || (data.user && data.user.role) || 'user';
+            const isAdmin = role === 'admin';
+            const msg = isAdmin ? "ADMINISTRATOR TASDIQLANDI... XUSH KELIBSIZ!" : 'IDENTIFIKATSIYA TASDIQLANDI... XUSH KELIBSIZ!';
             playEntranceTransition(msg, data.redirect || (isAdmin ? '/admin' : '/'));
         } else {
             if (btn) {
@@ -47,7 +159,17 @@ function submitLogin(e) {
                 btn.innerHTML = 'Tizimga Kirish 🔓';
             }
             if (errorEl) {
-                errorEl.innerText = data.message || "Login yoki parol noto'g'ri!";
+                if (data.user_exists === false) {
+                    const safeUser = username.replace(/"/g, '&quot;').replace(/'/g, "\'");
+                    errorEl.innerHTML = `
+                        <div style="margin-bottom: 0.6rem;">${data.message || 'Bunday login topilmadi!'}</div>
+                        <button type="button" onclick="switchToRegisterWithUser('${safeUser}')" style="width: 100%; padding: 0.6rem 0.8rem; background: #10b981; border: none; border-radius: 7px; color: #ffffff; font-weight: 700; cursor: pointer; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                            <span>✨</span> <span>'${username}' bilan yangi login yaratish</span>
+                        </button>
+                    `;
+                } else {
+                    errorEl.innerHTML = `<span>⚠️ ${data.message || "Login yoki parol noto'g'ri!"}</span>`;
+                }
                 errorEl.style.display = 'block';
                 errorEl.animate([
                     { transform: 'translateX(-6px)' },
@@ -65,12 +187,123 @@ function submitLogin(e) {
             btn.innerHTML = 'Tizimga Kirish 🔓';
         }
         if (errorEl) {
-            errorEl.innerText = "Server bilan aloqa xatosi! Qaytadan urinib ko'ring.";
+            errorEl.innerHTML = "<span>⚠️ Server bilan aloqa xatosi! Qaytadan urinib ko'ring.</span>";
             errorEl.style.display = 'block';
         }
     });
 }
 
+// 2. Birinchi marta kirish (Yangi login va parol o'rnatish)
+function submitRegister(e) {
+    if (e) e.preventDefault();
+
+    const userInput = document.getElementById('reg_user');
+    const nameInput = document.getElementById('reg_name');
+    const passInput = document.getElementById('reg_pass');
+    const passConfirmInput = document.getElementById('reg_pass_confirm');
+    const errorEl = document.getElementById('registerError');
+    const successEl = document.getElementById('registerSuccess');
+    const btn = document.getElementById('btnRegisterSubmit');
+
+    const username = userInput ? userInput.value.trim() : '';
+    const name = nameInput ? nameInput.value.trim() : '';
+    const password = passInput ? passInput.value.trim() : '';
+    const passwordConfirm = passConfirmInput ? passConfirmInput.value.trim() : '';
+
+    if (errorEl) errorEl.style.display = 'none';
+    if (successEl) successEl.style.display = 'none';
+
+    if (!username) {
+        showRegisterError("Iltimos, o'zingiz uchun yangi login kiriting!");
+        if (userInput) userInput.focus();
+        return;
+    }
+
+    if (username.length < 3) {
+        showRegisterError("Login kamida 3 ta belgidan iborat bo'lishi kerak!");
+        if (userInput) userInput.focus();
+        return;
+    }
+
+    if (!password) {
+        showRegisterError("Iltimos, parol kiriting!");
+        if (passInput) passInput.focus();
+        return;
+    }
+
+    if (password.length < 4) {
+        showRegisterError("Parol kamida 4 ta belgidan iborat bo'lishi kerak!");
+        if (passInput) passInput.focus();
+        return;
+    }
+
+    if (password !== passwordConfirm) {
+        showRegisterError("Kiritilgan parollar bir-biriga mos kelmadi! Qaytadan tekshiring.");
+        if (passConfirmInput) passConfirmInput.focus();
+        return;
+    }
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Saqlanmoqda... ⏳';
+    }
+
+    fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            name: name,
+            redirect: getQueryRedirect()
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            try {
+                localStorage.setItem('zooventure_saved_username', username);
+            } catch (_) {}
+
+            if (successEl) {
+                successEl.innerHTML = `✅ <strong>Ajoyib!</strong> Yangi login va parolingiz muvaffaqiyatli o'rnatildi. Keyingi safar doim ushbu login (${username}) bilan kirasiz.`;
+                successEl.style.display = 'block';
+            }
+
+            playEntranceTransition("LOGIN VA PAROLINGIZ SAQLANDI! TIZIMGA KIRILMOQDA...", data.redirect || getQueryRedirect() || '/');
+        } else {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Login va Parolni Saqlash ✨';
+            }
+            showRegisterError(data.message || "Ro'yxatdan o'tishda xatolik yuz berdi.");
+        }
+    })
+    .catch(() => {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Login va Parolni Saqlash ✨';
+        }
+        showRegisterError("Server bilan aloqa xatosi! Internet aloqasini tekshiring.");
+    });
+}
+
+function showRegisterError(msg) {
+    const errorEl = document.getElementById('registerError');
+    if (errorEl) {
+        errorEl.innerHTML = `<span>⚠️ ${msg}</span>`;
+        errorEl.style.display = 'block';
+        errorEl.animate([
+            { transform: 'translateX(-6px)' },
+            { transform: 'translateX(6px)' },
+            { transform: 'translateX(-4px)' },
+            { transform: 'translateX(4px)' },
+            { transform: 'translateX(0)' }
+        ], { duration: 300 });
+    }
+}
+
+// 3. Mehmon (Demo) kirish
 function loginAsDemo(role, e) {
     const btn = (e && e.target) || (window.event ? window.event.target : null);
     if (btn) btn.innerHTML = 'Kirilmoqda... ⏳';
@@ -96,6 +329,7 @@ function loginAsDemo(role, e) {
     });
 }
 
+// Kirish o'tish animatsiyasi
 function playEntranceTransition(customText, customRedirect) {
     const overlay = document.getElementById('aiSplashOverlay');
     if (overlay) {
@@ -104,17 +338,34 @@ function playEntranceTransition(customText, customRedirect) {
         if (status) status.innerText = customText || 'AI IDENTIFIKATSIYA TASDIQLANDI... XUSH KELIBSIZ!';
     }
     setTimeout(() => {
-        if (customRedirect) {
-            window.location.href = customRedirect;
-            return;
-        }
         const urlParams = new URLSearchParams(window.location.search);
-        const redirect = urlParams.get('redirect') || '/';
+        const redirect = urlParams.get('redirect') || customRedirect || '/';
         window.location.href = redirect;
     }, 1200);
 }
 
-window.onload = function() {
+// Sahifa yuklanganda: saqlangan loginni avtomatik to'ldirish
+document.addEventListener('DOMContentLoaded', function() {
+    let savedUser = '';
+    try {
+        savedUser = localStorage.getItem('zooventure_saved_username') || '';
+    } catch (_) {}
+
     const userInput = document.getElementById('login_user');
-    if (userInput) userInput.focus();
-};
+    const passInput = document.getElementById('login_pass');
+
+    if (savedUser && userInput) {
+        userInput.value = savedUser;
+        if (passInput) passInput.focus();
+    } else if (userInput) {
+        userInput.focus();
+    }
+
+    // URL parametrlari bo'yicha tab tanlash
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'register' || window.location.hash === '#register') {
+            switchAuthTab('register');
+        }
+    } catch (_) {}
+});

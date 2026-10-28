@@ -136,43 +136,117 @@
         </div>
 
         <!-- ================= MARKAZIY KIRISH PANELI ================= -->
-        <div class="gateway-hero-card">
+        <div class="gateway-hero-card" style="max-height: 94vh; overflow-y: auto; padding: 2.2rem 2.2rem;">
             
-            <img src="/static/images/logo.png" alt="Zooventure Logo" style="width: 110px; height: auto; margin: 0 auto 0.8rem; display: block; filter: drop-shadow(0 4px 18px rgba(16, 185, 129, 0.45));">
+            <img src="/static/images/logo.png" alt="Zooventure Logo" style="width: 96px; height: auto; margin: 0 auto 0.6rem; display: block; filter: drop-shadow(0 4px 18px rgba(16, 185, 129, 0.45));">
 
-            <div class="gateway-badge">
+            <div class="gateway-badge" style="margin-bottom: 0.7rem;">
                 <span>🔐</span> {{ t('login_title') }}
             </div>
 
-            <h1 class="gateway-title">Zooventure</h1>
-            <p class="gateway-desc">
-                {{ t('login_desc') }}
+            <h1 class="gateway-title" style="margin-bottom: 0.3rem; font-size: 2rem;">Zooventure</h1>
+            <p class="gateway-desc" style="margin-bottom: 1.1rem; font-size: 0.88rem; line-height: 1.4;">
+                O'zingiz belgilagan login va parol bilan kiring yoki birinchi marta yangi login o'rnating.
             </p>
 
-            <!-- LOGIN VA PAROL FORMASI -->
-            <form onsubmit="submitLogin(event)" style="text-align: left; margin-top: 1.5rem;">
-                <div style="margin-bottom: 1.1rem;">
-                    <label for="login_user" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">{{ t('admin_user') }}:</label>
-                    <input type="text" id="login_user" class="form-control" required placeholder="admin" autocomplete="username">
-                </div>
-
-                <div style="margin-bottom: 1.3rem;">
-                    <label for="login_pass" style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 500;">{{ t('admin_pass') }}:</label>
-                    <input type="password" id="login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password">
-                </div>
-
-                <div id="loginError" style="display: none; font-size: 0.82rem; color: #f87171; margin-bottom: 1.2rem; background: rgba(239, 68, 68, 0.15); padding: 0.65rem 0.9rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
-
-                <button type="submit" id="btnLoginSubmit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
-                    {{ t('login_title') }} 🔓
+            <!-- TABS: TIZIMGA KIRISH / BIRINCHI MARTA KIRISH -->
+            <div class="auth-tabs-nav" style="display: flex; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 4px; margin-bottom: 1.2rem; gap: 4px;">
+                <button type="button" id="tabBtnLogin" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.65rem 0.6rem; font-size: 0.88rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; background: #10b981; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 0.45rem; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);">
+                    <span>🔑</span> <span>Tizimga kirish</span>
                 </button>
-            </form>
-
-            <div style="margin-top: 1.3rem; font-size: 0.82rem; text-align: center;">
-                <a href="javascript:void(0)" onclick="loginAsDemo('user')" style="color: #94a3b8; text-decoration: underline;">⚡ Demo Access (Mehmon rejimi)</a>
+                <button type="button" id="tabBtnRegister" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.65rem 0.6rem; font-size: 0.88rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; background: transparent; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                    <span>✨</span> <span>Birinchi marta kirish</span>
+                </button>
             </div>
 
-            <div style="margin-top: 1.5rem; font-size: 0.78rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <!-- 1. TIZIMGA KIRISH FORMASI (Doimiy tashrif buyuruvchilar uchun) -->
+            <form id="formLogin" onsubmit="submitLogin(event)" style="text-align: left;">
+                <div style="margin-bottom: 0.95rem;">
+                    <label for="login_user" style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem; font-weight: 600;">
+                        {{ t('admin_user') }}:
+                    </label>
+                    <input type="text" id="login_user" class="form-control" required placeholder="Masalan: admin yoki o'z loginigiz" autocomplete="username" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 1.1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <label for="login_pass" style="font-size: 0.82rem; color: #cbd5e1; font-weight: 600;">
+                            {{ t('admin_pass') }}:
+                        </label>
+                        <a href="javascript:void(0)" onclick="togglePasswordVisibility('login_pass', this)" style="font-size: 0.76rem; color: #10b981; text-decoration: none;">Ko'rsatish 👁️</a>
+                    </div>
+                    <input type="password" id="login_pass" class="form-control" required placeholder="••••••••" autocomplete="current-password" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div id="loginError" style="display: none; font-size: 0.82rem; color: #fca5a5; margin-bottom: 1rem; background: rgba(239, 68, 68, 0.16); padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.35); line-height: 1.4;"></div>
+
+                <button type="submit" id="btnLoginSubmit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.88rem; font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); border-radius: 9px; cursor: pointer;">
+                    {{ t('login_title') }} 🔓
+                </button>
+
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; color: #94a3b8;">
+                    Birinchi marta kiryapsizmi? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: #34d399; font-weight: 600; text-decoration: underline;">Bu yerda yangi login va parol o'rnating</a>
+                </div>
+            </form>
+
+            <!-- 2. BIRINCHI MARTA KIRISH FORMASI (Yangi login o'rnatuvchilar uchun) -->
+            <form id="formRegister" onsubmit="submitRegister(event)" style="text-align: left; display: none;">
+                
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 0.75rem 0.9rem; margin-bottom: 1.1rem; display: flex; gap: 0.6rem; align-items: flex-start;">
+                    <span style="font-size: 1.1rem; line-height: 1;">💡</span>
+                    <span style="font-size: 0.78rem; color: #d1fae5; line-height: 1.35;">
+                        <strong>Birinchi kirish:</strong> O'zingiz uchun qulay login va parol o'rnating. Keyingi barcha tashriflaringizda doim ushbu login va parolingiz bilan kirasiz!
+                    </span>
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label for="reg_user" style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem; font-weight: 600;">
+                        Yangi Login (Foydalanuvchi nomi) <span style="color: #10b981;">*</span>:
+                    </label>
+                    <input type="text" id="reg_user" class="form-control" required placeholder="Masalan: sherzod, nodirbek yoki admin" autocomplete="username" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label for="reg_name" style="display: block; font-size: 0.82rem; color: #94a3b8; margin-bottom: 0.35rem; font-weight: 500;">
+                        Ism yoki Taxallusingiz (ixtiyoriy):
+                    </label>
+                    <input type="text" id="reg_name" class="form-control" placeholder="Masalan: Jasur Komilov" autocomplete="name" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <label for="reg_pass" style="font-size: 0.82rem; color: #cbd5e1; font-weight: 600;">
+                            Yangi Parol <span style="color: #10b981;">*</span>:
+                        </label>
+                        <a href="javascript:void(0)" onclick="togglePasswordVisibility('reg_pass', this)" style="font-size: 0.76rem; color: #10b981; text-decoration: none;">Ko'rsatish 👁️</a>
+                    </div>
+                    <input type="password" id="reg_pass" class="form-control" required placeholder="Kamida 4 ta belgi" autocomplete="new-password" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 1.1rem;">
+                    <label for="reg_pass_confirm" style="display: block; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem; font-weight: 600;">
+                        Parolni tasdiqlang <span style="color: #10b981;">*</span>:
+                    </label>
+                    <input type="password" id="reg_pass_confirm" class="form-control" required placeholder="Parolni qayta kiriting" autocomplete="new-password" style="width: 100%; padding: 0.75rem 0.9rem; font-size: 0.95rem;">
+                </div>
+
+                <div id="registerError" style="display: none; font-size: 0.82rem; color: #fca5a5; margin-bottom: 1rem; background: rgba(239, 68, 68, 0.16); padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.35); line-height: 1.4;"></div>
+                <div id="registerSuccess" style="display: none; font-size: 0.82rem; color: #86efac; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.16); padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.35); line-height: 1.4;"></div>
+
+                <button type="submit" id="btnRegisterSubmit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.88rem; font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); border-radius: 9px; cursor: pointer;">
+                    Login va Parolni Saqlash ✨
+                </button>
+
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; color: #94a3b8;">
+                    Allaqachon login o'rnatganmisiz? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: #34d399; font-weight: 600; text-decoration: underline;">Tizimga kirish bo'limiga o'tish</a>
+                </div>
+            </form>
+
+            <div style="margin-top: 1.2rem; font-size: 0.82rem; text-align: center;">
+                <a href="javascript:void(0)" onclick="loginAsDemo('user')" style="color: #94a3b8; text-decoration: underline;">⚡ Demo Access (Mehmon sifatida sinab ko'rish)</a>
+            </div>
+
+            <div style="margin-top: 1.2rem; font-size: 0.78rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                 <span>⚡ {{ t('footer_rights') }}</span>
             </div>
 

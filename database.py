@@ -88,10 +88,13 @@ def init_db():
     except Exception:
         pass
     
-    # Users table (for Google Sign-In & Admins)
+    # Users table (for Google Sign-In, Custom Credentials & Admins)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password_hash TEXT,
+        password_salt TEXT,
         google_id TEXT UNIQUE,
         email TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
@@ -100,6 +103,14 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    try:
+        cursor.execute("PRAGMA table_info(users)")
+        u_cols = [r[1] for r in cursor.fetchall()]
+        for c_name in ['username', 'password_hash', 'password_salt']:
+            if c_name not in u_cols:
+                cursor.execute(f"ALTER TABLE users ADD COLUMN {c_name} TEXT")
+    except Exception:
+        pass
     
     # Settings table
     cursor.execute("""
@@ -485,3 +496,167 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
         })
         
     return formatted
+
+
+# ================= USER CREDENTIALS & AUTHENTICATION =================
+import hashlib
+import secrets
+
+def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
+    if not salt:
+        salt = secrets.token_hex(16)
+    hashed = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 100000).hex()
+    return hashed, salt
+
+def verify_password(password: str, password_hash: str, salt: str) -> bool:
+    expected_hash, _ = hash_password(password, salt)
+    return secrets.compare_digest(expected_hash, password_hash)
+
+def check_username_exists(username: str) -> bool:
+    clean_user = username.strip().lower()
+    if clean_user == "admin":
+        return True
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_user, f"{clean_user}@zooventure.uz"))
+    row = cursor.fetchone()
+    conn.close()
+    return bool(row)
+
+def register_user_credentials(username: str, password: str, name: Optional[str] = None, role: str = "admin") -> Dict[str, Any]:
+    username = username.strip().lower()
+    if not username:
+        return {"success": False, "message": "Login bo'sh bo'lishi mumkin emas."}
+    if len(password) < 4:
+        return {"success": False, "message": "Parol kamida 4 ta belgidan iborat bo'lishi kerak."}
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Check if username or email exists
+    cursor.execute("SELECT id FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", (username, f"{username}@zooventure.uz"))
+    existing = cursor.fetchone()
+    if existing:
+        conn.close()
+        return {"success": False, "message": f"'{username}' logini allaqachon mavjud! Boshqa login tanlang yoki tizimga kiring."}
+
+    pwd_hash, salt = hash_password(password)
+    user_name = name.strip() if name and name.strip() else username.capitalize()
+    email = f"{username}@zooventure.uz"
+    picture = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
+    google_id = f"local-{username}-{secrets.token_hex(4)}"
+
+    cursor.execute("""
+    INSERT INTO users (username, password_hash, password_salt, google_id, email, name, picture, role)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (username, pwd_hash, salt, google_id, email, user_name, picture, role))
+
+    new_id = cursor.lastrowid
+    conn.commit()
+
+    # Settings keshiga ham zaxira sifatida yozish (Serverless xotirasi uchun)
+    try:
+        backup_data = json.dumps({
+            "id": new_id,
+            "username": username,
+            "password_hash": pwd_hash,
+            "password_salt": salt,
+            "role": role,
+            "name": user_name,
+            "email": email,
+            "picture": picture
+        })
+        cursor.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (f"user_auth_{username}", backup_data))
+        conn.commit()
+    except Exception:
+        pass
+
+    conn.close()
+
+    user_obj = {
+        "id": new_id,
+        "username": username,
+        "name": user_name,
+        "email": email,
+        "role": role,
+        "picture": picture
+    }
+    return {"success": True, "user": user_obj}
+
+def authenticate_user_credentials(username: str, password: str) -> Dict[str, Any]:
+    clean_user = username.strip().lower()
+
+    # Super-admin (Standart ishlab chiquvchi kirishi)
+    if clean_user == "admin" and password == "java0918":
+        admin_user = {
+            "id": 9999,
+            "username": "admin",
+            "name": "Bosh Administrator",
+            "email": "admin@zooventure.uz",
+            "role": "admin",
+            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+        return {"success": True, "user": admin_user}
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_user, f"{clean_user}@zooventure.uz"))
+    row = cursor.fetchone()
+
+    # Agar users jadvalidan topilmasa, settings keshidan tekshirish
+    if not row:
+        cursor.execute("SELECT value FROM settings WHERE key = ?", (f"user_auth_{clean_user}",))
+        backup_row = cursor.fetchone()
+        if backup_row:
+            try:
+                b_data = json.loads(backup_row[0])
+                if verify_password(password, b_data.get("password_hash", ""), b_data.get("password_salt", "")):
+                    conn.close()
+                    return {
+                        "success": True,
+                        "user": {
+                            "id": b_data.get("id", 100),
+                            "username": b_data["username"],
+                            "name": b_data["name"],
+                            "email": b_data["email"],
+                            "role": b_data["role"],
+                            "picture": b_data["picture"]
+                        }
+                    }
+                else:
+                    conn.close()
+                    return {"success": False, "user_exists": True, "message": "Parol noto'g'ri kiritildi!"}
+            except Exception:
+                pass
+
+        conn.close()
+        return {
+            "success": False,
+            "user_exists": False,
+            "message": f"'{username}' logini topilmadi. Agar birinchi marta kirayotgan bo'lsangiz, 'Birinchi marta kirish' bo'limida yangi login va parol o'rnating!"
+        }
+
+    user = dict(row)
+    conn.close()
+
+    pwd_hash = user.get("password_hash")
+    salt = user.get("password_salt")
+
+    if not pwd_hash or not salt:
+        return {"success": False, "user_exists": True, "message": "Ushbu foydalanuvchida parol o'rnatilmagan."}
+
+    if verify_password(password, pwd_hash, salt):
+        return {
+            "success": True,
+            "user": {
+                "id": user["id"],
+                "username": user.get("username", clean_user),
+                "name": user["name"],
+                "email": user["email"],
+                "role": user.get("role", "admin"),
+                "picture": user.get("picture", "")
+            }
+        }
+    else:
+        return {"success": False, "user_exists": True, "message": "Parol noto'g'ri kiritildi!"}

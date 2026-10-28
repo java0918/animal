@@ -14,7 +14,8 @@ import aiofiles
 from database import (
     init_db, get_all_animals, get_animals_count, get_animal_by_id, insert_animal,
     update_animal, delete_animal, get_or_create_user, get_all_users,
-    get_stats, get_connection, get_random_quizzes, get_quizzes_total_count
+    get_stats, get_connection, get_random_quizzes, get_quizzes_total_count,
+    register_user_credentials, authenticate_user_credentials, check_username_exists
 )
 from ai_service import ask_ai
 from audio_resolver import resolve_animal_audio
@@ -222,35 +223,76 @@ async def admin_login(request: Request, response: Response):
     data = await request.json()
     username = data.get("username", "").strip()
     password = data.get("password", "").strip()
+    custom_redirect = data.get("redirect", "").strip()
     
-    if username == "admin" and password == "java0918":
-        admin_user = {
-            "id": 9999,
-            "google_id": "system-admin-01",
-            "email": "admin@zooventure.uz",
-            "name": "Bosh Administrator",
-            "picture": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-            "role": "admin"
-        }
-        get_or_create_user(
-            google_id=admin_user["google_id"],
-            email=admin_user["email"],
-            name=admin_user["name"],
-            picture=admin_user["picture"],
-            role="admin"
-        )
+    if not username or not password:
+        return JSONResponse({"success": False, "message": "Iltimos, login va parolni kiriting!"}, status_code=400)
+        
+    auth_res = authenticate_user_credentials(username, password)
+    if auth_res.get("success"):
+        user = auth_res["user"]
+        is_admin = user.get("role") == "admin"
+        if custom_redirect:
+            redirect_url = custom_redirect
+        elif is_admin and username.lower() == "admin":
+            redirect_url = "/admin"
+        else:
+            redirect_url = "/"
+
         res = JSONResponse({
             "success": True,
-            "user": admin_user,
-            "role": "admin",
-            "redirect": "/admin"
+            "user": user,
+            "role": user.get("role", "admin"),
+            "redirect": redirect_url
         })
-        cookie_val = urllib.parse.quote(json.dumps(admin_user))
+        cookie_val = urllib.parse.quote(json.dumps(user))
         for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
-            res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 7, samesite="lax", path="/")
+            res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax", path="/")
         return res
     else:
-        return JSONResponse({"success": False, "message": "Login yoki parol noto'g'ri!"}, status_code=401)
+        return JSONResponse({
+            "success": False,
+            "user_exists": auth_res.get("user_exists", True),
+            "message": auth_res.get("message", "Login yoki parol noto'g'ri!")
+        }, status_code=401)
+
+@app.post("/api/auth/register")
+@app.post("/api/auth/setup-credentials")
+async def register_credentials_endpoint(request: Request, response: Response):
+    data = await request.json()
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
+    name = data.get("name", "").strip()
+    custom_redirect = data.get("redirect", "").strip()
+    
+    if not username or not password:
+        return JSONResponse({"success": False, "message": "Login va parol kiritilishi shart!"}, status_code=400)
+        
+    reg_res = register_user_credentials(username, password, name=name, role="admin")
+    if reg_res.get("success"):
+        user = reg_res["user"]
+        redirect_url = custom_redirect if custom_redirect else "/"
+        res = JSONResponse({
+            "success": True,
+            "user": user,
+            "role": user.get("role", "admin"),
+            "redirect": redirect_url,
+            "message": "Login va parolingiz muvaffaqiyatli saqlandi!"
+        })
+        cookie_val = urllib.parse.quote(json.dumps(user))
+        for k in ["zooventure_session", "animind_session", "animora_session", "fauna_session"]:
+            res.set_cookie(key=k, value=cookie_val, httponly=True, max_age=86400 * 30, samesite="lax", path="/")
+        return res
+    else:
+        return JSONResponse({
+            "success": False,
+            "message": reg_res.get("message", "Ro'yxatdan o'tishda xatolik!")
+        }, status_code=400)
+
+@app.get("/api/auth/check-username")
+async def check_username_endpoint(username: str):
+    exists = check_username_exists(username)
+    return JSONResponse({"exists": exists})
 
 @app.post("/api/auth/demo-login")
 async def demo_login(request: Request, response: Response):
