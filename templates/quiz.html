@@ -291,11 +291,13 @@ function toggleQuizSpeech() {
     const audio = new Audio();
     currentQuizAudio = audio;
 
-    audio.onplaying = function() {
+    const markPlaying = function() {
         isQuizSpeechLoading = false;
         isQuizSpeechActive = true;
         updateQuizSoundUI('playing');
     };
+    audio.onplay = markPlaying;
+    audio.onplaying = markPlaying;
 
     audio.onended = function() {
         stopQuizSpeech();
@@ -359,6 +361,15 @@ function renderQuestion() {
     const soundWrap = document.getElementById('soundCueWrap');
     if (soundWrap) {
         soundWrap.style.display = 'block';
+    }
+
+    // Navbatdagi savol audiosini oldindan keshga yuklab qo'yish (Bosilganda bir zumda yangrashi uchun)
+    if (q.audioUrl) {
+        try {
+            const preloader = new Audio();
+            preloader.src = q.audioUrl;
+            preloader.preload = 'auto';
+        } catch (_) {}
     }
 
     // Variantlar
