@@ -634,7 +634,7 @@ def authenticate_user_credentials(username: str, password: str) -> Dict[str, Any
         return {
             "success": False,
             "user_exists": False,
-            "message": f"'{username}' logini topilmadi. Agar birinchi marta kirayotgan bo'lsangiz, 'Birinchi marta kirish' bo'limida yangi login va parol o'rnating!"
+            "message": f"'{username}' logini topilmadi. Ro'yxatdan o'tish bo'limida yangi hisob yarating!"
         }
 
     user = dict(row)

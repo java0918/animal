@@ -1,11 +1,8 @@
 /**
  * ZOOVENTURE — Foydalanuvchi va Admin Kirish / Ro'yxatdan o'tish tizimi
- * 
- * Birinchi tashrif buyuruvchi o'zi yangi login va parol o'rnatadi.
- * Keyingi barcha tashriflarda aynan o'sha login va paroli bilan kiradi.
  */
 
-// Tablar orasida o'tish (Kirish <-> Birinchi marta kirish)
+// Tablar orasida o'tish (Tizimga kirish <-> Ro'yxatdan o'tish)
 function switchAuthTab(tab) {
     const tabLogin = document.getElementById('tabBtnLogin');
     const tabRegister = document.getElementById('tabBtnRegister');
@@ -84,7 +81,7 @@ function togglePasswordVisibility(inputId, triggerEl) {
     }
 }
 
-// Foydalanuvchi topilmaganda bir martalik o'tish yordamchisi
+// Foydalanuvchi topilmaganda ro'yxatdan o'tishga tezkor o'tish
 function switchToRegisterWithUser(username) {
     switchAuthTab('register');
     const regUser = document.getElementById('reg_user');
@@ -106,7 +103,7 @@ function getQueryRedirect() {
     }
 }
 
-// 1. Tizimga Kirish (Doimiy login)
+// 1. Tizimga Kirish
 function submitLogin(e) {
     if (e) e.preventDefault();
 
@@ -120,7 +117,7 @@ function submitLogin(e) {
 
     if (!username || !password) {
         if (errorEl) {
-            errorEl.innerHTML = "<span>⚠️ Iltimos, login va parolni to'liq kiriting!</span>";
+            errorEl.innerHTML = "<span>⚠️ Iltimos, login va parolni kiriting!</span>";
             errorEl.style.display = 'block';
         }
         return;
@@ -144,7 +141,6 @@ function submitLogin(e) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Muvaffaqiyatli kirilganda loginni eslab qolish
             try {
                 localStorage.setItem('zooventure_saved_username', username);
             } catch (_) {}
@@ -164,7 +160,7 @@ function submitLogin(e) {
                     errorEl.innerHTML = `
                         <div style="margin-bottom: 0.6rem;">${data.message || 'Bunday login topilmadi!'}</div>
                         <button type="button" onclick="switchToRegisterWithUser('${safeUser}')" style="width: 100%; padding: 0.6rem 0.8rem; background: #10b981; border: none; border-radius: 7px; color: #ffffff; font-weight: 700; cursor: pointer; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                            <span>✨</span> <span>'${username}' bilan yangi login yaratish</span>
+                            <span>✨</span> <span>'${username}' nomi bilan ro'yxatdan o'tish</span>
                         </button>
                     `;
                 } else {
@@ -193,7 +189,7 @@ function submitLogin(e) {
     });
 }
 
-// 2. Birinchi marta kirish (Yangi login va parol o'rnatish)
+// 2. Ro'yxatdan O'tish
 function submitRegister(e) {
     if (e) e.preventDefault();
 
@@ -214,7 +210,7 @@ function submitRegister(e) {
     if (successEl) successEl.style.display = 'none';
 
     if (!username) {
-        showRegisterError("Iltimos, o'zingiz uchun yangi login kiriting!");
+        showRegisterError("Iltimos, login kiriting!");
         if (userInput) userInput.focus();
         return;
     }
@@ -238,14 +234,14 @@ function submitRegister(e) {
     }
 
     if (password !== passwordConfirm) {
-        showRegisterError("Kiritilgan parollar bir-biriga mos kelmadi! Qaytadan tekshiring.");
+        showRegisterError("Kiritilgan parollar bir-biriga mos kelmadi!");
         if (passConfirmInput) passConfirmInput.focus();
         return;
     }
 
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = 'Saqlanmoqda... ⏳';
+        btn.innerHTML = "Ro'yxatdan o'tilmoqda... ⏳";
     }
 
     fetch('/api/auth/register', {
@@ -266,15 +262,15 @@ function submitRegister(e) {
             } catch (_) {}
 
             if (successEl) {
-                successEl.innerHTML = `✅ <strong>Ajoyib!</strong> Yangi login va parolingiz muvaffaqiyatli o'rnatildi. Keyingi safar doim ushbu login (${username}) bilan kirasiz.`;
+                successEl.innerHTML = `✅ <strong>Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!</strong> Tizimga kirilmoqda...`;
                 successEl.style.display = 'block';
             }
 
-            playEntranceTransition("LOGIN VA PAROLINGIZ SAQLANDI! TIZIMGA KIRILMOQDA...", data.redirect || getQueryRedirect() || '/');
+            playEntranceTransition("RO'YXATDAN O'TISH MUVAFFAQIYATLI YAKUNLANDI... XUSH KELIBSIZ!", data.redirect || getQueryRedirect() || '/');
         } else {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = 'Login va Parolni Saqlash ✨';
+                btn.innerHTML = "Ro'yxatdan o'tish ✨";
             }
             showRegisterError(data.message || "Ro'yxatdan o'tishda xatolik yuz berdi.");
         }
@@ -282,7 +278,7 @@ function submitRegister(e) {
     .catch(() => {
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = 'Login va Parolni Saqlash ✨';
+            btn.innerHTML = "Ro'yxatdan o'tish ✨";
         }
         showRegisterError("Server bilan aloqa xatosi! Internet aloqasini tekshiring.");
     });
@@ -361,7 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
         userInput.focus();
     }
 
-    // URL parametrlari bo'yicha tab tanlash
     try {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'register' || window.location.hash === '#register') {
