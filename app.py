@@ -105,7 +105,7 @@ class ClosedPortalMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         
         # Public paths: static assets, login page, auth API endpoints, language switch
-        public_prefixes = ["/static", "/login", "/api/auth", "/set-lang", "/api/tts"]
+        public_prefixes = ["/static", "/login", "/api/auth", "/set-lang", "/api/tts", "/api/quiz"]
         if any(path.startswith(prefix) for prefix in public_prefixes):
             return await call_next(request)
             
@@ -500,6 +500,11 @@ async def quiz_page(request: Request):
     current_lang = get_current_lang(request)
     ctx = get_base_context(request, current_lang)
     ctx["total_quiz_pool"] = get_quizzes_total_count()
+    # 0ms kechikish uchun dastlabki 20 ta savolni to'g'ridan-to'g'ri HTML shablonga kiritish
+    try:
+        ctx["initial_quizzes"] = get_random_quizzes(count=20, exclude_ids=[], lang=current_lang)
+    except Exception as e:
+        ctx["initial_quizzes"] = []
     return templates.TemplateResponse(
         request=request,
         name="quiz.html",

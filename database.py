@@ -465,8 +465,8 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
     # 3. Format according to requested language
     formatted = []
     for q in results:
-        q_text = q.get(f"question_{lang}") or q["question"]
-        expl_text = q.get(f"explanation_{lang}") or q["explanation"]
+        q_text = (q.get(f"question_{lang}") or q["question"]).replace("\ufffd", '"')
+        expl_text = (q.get(f"explanation_{lang}") or q["explanation"]).replace("\ufffd", '"')
         
         opts_raw = q.get(f"options_{lang}") or q["options"]
         opts = []
@@ -483,6 +483,9 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
                 opts = json.loads(q["options"])
             except Exception:
                 opts = ["Variant A", "Variant B", "Variant C", "Variant D"]
+
+        if isinstance(opts, list):
+            opts = [str(o).replace("\ufffd", '"') for o in opts]
                 
         formatted.append({
             "id": q["id"],

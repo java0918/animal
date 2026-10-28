@@ -108,7 +108,7 @@
 
 {% block extra_scripts %}
 <script>
-let currentQuizSession = [];
+let currentQuizSession = {{ initial_quizzes | tojson if initial_quizzes else '[]' }};
 let currentQuestionIndex = 0;
 let userScore = 0;
 let hasAnsweredCurrent = false;
@@ -171,6 +171,27 @@ async function loadQuizSession() {
         }
     } catch (e) {
         console.error('Quiz session yuklashda xatolik:', e);
+    }
+
+    if (!currentQuizSession || currentQuizSession.length === 0) {
+        currentQuizSession = [
+            {
+                id: 101,
+                question: "Qaysi hayvon yer yuzidagi eng tez yuguruvchi sutemizuvchi hisoblanadi?",
+                options: ["Gepard", "Qoplon", "Jayron", "Bo'ri"],
+                correct: 0,
+                explanation: "Gepard qisqa masofada 110-120 km/soat tezlikka erisha oladi.",
+                category: "Sutemizuvchilar"
+            },
+            {
+                id: 102,
+                question: "O'zbekiston Qizil kitobiga kiritilgan 'Ilvirs' (Qor qoploni) qayerda yashaydi?",
+                options: ["Qizilqum cho'llarida", "Tyan-Shan va Pomir-Oloy baland tog'larida", "Orol dengizi atrofida", "Farg'ona vodiysida"],
+                correct: 1,
+                explanation: "Qor qoploni dengiz sathidan 2500 metrdan baland qoyali tog'larda yashaydi.",
+                category: "Yirtqichlar"
+            }
+        ];
     }
 
     if (card) card.style.opacity = '1';
@@ -258,7 +279,7 @@ function toggleQuizSpeech() {
     if (!q || !q.question) return;
 
     // Matnni o'zbekcha talaffuz uchun tozalash
-    const questionToRead = q.question.replace(//g, '"').replace(/[ʻ‘’`]/g, "'").trim();
+    const questionToRead = q.question.replace(/["“”«»]/g, '"').replace(/[ʻ‘’`]/g, "'").trim();
     if (!questionToRead) return;
 
     stopQuizSpeech();
@@ -355,7 +376,7 @@ function renderQuestion() {
     document.getElementById('questionText').innerText = q.question;
 
     // O'zbekcha ovozli o'qish uchun audio faylni oldindan fon rejimida keshlab qo'yish (0ms kechikish bilan o'ynashi uchun)
-    const cleanQ = (q.question || '').replace(//g, '"').replace(/[ʻ‘’`]/g, "'").trim();
+    const cleanQ = (q.question || '').replace(/["“”«»]/g, '"').replace(/[ʻ‘’`]/g, "'").trim();
     prefetchCurrentQuestionAudio(cleanQ);
 
     // Tovush tugmasi doim faol (har bir savol o'qib beriladi)
@@ -516,7 +537,14 @@ window.addEventListener('beforeunload', () => {
 
 // Boshlang'ich ishga tushirish
 window.addEventListener('DOMContentLoaded', () => {
-    loadQuizSession();
+    if (currentQuizSession && currentQuizSession.length > 0) {
+        currentQuestionIndex = 0;
+        userScore = 0;
+        updateScoreUI();
+        renderQuestion();
+    } else {
+        loadQuizSession();
+    }
 });
 </script>
 {% endblock %}
