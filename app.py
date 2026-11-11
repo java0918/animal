@@ -393,10 +393,11 @@ async def animal_detail(animal_id: int, request: Request):
     if not animal:
         raise HTTPException(status_code=404, detail="Hayvon topilmadi")
         
+    raw_category = animal.get("category", "")
     animal = localize_animal(animal, current_lang)
     conn = get_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM animals WHERE category = ? AND id != ? LIMIT 4", (animal["category"], animal_id))
+    c.execute("SELECT * FROM animals WHERE category = ? AND id != ? ORDER BY RANDOM() LIMIT 4", (raw_category, animal_id))
     similar_rows = [dict(r) for r in c.fetchall()]
     conn.close()
     similar_animals = [localize_animal(a, current_lang) for a in similar_rows]
