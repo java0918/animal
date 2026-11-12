@@ -27,67 +27,36 @@
         <a href="/redbook?status_filter=VU" class="category-pill {% if status_filter == 'VU' %}active{% endif %}">{{ t('filter_vu') }}</a>
     </div>
 
-    <!-- QIZIL KITOB HAYVONLAR KARTALARI -->
-    <div class="animals-grid">
-        {% for a in animals %}
-        <div class="animal-card" style="border-color: rgba(239, 68, 68, 0.35);">
-            
-            <div class="card-image-wrap">
-                <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" class="card-image" loading="lazy">
-                
-                <div class="badge-redbook status-danger">
-                    <span>📕</span>
-                    <span>{{ a.uz_red_book_status }}</span>
-                </div>
+</div>
 
-                <div class="badge-category">{{ a.category }}</div>
-            </div>
-
-            <div class="card-body">
-                <h3 class="animal-title">{{ a.name_uz }}</h3>
-                <div class="animal-latin">{{ a.name_latin }}</div>
-
-                <!-- Muhofaza tafsilotlari -->
-                <div style="background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; padding: 0.85rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 1rem;">
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #fca5a5; text-transform: uppercase;">{{ t('redbook_title') }}:</div>
-                    <p style="font-size: 0.85rem; color: #ffffff; line-height: 1.4; margin-top: 0.2rem;">{{ a.uz_red_book_desc }}</p>
-                    <div style="margin-top: 0.4rem; font-size: 0.78rem; color: #fde047;">
-                        <strong>IUCN:</strong> {{ a.iucn_status }} ({{ a.iucn_desc }})
-                    </div>
-                </div>
-
-                <p class="animal-desc-short">{{ a.description }}</p>
-
-                <div class="card-actions-row">
-                    <button type="button" 
-                            class="btn-sound-play" 
-                            data-sound-type="{{ a.sound_type }}" 
-                            data-sound-file="{{ a.audioUrl or a.sound_file }}"
-                            data-animal-name="{{ a.name_uz }}"
-                            data-animal-latin="{{ a.name_latin }}"
-                            data-animal-img="{{ a.image_url }}"
-                            title="{{ t('listen_sound') }}">
-                        <span class="sound-icon">🔊</span>
-                        <span class="sound-btn-text">{{ t('listen') }}</span>
-                        <div class="sound-waves-indicator"><span></span><span></span><span></span></div>
-                    </button>
-
-                    <a href="/animal/{{ a.id }}" class="btn-detail-link">
-                        <span>{{ t('view_details') }}</span>
-                        <span>→</span>
-                    </a>
-                </div>
-
-            </div>
-
-        </div>
-        {% else %}
-        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: var(--color-bg-card); border-radius: var(--radius-lg);">
-            <p style="color: #ffffff;">{{ t('no_results') }}</p>
-        </div>
-        {% endfor %}
+<!-- QIZIL KITOB HAYVONLARI KO'RGAZMA QATORI -->
+<section class="zoo-showcase-band">
+    <div class="zoo-wave-top">
+        <svg viewBox="0 0 1440 40" preserveAspectRatio="none">
+            <path d="M0,0 L1440,0 L1440,12 C1080,44 360,-4 0,24 Z"></path>
+        </svg>
     </div>
 
+    <div class="zoo-showcase-inner">
+        <div class="zoo-animals-grid">
+            {% for a in animals %}
+            {% include "_animal_card.html" %}
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: rgba(7, 14, 10, 0.85); border-radius: var(--radius-lg);">
+                <p style="color: #ffffff;">{{ t('no_results') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="zoo-wave-bottom">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+            <path d="M0,18 C460,64 980,0 1440,38 L1440,60 L0,60 Z"></path>
+        </svg>
+    </div>
+</section>
+
+<div class="portal-content-wrap">
     <!-- SAHIFALASH (PAGINATION) -->
     {% if total_pages > 1 %}
     <div class="pagination-container">

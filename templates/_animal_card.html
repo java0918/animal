@@ -1,0 +1,41 @@
+<div class="zoo-animal-card">
+    <a href="/animal/{{ a.id }}" class="zoo-card-link" aria-label="{{ a.name_uz }}">
+        <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" class="zoo-card-img" loading="lazy">
+        <div class="zoo-card-scrim"></div>
+
+        {% if a.uz_red_book_status != 'Kiritilmagan' or a.iucn_status in ['CR', 'EN', 'VU'] %}
+        <span class="zoo-status-pill {% if a.uz_red_book_status.startswith('1') or a.iucn_status == 'CR' %}danger{% else %}warn{% endif %}" title="{{ a.uz_red_book_status }}">
+            📕 {{ a.iucn_status }}
+        </span>
+        {% endif %}
+
+        <div class="zoo-card-footer">
+            <h3 class="zoo-card-title">{{ a.name_uz.split('(')[0].strip() }}</h3>
+            <div class="zoo-card-cue">
+                <div class="zoo-paw-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="4" r="1.8"/>
+                        <circle cx="18" cy="8" r="1.8"/>
+                        <circle cx="20" cy="14" r="1.8"/>
+                        <circle cx="5" cy="9" r="1.8"/>
+                        <path d="M9.5 14.5c-1.8 1.5-2.5 3.2-1.5 4.8 1 1.5 3.5 1.2 5.5 0.5 2-.7 3.8-1.5 4-3.3.2-1.8-1.5-3.2-3.5-3.5-1.5-.2-3 .2-4.5 1.5z"/>
+                    </svg>
+                </div>
+                <span class="zoo-arrow-icon">→</span>
+            </div>
+        </div>
+    </a>
+
+    <!-- Yagona Audio Controller tugmasi -->
+    <button type="button"
+            class="btn-sound-play zoo-sound-circle"
+            data-sound-type="{{ a.sound_type }}"
+            data-sound-file="{{ a.audioUrl or a.sound_file }}"
+            data-animal-name="{{ a.name_uz }}"
+            data-animal-latin="{{ a.name_latin }}"
+            data-animal-img="{{ a.image_url }}"
+            title="{{ t('listen_sound') }}">
+        <span class="sound-icon">🔊</span>
+        <span class="sound-btn-text" style="display: none;">{{ t('listen') }}</span>
+    </button>
+</div>

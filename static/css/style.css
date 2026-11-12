@@ -2309,3 +2309,317 @@ a:hover {
     padding: 0 0.4rem;
     font-weight: 700;
 }
+
+
+/* ==========================================================================
+   HAYVONLAR PORTRETLI SHOWCASE KARTALARI (ZOO GALLERY LAYOUT)
+   ========================================================================== */
+.zoo-showcase-band {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #27995b 0%, #37b46e 50%, #238b52 100%);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600' fill='none'%3E%3Cpath d='M-50 120 C 180 40, 320 260, 620 140 C 750 88, 860 190, 920 160' stroke='rgba(255,255,255,0.12)' stroke-width='2'/%3E%3Cpath d='M-40 240 C 210 150, 360 390, 650 240 C 780 175, 840 310, 910 270' stroke='rgba(255,255,255,0.09)' stroke-width='1.5'/%3E%3Cpath d='M-60 400 C 150 310, 380 510, 680 390 C 800 340, 860 440, 940 410' stroke='rgba(255,255,255,0.08)' stroke-width='1.5'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, #27995b 0%, #37b46e 50%, #238b52 100%);
+    background-size: cover;
+    padding: 3.5rem 0 6.5rem;
+    margin: 1.5rem 0 2.5rem;
+    overflow: hidden;
+}
+
+.zoo-wave-top {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.zoo-wave-bottom {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.zoo-wave-top svg,
+.zoo-wave-bottom svg {
+    display: block;
+    width: 100%;
+    height: 54px;
+}
+
+.zoo-wave-top svg path,
+.zoo-wave-bottom svg path {
+    fill: #070e0a;
+}
+
+html[data-theme="light"] .zoo-wave-top svg path,
+html[data-theme="light"] .zoo-wave-bottom svg path {
+    fill: #f1f5f9;
+}
+
+.zoo-showcase-inner {
+    position: relative;
+    z-index: 5;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 0;
+}
+
+.zoo-animals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.65rem;
+}
+
+.zoo-animal-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: #0d1f15;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.zoo-animal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.42);
+}
+
+.zoo-card-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.zoo-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+
+.zoo-animal-card:hover .zoo-card-img {
+    transform: scale(1.06);
+    filter: brightness(0.9);
+}
+
+.zoo-card-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.84) 0%,
+        rgba(0, 0, 0, 0.36) 36%,
+        rgba(0, 0, 0, 0) 68%
+    );
+    pointer-events: none;
+    transition: background 0.3s ease;
+}
+
+.zoo-animal-card:hover .zoo-card-scrim {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.44) 44%,
+        rgba(0, 0, 0, 0.1) 75%
+    );
+}
+
+/* Status pill (top-left, minimalist) */
+.zoo-status-pill {
+    position: absolute;
+    top: 0.95rem;
+    left: 0.95rem;
+    z-index: 4;
+    padding: 0.28rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.zoo-status-pill.danger {
+    background: rgba(220, 38, 38, 0.82);
+    border: 1px solid rgba(248, 113, 113, 0.7);
+}
+
+.zoo-status-pill.warn {
+    background: rgba(217, 119, 6, 0.82);
+    border: 1px solid rgba(251, 191, 36, 0.7);
+}
+
+/* Floating Audio Controller Circle Button (top-right) */
+html[data-theme="light"] .zoo-sound-circle,
+.zoo-sound-circle {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    z-index: 6;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255, 255, 255, 0.52) !important;
+    color: #ffffff !important;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transition: all 0.25s ease;
+}
+
+html[data-theme="light"] .zoo-sound-circle:hover,
+html[data-theme="light"] .zoo-sound-circle.playing,
+.zoo-sound-circle:hover,
+.zoo-sound-circle.playing {
+    background: #10b981 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Bottom Overlay Content (Title on left + Paw Circle & Arrow on right) */
+.zoo-card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    padding: 1.35rem 1.25rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+html[data-theme="light"] .zoo-card-title,
+.zoo-card-title {
+    font-family: var(--font-main);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff !important;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75) !important;
+    max-width: 75%;
+}
+
+.zoo-card-cue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    flex-shrink: 0;
+}
+
+.zoo-paw-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zoo-arrow-icon {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4ade80;
+    line-height: 1;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zoo-animal-card:hover .zoo-paw-badge {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.zoo-animal-card:hover .zoo-arrow-icon {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (hover: none) {
+    .zoo-paw-badge {
+        opacity: 0.9;
+        transform: translateY(0) scale(1);
+        width: 34px;
+        height: 34px;
+    }
+    .zoo-arrow-icon {
+        opacity: 0.95;
+        transform: translateX(0);
+    }
+}
+
+/* Grid Responsive Breakpoints */
+@media (max-width: 1120px) {
+    .zoo-animals-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 780px) {
+    .zoo-showcase-band {
+        padding: 2.5rem 0 4.5rem;
+    }
+    .zoo-animals-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    html[data-theme="light"] .zoo-card-title,
+    .zoo-card-title {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .zoo-showcase-inner {
+        padding: 0.5rem 0.9rem 0;
+    }
+    .zoo-animals-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    .zoo-card-footer {
+        padding: 0.9rem 0.85rem;
+    }
+    .zoo-sound-circle {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        top: 0.65rem;
+        right: 0.65rem;
+    }
+}

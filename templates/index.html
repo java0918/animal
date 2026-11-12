@@ -138,95 +138,42 @@
         </div>
     </div>
 
-    <!-- HAYVONLAR KARTALARI RO'YXATI -->
-    <div class="animals-grid">
-        {% for a in animals %}
-        <div class="animal-card">
-            
-            <div class="card-image-wrap">
-                <img src="{{ a.image_url }}" alt="{{ a.name_uz }}" class="card-image" loading="lazy">
-                
-                <!-- Qizil Kitob Holati Nishoni -->
-                {% if a.uz_red_book_status != 'Kiritilmagan' or a.iucn_status in ['CR', 'EN', 'VU'] %}
-                <div class="badge-redbook {% if a.uz_red_book_status.startswith('1') or a.iucn_status == 'CR' %}status-danger{% else %}status-warning{% endif %}">
-                    <span>📕</span>
-                    <span>
-                        {% if a.uz_red_book_status != 'Kiritilmagan' %}
-                        {{ a.uz_red_book_status }}
-                        {% else %}
-                        IUCN: {{ a.iucn_status }}
-                        {% endif %}
-                    </span>
-                </div>
-                {% else %}
-                <div class="badge-redbook status-safe">
-                    <span>🟢</span>
-                    <span>{{ t('safe_status') }}</span>
-                </div>
-                {% endif %}
+</div>
 
-                <div class="badge-category">{{ a.category }}</div>
-            </div>
-
-            <div class="card-body">
-                <h3 class="animal-title">{{ a.name_uz }}</h3>
-                <div class="animal-latin">{{ a.name_latin }} • {{ a.name_en }}</div>
-                
-                <p class="animal-desc-short">{{ a.description }}</p>
-
-                <!-- O'xshash turidan qanday farqlanishi -->
-                <div class="difference-highlight-box">
-                    <div class="diff-header">
-                        <span>🔬</span>
-                        <span>{{ t('diff_title') }}</span>
-                    </div>
-                    <p class="diff-text">{{ a.differences }}</p>
-                    <button type="button" 
-                            onclick="openDiffModal('{{ a.name_uz }}', `{{ a.differences | replace('`', '') }}`, '{{ a.similar_species }}')"
-                            style="background: none; border: none; color: #4ade80; font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 0; margin-top: 0.3rem;">
-                        {{ t('how_it_differs') }} →
-                    </button>
-                </div>
-
-                <!-- Pastki harakat tugmalari: Audio va Batafsil -->
-                <div class="card-actions-row">
-                    <button type="button" 
-                            class="btn-sound-play" 
-                            data-sound-type="{{ a.sound_type }}" 
-                            data-sound-file="{{ a.audioUrl or a.sound_file }}"
-                            data-animal-name="{{ a.name_uz }}"
-                            data-animal-latin="{{ a.name_latin }}"
-                            data-animal-img="{{ a.image_url }}"
-                            title="{{ t('listen_sound') }}">
-                        <span class="sound-icon">🔊</span>
-                        <span class="sound-btn-text">{{ t('listen') }}</span>
-                        <div class="sound-waves-indicator">
-                            <span></span><span></span><span></span>
-                        </div>
-                    </button>
-
-                    <a href="/animal/{{ a.id }}" class="btn-detail-link">
-                        <span>{{ t('view_details') }}</span>
-                        <span>→</span>
-                    </a>
-                </div>
-
-            </div>
-
-        </div>
-        {% else %}
-        <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: var(--color-bg-card); border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
-            <h3 style="color: #ffffff;">{{ t('no_results') }}</h3>
-            <p style="color: #94a3b8; margin: 0.8rem auto 1.5rem; max-width: 500px;">10,000 talik bazamizda topilmadi. Gemini AI yordamida dunyodagi 1.5 million hayvon bazasidan qidirishingiz mumkin!</p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <a href="/" class="btn-primary">{{ t('cat_all') }}</a>
-                <a href="/ai-chat" class="btn-primary" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">✨ Gemini 1.5M Bazasidan qidirish</a>
-            </div>
-        </div>
-        {% endfor %}
+<!-- YASHIL BOTANIKA VA TO'LQINLI HAYVONLAR KO'RGAZMA QATORI -->
+<section class="zoo-showcase-band">
+    <div class="zoo-wave-top">
+        <svg viewBox="0 0 1440 40" preserveAspectRatio="none">
+            <path d="M0,0 L1440,0 L1440,12 C1080,44 360,-4 0,24 Z"></path>
+        </svg>
     </div>
 
+    <div class="zoo-showcase-inner">
+        <div class="zoo-animals-grid">
+            {% for a in animals %}
+            {% include "_animal_card.html" %}
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: rgba(7, 14, 10, 0.85); backdrop-filter: blur(12px); border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.2);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                <h3 style="color: #ffffff;">{{ t('no_results') }}</h3>
+                <p style="color: #e2e8f0; margin: 0.8rem auto 1.5rem; max-width: 500px;">10,000 talik bazamizda topilmadi. Gemini AI yordamida dunyodagi 1.5 million hayvon bazasidan qidirishingiz mumkin!</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/" class="btn-primary">{{ t('cat_all') }}</a>
+                    <a href="/ai-chat" class="btn-primary" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">✨ Gemini 1.5M Bazasidan qidirish</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="zoo-wave-bottom">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+            <path d="M0,18 C460,64 980,0 1440,38 L1440,60 L0,60 Z"></path>
+        </svg>
+    </div>
+</section>
+
+<div class="portal-content-wrap">
     <!-- SAHIFALASH (PAGINATION) -->
     {% if total_pages > 1 %}
     <div class="pagination-container">
