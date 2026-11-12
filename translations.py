@@ -160,7 +160,7 @@ TRANSLATIONS = {
         # Quiz
         "quiz_hero_badge": "🧠 Interaktiv Biologik Viktorina",
         "quiz_hero_title": "Hayvonlar Farqini Topa Olasizmi?",
-        "quiz_hero_desc": "Akustik tovushlar, biologik belgilar va farqlarni sinab ko'ring. Savolni o'qib berish tugmasini bosishingiz mumkin!",
+        "quiz_hero_desc": "Hayvonot olami, biologik belgilar va turlar o'rtasidagi farqlarni interaktiv viktorina orqali sinab ko'ring.",
         "quiz_question_num": "Savol:",
         "quiz_score": "To'plangan ball:",
         "quiz_listen": "Savolni o'qib berish",
@@ -293,7 +293,7 @@ TRANSLATIONS = {
         # Quiz
         "quiz_hero_badge": "🧠 Interaktiv Biologiyalıq Viktorina",
         "quiz_hero_title": "Haywanlar Parqın Taba Alasızba?",
-        "quiz_hero_desc": "Akustikalıq dawıslar hám biologiyalıq belgilerdi sınań. Sorawdı oqıw túymesin basıwıńız múmkin!",
+        "quiz_hero_desc": "Haywanat álemi, biologiyalıq belgiler hám túrler ortasındaǵı parqlardı interaktiv viktorina arqalı sınap kóriń.",
         "quiz_question_num": "Soraw:",
         "quiz_score": "Jıynaǵan ball:",
         "quiz_listen": "Sorawdı oqıp beriw",
@@ -426,7 +426,7 @@ TRANSLATIONS = {
         # Quiz
         "quiz_hero_badge": "🧠 Интерактивная био-викторина",
         "quiz_hero_title": "Сможете отличить животных?",
-        "quiz_hero_desc": "Проверьте свои знания по биоакустике и анатомическим признакам. Нажмите кнопку, чтобы озвучить вопрос голосом!",
+        "quiz_hero_desc": "Проверьте свои знания о мире животных, биологических признаках и особенностях видов в интерактивной викторине.",
         "quiz_question_num": "Вопрос:",
         "quiz_score": "Набранные баллы:",
         "quiz_listen": "Озвучить вопрос",
@@ -559,7 +559,7 @@ TRANSLATIONS = {
         # Quiz
         "quiz_hero_badge": "🧠 Interactive Wildlife Quiz",
         "quiz_hero_title": "Can You Distinguish Wildlife?",
-        "quiz_hero_desc": "Test your knowledge of acoustic calls, anatomy, and distinct species traits. Click the voice button to hear questions read aloud!",
+        "quiz_hero_desc": "Test your knowledge of wildlife, biological traits, and distinct species features in this interactive quiz.",
         "quiz_question_num": "Question:",
         "quiz_score": "Score:",
         "quiz_listen": "Read Question Aloud",
@@ -692,7 +692,7 @@ TRANSLATIONS = {
         # Quiz
         "quiz_hero_badge": "🧠 Quiz Biologique Interactif",
         "quiz_hero_title": "Pouvez-vous distinguer les animaux ?",
-        "quiz_hero_desc": "Testez vos connaissances en sons réels, anatomie et critères distinctifs. Activez la lecture vocale de la question !",
+        "quiz_hero_desc": "Testez vos connaissances sur la faune, les traits biologiques et les critères distinctifs des espèces.",
         "quiz_question_num": "Question :",
         "quiz_score": "Score :",
         "quiz_listen": "Lire la question à voix haute",
