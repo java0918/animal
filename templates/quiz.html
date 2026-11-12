@@ -2,6 +2,80 @@
 
 {% block title %}{{ t('quiz_hero_title') }} — Zooventure{% endblock %}
 
+{% block extra_head %}
+<style>
+    .quiz-option-btn {
+        width: 100%;
+        text-align: left;
+        padding: 1.05rem 1.4rem;
+        margin-bottom: 0.85rem;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1.5px solid rgba(255, 255, 255, 0.14);
+        border-radius: var(--radius-md);
+        color: #f8fafc;
+        font-size: 0.98rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quiz-option-btn:hover:not(:disabled) {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.14);
+        transform: translateX(4px);
+    }
+
+    .quiz-option-btn:disabled {
+        cursor: default;
+    }
+
+    .quiz-option-btn.correct {
+        background: rgba(16, 185, 129, 0.24) !important;
+        border-color: #10b981 !important;
+        color: #34d399 !important;
+    }
+
+    .quiz-option-btn.incorrect {
+        background: rgba(239, 68, 68, 0.24) !important;
+        border-color: #ef4444 !important;
+        color: #f87171 !important;
+    }
+
+    .quiz-option-btn.dimmed {
+        opacity: 0.52;
+    }
+
+    .quiz-option-letter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #38bdf8;
+    }
+
+    html[data-theme="light"] .quiz-option-letter {
+        background: rgba(16, 185, 129, 0.12);
+        color: #047857;
+    }
+
+    .quiz-option-mark {
+        margin-left: auto;
+        font-size: 1.15rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div class="portal-content-wrap">
@@ -35,21 +109,14 @@
             <div id="quizProgressBar" style="width: 5%; height: 100%; background: linear-gradient(90deg, #10b981, #fbbf24); transition: width 0.4s ease; border-radius: 8px;"></div>
         </div>
 
-        <!-- Savol matni va tovush tinglash -->
+        <!-- Savol matni -->
         <div id="quizQuestionWrap" style="margin-bottom: 2rem;">
-            <div id="categoryBadge" style="display: inline-block; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.25rem 0.75rem; border-radius: 6px; margin-bottom: 0.8rem;">
-                Sutemizuvchilar
+            <div id="categoryBadge" style="display: inline-block; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.25rem 0.75rem; border-radius: 6px; margin-bottom: 0.85rem;">
+                Biologiya
             </div>
-            <h2 id="questionText" style="font-size: 1.35rem; font-weight: 700; color: #ffffff; line-height: 1.5; margin-bottom: 1.2rem;">
+            <h2 id="questionText" style="font-size: 1.38rem; font-weight: 700; color: #ffffff; line-height: 1.5; margin-bottom: 0.5rem;">
                 Savol yuklanmoqda... ⏳
             </h2>
-            <div id="soundCueWrap" style="margin-bottom: 1.2rem; display: block;">
-                <button type="button" id="btnQuizSound" onclick="toggleQuizSpeech()" class="btn-sound-play" style="padding: 0.65rem 1.3rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; border-radius: 30px; font-weight: 600; font-size: 0.9rem;">
-                    <span id="quizSoundIcon">🔊</span>
-                    <span id="quizSoundText">{{ t('quiz_listen') }}</span>
-                    <div id="quizSoundWaves" class="sound-waves-indicator" style="display: none;"><span></span><span></span><span></span></div>
-                </button>
-            </div>
         </div>
 
         <!-- Variantlar -->
@@ -85,7 +152,7 @@
         </p>
 
         <div style="font-size: 2rem; font-weight: 800; color: #34d399; margin-bottom: 0.8rem;">
-            {{ t('quiz_your_score') }} <span id="finalScoreText">0</span> / 20 (<span id="percentText">0%</span>)
+            {{ t('quiz_your_score') }} <span id="finalScoreText">0</span> / <span id="finalTotalText">20</span> (<span id="percentText">0%</span>)
         </div>
 
         <div id="quizRankBadge" style="font-size: 1.15rem; color: #fbbf24; margin-bottom: 2.2rem; font-weight: 700; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 0.6rem 1.4rem; border-radius: 9999px; display: inline-block;">
@@ -108,29 +175,20 @@
 
 {% block extra_scripts %}
 <script>
-let currentQuizSession = {{ initial_quizzes | tojson if initial_quizzes else '[]' }};
+const INITIAL_QUIZ_DATA = {{ (initial_quizzes or []) | tojson }};
+const LABEL_NEXT_BTN = {{ t('quiz_next') | tojson }};
+const LABEL_FINISH_BTN = {{ (t('quiz_finish', "Natijani ko'rish") ~ ' →') | tojson }};
+let currentQuizSession = Array.isArray(INITIAL_QUIZ_DATA) ? INITIAL_QUIZ_DATA : [];
 let currentQuestionIndex = 0;
 let userScore = 0;
 let hasAnsweredCurrent = false;
-let isQuizSpeechActive = false;
-window.CURRENT_SPEECH_LANG = '{{ current_lang or "uz" }}';
-
-// Brauzer ovozlarini oldindan keshga yuklash
-if ('speechSynthesis' in window) {
-    if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
-        window.speechSynthesis.onvoiceschanged = function() {
-            try { window.speechSynthesis.getVoices(); } catch (e) {}
-        };
-    }
-    try { window.speechSynthesis.getVoices(); } catch (e) {}
-}
 
 // 1. Foydalanuvchi ko'rgan savol ID larini localStorage da saqlash (Takrorlanmaslik kafolati)
 function getSeenQuizIds() {
     try {
         const stored = localStorage.getItem('zooventure_seen_quiz_ids');
         return stored ? JSON.parse(stored) : [];
-    } catch(e) {
+    } catch (e) {
         return [];
     }
 }
@@ -146,12 +204,11 @@ function recordSeenQuizId(id) {
             }
             localStorage.setItem('zooventure_seen_quiz_ids', JSON.stringify(seen));
         }
-    } catch(e) {}
+    } catch (e) {}
 }
 
 // 2. Viktorina savollarini serverdan olish
 async function loadQuizSession() {
-    stopQuizSpeech();
     const card = document.getElementById('quizQuestionCard');
     const resultBox = document.getElementById('quizResultBox');
     if (card) {
@@ -164,16 +221,14 @@ async function loadQuizSession() {
     try {
         const res = await fetch('/api/quiz/session?seen_ids=' + encodeURIComponent(seenIds.join(',')));
         const data = await res.json();
-        if (data.success && data.quizzes && data.quizzes.length > 0) {
+        if (data.success && Array.isArray(data.quizzes) && data.quizzes.length > 0) {
             currentQuizSession = data.quizzes;
-        } else {
-            console.warn('Fallback: Bo\'sh viktorina javobi.');
         }
     } catch (e) {
         console.error('Quiz session yuklashda xatolik:', e);
     }
 
-    if (!currentQuizSession || currentQuizSession.length === 0) {
+    if (!Array.isArray(currentQuizSession) || currentQuizSession.length === 0) {
         currentQuizSession = [
             {
                 id: 101,
@@ -185,11 +240,11 @@ async function loadQuizSession() {
             },
             {
                 id: 102,
-                question: "O'zbekiston Qizil kitobiga kiritilgan 'Ilvirs' (Qor qoploni) qayerda yashaydi?",
+                question: "O'zbekiston Qizil kitobiga kiritilgan 'Ilbirs' (Qor qoploni) qayerda yashaydi?",
                 options: ["Qizilqum cho'llarida", "Tyan-Shan va Pomir-Oloy baland tog'larida", "Orol dengizi atrofida", "Farg'ona vodiysida"],
                 correct: 1,
                 explanation: "Qor qoploni dengiz sathidan 2500 metrdan baland qoyali tog'larda yashaydi.",
-                category: "Yirtqichlar"
+                category: "Sutemizuvchilar"
             }
         ];
     }
@@ -203,126 +258,14 @@ async function loadQuizSession() {
 
 function updateScoreUI() {
     const scoreEl = document.getElementById('currentScore');
+    const maxScoreEl = document.getElementById('maxScore');
     if (scoreEl) scoreEl.innerText = userScore;
-}
-
-// --- Ovozli O'qish (Haqiqiy O'zbekcha Neyron Nutq Sintezi) ---
-let currentQuizAudio = null;
-let isQuizSpeechActive = false;
-let isQuizSpeechLoading = false;
-
-function updateQuizSoundUI(state) {
-    const btnSound = document.getElementById('btnQuizSound');
-    const soundText = document.getElementById('quizSoundText');
-    const soundIcon = document.getElementById('quizSoundIcon');
-    const soundWaves = document.getElementById('quizSoundWaves');
-
-    if (state === 'playing') {
-        if (soundText) soundText.innerText = "{{ t('quiz_reading') }}";
-        if (soundIcon) soundIcon.innerText = "⏹️";
-        if (soundWaves) soundWaves.style.display = 'inline-flex';
-        if (btnSound) {
-            btnSound.classList.add('playing');
-            btnSound.style.borderColor = '#38bdf8';
-            btnSound.style.background = 'rgba(56, 189, 248, 0.35)';
-            btnSound.style.boxShadow = '0 0 15px rgba(56, 189, 248, 0.4)';
-        }
-    } else if (state === 'loading') {
-        if (soundText) soundText.innerText = "Ovoz tayyorlanmoqda... ⏳";
-        if (soundIcon) soundIcon.innerText = "⏳";
-        if (soundWaves) soundWaves.style.display = 'none';
-        if (btnSound) {
-            btnSound.classList.remove('playing');
-            btnSound.style.borderColor = '#fbbf24';
-            btnSound.style.background = 'rgba(251, 191, 36, 0.2)';
-            btnSound.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.3)';
-        }
-    } else {
-        if (soundText) soundText.innerText = "{{ t('quiz_listen') }}";
-        if (soundIcon) soundIcon.innerText = "🔊";
-        if (soundWaves) soundWaves.style.display = 'none';
-        if (btnSound) {
-            btnSound.classList.remove('playing');
-            btnSound.style.borderColor = 'rgba(56, 189, 248, 0.35)';
-            btnSound.style.background = 'rgba(56, 189, 248, 0.15)';
-            btnSound.style.boxShadow = 'none';
-        }
-    }
-}
-
-function stopQuizSpeech() {
-    if (currentQuizAudio) {
-        try {
-            currentQuizAudio.pause();
-            currentQuizAudio.currentTime = 0;
-            currentQuizAudio.src = '';
-        } catch (_) {}
-        currentQuizAudio = null;
-    }
-    isQuizSpeechActive = false;
-    isQuizSpeechLoading = false;
-    updateQuizSoundUI('stopped');
-}
-
-function toggleQuizSpeech() {
-    // Agar allaqachon o'qilayotgan yoki yuklanayotgan bo'lsa, bosilganda to'xtatamiz
-    if (isQuizSpeechActive || isQuizSpeechLoading) {
-        stopQuizSpeech();
-        return;
-    }
-
-    if (!currentQuizSession || !currentQuizSession[currentQuestionIndex]) return;
-    const q = currentQuizSession[currentQuestionIndex];
-    if (!q || !q.question) return;
-
-    // Matnni tozalash
-    const questionToRead = (q.question || '').replace(/["“”«»\ufffd]/g, '"').replace(/[ʻ‘’`]/g, "'").trim();
-    if (!questionToRead) return;
-
-    stopQuizSpeech();
-    isQuizSpeechLoading = true;
-    updateQuizSoundUI('loading');
-
-    const lang = window.CURRENT_SPEECH_LANG || 'uz';
-    const audioSrc = (q.audioUrl && q.audioUrl.length > 5)
-        ? q.audioUrl
-        : `/api/tts?quiz_id=${q.id || ''}&text=${encodeURIComponent(questionToRead)}&lang=${encodeURIComponent(lang)}`;
-
-    const audio = new Audio();
-    currentQuizAudio = audio;
-
-    const markPlaying = function() {
-        isQuizSpeechLoading = false;
-        isQuizSpeechActive = true;
-        updateQuizSoundUI('playing');
-    };
-    audio.onplay = markPlaying;
-    audio.onplaying = markPlaying;
-
-    audio.onended = function() {
-        stopQuizSpeech();
-    };
-
-    audio.onerror = function(e) {
-        console.warn('Audio ijrosida xatolik:', e);
-        stopQuizSpeech();
-        const soundText = document.getElementById('quizSoundText');
-        if (soundText) soundText.innerText = "Qaytadan bosing ⚠️";
-        setTimeout(() => { updateQuizSoundUI('stopped'); }, 2000);
-    };
-
-    audio.src = audioSrc;
-    audio.play().catch(function(err) {
-        console.warn('Audio play xatosi:', err);
-        stopQuizSpeech();
-    });
+    if (maxScoreEl) maxScoreEl.innerText = currentQuizSession.length || 20;
 }
 
 // 3. Savolni ekranga chiqarish
 function renderQuestion() {
-    stopQuizSpeech();
-
-    if (!currentQuizSession || currentQuizSession.length === 0) {
+    if (!Array.isArray(currentQuizSession) || currentQuizSession.length === 0) {
         document.getElementById('questionText').innerText = "Viktorina savollari yuklanmoqda...";
         return;
     }
@@ -336,56 +279,36 @@ function renderQuestion() {
     const q = currentQuizSession[currentQuestionIndex];
     const totalQ = currentQuizSession.length;
 
-    // Ko'rgan savollar ro'yxatiga yozish
     recordSeenQuizId(q.id);
 
-    // Savol raqami va progress bar
     document.getElementById('currentQuestionNum').innerText = currentQuestionIndex + 1;
     document.getElementById('totalQuestionsNum').innerText = totalQ;
+    const maxScoreEl = document.getElementById('maxScore');
+    if (maxScoreEl) maxScoreEl.innerText = totalQ;
+
     const progressPercent = ((currentQuestionIndex + 1) / totalQ) * 100;
     document.getElementById('quizProgressBar').style.width = progressPercent + '%';
 
-    // Kategoriya
     const catBadge = document.getElementById('categoryBadge');
     if (catBadge) {
         catBadge.innerText = q.category || "Biologiya";
     }
 
-    // Savol matni
     document.getElementById('questionText').innerText = q.question;
-
-    // O'zbekcha ovozli o'qish uchun audio faylni oldindan fon rejimida keshlab qo'yish (0ms kechikish bilan o'ynashi uchun)
-    const cleanQ = (q.question || '').replace(/["“”«»]/g, '"').replace(/[ʻ‘’`]/g, "'").trim();
-
-    // Tovush tugmasi doim faol (har bir savol o'qib beriladi)
-    const soundWrap = document.getElementById('soundCueWrap');
-    if (soundWrap) {
-        soundWrap.style.display = 'block';
-    }
-
-    // Navbatdagi savol audiosini oldindan keshga yuklab qo'yish (Bosilganda bir zumda yangrashi uchun)
-    if (q.audioUrl) {
-        try {
-            const preloader = new Audio();
-            preloader.src = q.audioUrl;
-            preloader.preload = 'auto';
-        } catch (_) {}
-    }
 
     // Variantlar
     const optionsWrap = document.getElementById('quizOptionsWrap');
     optionsWrap.innerHTML = '';
 
     const letters = ['A', 'B', 'C', 'D'];
-    q.options.forEach((optText, idx) => {
+    (q.options || []).forEach((optText, idx) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'quiz-option-btn';
-        btn.style.cssText = "width: 100%; text-align: left; padding: 1rem 1.4rem; margin-bottom: 0.8rem; background: rgba(15, 23, 42, 0.7); border: 1.5px solid var(--color-border-light); border-radius: var(--radius-md); color: #ffffff; font-size: 0.95rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 1rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);";
 
         const letterSpan = document.createElement('span');
-        letterSpan.style.cssText = "display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); font-weight: 700; font-size: 0.85rem; color: #38bdf8;";
-        letterSpan.innerText = letters[idx];
+        letterSpan.className = 'quiz-option-letter';
+        letterSpan.innerText = letters[idx] || String(idx + 1);
 
         const textSpan = document.createElement('span');
         textSpan.innerText = optText;
@@ -393,38 +316,26 @@ function renderQuestion() {
         btn.appendChild(letterSpan);
         btn.appendChild(textSpan);
 
-        btn.onmouseover = function() {
-            if (!hasAnsweredCurrent) {
-                btn.style.borderColor = '#10b981';
-                btn.style.background = 'rgba(16, 185, 129, 0.12)';
-                btn.style.transform = 'translateX(4px)';
-            }
-        };
-        btn.onmouseout = function() {
-            if (!hasAnsweredCurrent) {
-                btn.style.borderColor = 'var(--color-border-light)';
-                btn.style.background = 'rgba(15, 23, 42, 0.7)';
-                btn.style.transform = 'none';
-            }
-        };
-
-        btn.onclick = function() {
+        btn.addEventListener('click', function() {
             handleAnswer(idx);
-        };
+        });
 
         optionsWrap.appendChild(btn);
     });
 
     // Izoh va tugmani yashirish
     document.getElementById('quizExplanationBox').style.display = 'none';
-    document.getElementById('btnNextQuestion').style.display = 'none';
+    const btnNext = document.getElementById('btnNextQuestion');
+    if (btnNext) {
+        btnNext.style.display = 'none';
+        btnNext.innerText = (currentQuestionIndex === totalQ - 1) ? LABEL_FINISH_BTN : LABEL_NEXT_BTN;
+    }
 }
 
 // 4. Javobni tekshirish
 function handleAnswer(selectedIndex) {
     if (hasAnsweredCurrent) return;
     hasAnsweredCurrent = true;
-    stopQuizSpeech();
 
     const q = currentQuizSession[currentQuestionIndex];
     const optionBtns = document.getElementById('quizOptionsWrap').querySelectorAll('button');
@@ -436,24 +347,26 @@ function handleAnswer(selectedIndex) {
     }
 
     optionBtns.forEach((btn, idx) => {
-        btn.style.cursor = 'default';
-        btn.style.transform = 'none';
+        btn.disabled = true;
         if (idx === q.correct) {
-            btn.style.background = 'rgba(16, 185, 129, 0.25)';
-            btn.style.borderColor = '#10b981';
-            btn.style.color = '#34d399';
-            btn.innerHTML += ' <span style="margin-left: auto; font-size: 1.1rem; color: #10b981;">✓</span>';
+            btn.classList.add('correct');
+            const mark = document.createElement('span');
+            mark.className = 'quiz-option-mark';
+            mark.style.color = '#10b981';
+            mark.innerText = '✓';
+            btn.appendChild(mark);
         } else if (idx === selectedIndex && !isCorrect) {
-            btn.style.background = 'rgba(239, 68, 68, 0.25)';
-            btn.style.borderColor = '#ef4444';
-            btn.style.color = '#f87171';
-            btn.innerHTML += ' <span style="margin-left: auto; font-size: 1.1rem; color: #ef4444;">✕</span>';
+            btn.classList.add('incorrect');
+            const mark = document.createElement('span');
+            mark.className = 'quiz-option-mark';
+            mark.style.color = '#ef4444';
+            mark.innerText = '✕';
+            btn.appendChild(mark);
         } else {
-            btn.style.opacity = '0.5';
+            btn.classList.add('dimmed');
         }
     });
 
-    // Izohni ko'rsatish
     const explBox = document.getElementById('quizExplanationBox');
     const explText = document.getElementById('explanationText');
     if (explBox && explText) {
@@ -461,7 +374,6 @@ function handleAnswer(selectedIndex) {
         explBox.style.display = 'block';
     }
 
-    // Keyingi savol tugmasi
     const btnNext = document.getElementById('btnNextQuestion');
     if (btnNext) {
         btnNext.style.display = 'inline-flex';
@@ -471,14 +383,12 @@ function handleAnswer(selectedIndex) {
 
 // 5. Keyingi savol
 function nextQuestion() {
-    stopQuizSpeech();
     currentQuestionIndex++;
     renderQuestion();
 }
 
 // 6. Natijalarni ko'rsatish
 function showResults() {
-    stopQuizSpeech();
     document.getElementById('quizQuestionCard').style.display = 'none';
     const resultBox = document.getElementById('quizResultBox');
     resultBox.style.display = 'block';
@@ -487,20 +397,21 @@ function showResults() {
     const percent = Math.round((userScore / total) * 100);
 
     document.getElementById('finalScoreText').innerText = userScore;
+    document.getElementById('finalTotalText').innerText = total;
     document.getElementById('percentText').innerText = percent + '%';
 
     const medalEl = document.getElementById('resultMedal');
     const badgeEl = document.getElementById('quizRankBadge');
 
-    if (userScore >= 18) {
+    if (percent >= 90) {
         medalEl.innerText = '🏆';
         badgeEl.innerText = "🌟 Oliy Toifali Zoolog-Ekspert (Mukammal Natija!)";
         badgeEl.style.color = '#34d399';
-    } else if (userScore >= 14) {
+    } else if (percent >= 70) {
         medalEl.innerText = '🥇';
         badgeEl.innerText = "🌿 Mohir Tabiatshunos Tadqiqotchi!";
         badgeEl.style.color = '#4ade80';
-    } else if (userScore >= 10) {
+    } else if (percent >= 50) {
         medalEl.innerText = '🥈';
         badgeEl.innerText = "🐾 Yosh Zoologiya Havaskori!";
         badgeEl.style.color = '#fbbf24';
@@ -513,25 +424,30 @@ function showResults() {
 
 // 7. Qayta boshlash
 function restartQuiz() {
-    stopQuizSpeech();
     loadQuizSession();
 }
 
-// Sahifadan chiqib ketilganda ovozni o'chirish
-window.addEventListener('beforeunload', () => {
-    stopQuizSpeech();
-});
-
 // Boshlang'ich ishga tushirish
-window.addEventListener('DOMContentLoaded', () => {
-    if (currentQuizSession && currentQuizSession.length > 0) {
-        currentQuestionIndex = 0;
-        userScore = 0;
-        updateScoreUI();
-        renderQuestion();
-    } else {
+function initQuizPage() {
+    try {
+        if (Array.isArray(currentQuizSession) && currentQuizSession.length > 0) {
+            currentQuestionIndex = 0;
+            userScore = 0;
+            updateScoreUI();
+            renderQuestion();
+        } else {
+            loadQuizSession();
+        }
+    } catch (err) {
+        console.error('Viktorina ishga tushirish xatosi:', err);
         loadQuizSession();
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQuizPage);
+} else {
+    initQuizPage();
+}
 </script>
 {% endblock %}

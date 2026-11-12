@@ -438,38 +438,36 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
             except (ValueError, TypeError):
                 pass
                 
-    results = []
-    # 1. Ovozli tayyor savollardan (1-50 oralig'i) foydalanuvchi hali ko'rmaganlarini tanlash (0ms audio ijro)
+    # 1. Foydalanuvchi hali ko'rmagan savollardan barcha 1000 ta bank bo'ylab tasodifiy tanlash
     results = []
     if exclude_clean:
         placeholders = ",".join(["?"] * len(exclude_clean))
-        cursor.execute(f"SELECT * FROM quizzes WHERE id BETWEEN 1 AND 50 AND id NOT IN ({placeholders}) ORDER BY RANDOM() LIMIT ?", (*exclude_clean, count))
+        cursor.execute(f"SELECT * FROM quizzes WHERE id NOT IN ({placeholders}) ORDER BY RANDOM() LIMIT ?", (*exclude_clean, count))
         results = [dict(r) for r in cursor.fetchall()]
     else:
-        cursor.execute("SELECT * FROM quizzes WHERE id BETWEEN 1 AND 50 ORDER BY RANDOM() LIMIT ?", (count,))
+        cursor.execute("SELECT * FROM quizzes ORDER BY RANDOM() LIMIT ?", (count,))
         results = [dict(r) for r in cursor.fetchall()]
-        
-    # 2. Agar 1-50 dagi savollar 20 tadan kam bo'lsa (foydalanuvchi ko'pini yechgan bo'lsa), qolgan 1000 ta bankdan to'ldirish
+
+    # 2. Agar ko'rilmagan savollar 20 tadan kam bo'lsa, qolgan bazadan to'ldirish
     if len(results) < count:
         needed = count - len(results)
         chosen_ids = [r["id"] for r in results]
-        all_exclude = set(exclude_clean + chosen_ids)
-        if all_exclude:
-            sub_placeholders = ",".join(["?"] * len(all_exclude))
-            cursor.execute(f"SELECT * FROM quizzes WHERE id NOT IN ({sub_placeholders}) ORDER BY RANDOM() LIMIT ?", (*list(all_exclude), needed))
+        if chosen_ids:
+            sub_placeholders = ",".join(["?"] * len(chosen_ids))
+            cursor.execute(f"SELECT * FROM quizzes WHERE id NOT IN ({sub_placeholders}) ORDER BY RANDOM() LIMIT ?", (*chosen_ids, needed))
         else:
             cursor.execute("SELECT * FROM quizzes ORDER BY RANDOM() LIMIT ?", (needed,))
         for r in cursor.fetchall():
             results.append(dict(r))
-            
+
     conn.close()
-    
+
     # 3. Format according to requested language
     formatted = []
     for q in results:
         q_text = (q.get(f"question_{lang}") or q["question"]).replace("\ufffd", '"')
         expl_text = (q.get(f"explanation_{lang}") or q["explanation"]).replace("\ufffd", '"')
-        
+
         opts_raw = q.get(f"options_{lang}") or q["options"]
         opts = []
         if isinstance(opts_raw, str):
@@ -479,7 +477,7 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
                 opts = []
         elif isinstance(opts_raw, list):
             opts = opts_raw
-            
+
         if not opts:
             try:
                 opts = json.loads(q["options"])
@@ -488,25 +486,8 @@ def get_random_quizzes(count: int = 20, exclude_ids: Optional[List[int]] = None,
 
         if isinstance(opts, list):
             opts = [str(o).replace("\ufffd", '"') for o in opts]
-                
-        # Avtomatik o'zbekcha audio manzilini ulash
-        audio_url = q.get("audio_url", "")
-        if not audio_url:
-            quiz_id = q["id"]
-            try:
-                qid_int = int(quiz_id)
-            except Exception:
-                qid_int = 0
-            if 1 <= qid_int <= 50:
-                audio_url = f"/static/audio/quiz/quiz_{quiz_id}.mp3"
-            else:
-                static_audio = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "audio", "quiz", f"quiz_{quiz_id}.mp3")
-                if os.path.exists(static_audio):
-                    audio_url = f"/static/audio/quiz/quiz_{quiz_id}.mp3"
-                else:
-                    import urllib.parse
-                    audio_url = f"/api/tts?quiz_id={quiz_id}&text={urllib.parse.quote(q_text)}&lang={lang}"
 
+        audio_url = q.get("audio_url", "")
         formatted.append({
             "id": q["id"],
             "question": q_text,
